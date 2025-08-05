@@ -42,7 +42,7 @@ export default function Home() {
           {siteData.mainService.map((item, index) => (
             <div className="space-y-6" key={index}>
               <div className="aspect-[2/1] bg-gray-200 w-full overflow-hidden rounded-2xl relative">
-                <Image src={item.image} width={200} height={200} alt="logo" className="object-cover size-full" />
+                <Image src={item.image} width={800} height={800} alt="logo" className="object-cover size-full" />
               </div>
               <div className="space-y-4">
                 <h1 className="text-3xl">{item.title}</h1>
