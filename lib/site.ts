@@ -10,7 +10,11 @@ export const siteConfig = {
     },
     {
       label: "Үйлчилгээ",
-      href: "/docs",
+      href: "/service",
+    },
+    {
+      label: "Бидний тухай",
+      href: "/about",
     },
   ],
   navMenuItems: [

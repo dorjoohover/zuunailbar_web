@@ -4,6 +4,7 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { ChevronRight, Handbag, PhoneCall } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -54,15 +55,14 @@ export default function Home() {
         </div>
       </section>
       <section className="border-gray-200 border-y-1">
-        <div className="container grid grid-cols-4 py-16 gap-y-20">
+        <div className="container grid grid-cols-4 py-8 gap-y-1 gap-x-8">
           {siteData.detailService.map((item, index) => (
-            <div key={index} className="flex flex-col items-center justify-center gap-6 text-center">
-              <div className="bg-gray-200 rounded-3xl size-24 aspect-square flex-center">{item.icon ? <item.icon className="size-8" /> : <span className="text-xs text-gray-400">No Icon</span>}</div>
-              <div className="space-y-2">
+            <Link href={item.title} key={index}>
+              <div className="flex flex-col items-center justify-center py-12 text-center duration-200 group outline-gray-200 hover:outline rounded-3xl gap-y-5">
+                <div className="duration-200 bg-gray-200 rounded-3xl size-24 aspect-square flex-center group-hover:bg-primary-pink">{item.icon ? <item.icon className="size-8" /> : <span className="text-xs text-gray-400">No Icon</span>}</div>
                 <h3 className="text-xl">{item.title}</h3>
-                {/* <p className="text-sm text-gray-500">Lorem ipsum dolor sit </p> */}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
