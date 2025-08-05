@@ -1,18 +1,19 @@
 import { Counter } from "@/components/counter";
 import { siteData } from "@/lib/constants";
 import { Button } from "@heroui/button";
+import { Input } from "@heroui/input";
 import { ChevronRight, Handbag, PhoneCall } from "lucide-react";
 import Image from "next/image";
 
 export default function Home() {
   return (
     <>
-    {/* bg-[url('/images/grid-bg.png')] bg-[url('/images/background.png')]  */}
+      {/* bg-[url('/images/grid-bg.png')] bg-[url('/images/background.png')]  */}
       <div className="bg-no-repeat bg-cover">
         <section className="container py-10 pb-0 ">
           <div className="flex h-full gap-4">
             <div className="h-[500px] basis-3/5 bg-no-repeat bg-cover relative overflow-hidden rounded-4xl">
-              <Image src={"/images/nail/1.png"} width={1200} height={400} className="z-0 object-cover h-full" alt="" /> 
+              <Image src={"/images/nail/1.png"} width={1200} height={400} className="z-0 object-cover h-full" alt="" />
               {/* <div className="absolute inset-0 z-10 bg-diagonal-fade"></div> */}
             </div>
             <div className="h-[500px] relative overflow-hidden basis-2/5 rounded-4xl">
@@ -63,6 +64,17 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+      <section className="h-[70vh] bg-dark w-full"></section>
+      <section className="py-24 bg-gray-200 flex-center">
+        <div className="flex flex-col items-center w-full max-w-xl p-10 pb-20 bg-white rounded-2xl gap-y-3">
+          <h1 className="text-3xl">Join our newsletter</h1>
+          <h1>We'll send you a nice letter once per week. No spam.</h1>
+          <div className="flex items-center h-12 mt-2 gap-x-2">
+            <Input size="lg" className="h-full rounded-lg" placeholder="Your e-mail" />
+            <Button className="h-full px-10 rounded-lg bg-primary-pink">Subscribe</Button>
+          </div>
         </div>
       </section>
       <section className="bg-dark">

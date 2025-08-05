@@ -8,6 +8,7 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/lib/site";
 import { fontSans } from "@/lib/fonts";
 import { Navbar } from "@/components/navbar";
+import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: {
@@ -36,12 +37,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="">
             <Navbar />
             {children}
-            <footer className="flex items-center justify-center w-full py-3">
+            <Footer />
+            <div className="flex items-center justify-center w-full py-10">
               <Link isExternal className="flex items-center gap-1 text-current" href="https://heroui.com?utm_source=next-app-template" title="heroui.com homepage">
-                <span className="text-default-600">Powered by</span>
-                <p className="text-primary">HeroUI</p>
+                <span className="text-dark-100">© 2025 Zu Nailbar by</span>
+                <p className="">Lorem</p>
+                <span className="text-dark-100">| All Rigth Reserved</span>
               </Link>
-            </footer>
+            </div>
           </main>
         </Providers>
       </body>

@@ -22,12 +22,26 @@ const config = {
           100: "#6f7675",
           200: "#3a3a3a",
           DEFAULT: "#191919",
-        }
+        },
       },
     },
   },
   darkMode: "class",
-  plugins: [heroui()],
+  plugins: [
+    heroui(),
+    function ({ addUtilities }) {
+      addUtilities({
+        ".mask-image-custom": {
+          "-webkit-mask-image": "url('/masks/image-mask.svg')",
+          "-webkit-mask-repeat": "no-repeat",
+          "-webkit-mask-size": "cover",
+          "mask-image": "url('/masks/image-mask.svg')",
+          "mask-repeat": "no-repeat",
+          "mask-size": "cover",
+        },
+      });
+    },
+  ],
 };
 
 module.exports = config;

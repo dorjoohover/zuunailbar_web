@@ -1,4 +1,4 @@
-import { BookMarked, Handbag, Sparkle, Tag } from "lucide-react";
+import { BookMarked, Facebook, Handbag, Instagram, Mail, Sparkle, Tag } from "lucide-react";
 
 export const siteData = {
   features: [
@@ -75,6 +75,20 @@ export const siteData = {
       title: "Арилгалт",
       description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
       icon: Handbag,
+    },
+  ],
+  footerLinks: [
+    {
+      icon: Facebook,
+      url: "https://www.facebook.com/zunailbar",
+    },
+    {
+      icon: Instagram,
+      url: "https://www.facebook.com/zunailbar",
+    },
+    {
+      icon: Mail,
+      url: "https://www.facebook.com/zunailbar",
     },
   ],
 };
