@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+
+@import "tailwindcss";
+
+@utility flex-center {
+  @apply flex items-center justify-center;
+}
+
+@utility col-center {
+  @apply flex flex-col items-center justify-center;
+}
+
+/* @utility container {
+  @apply px-4 mx-auto max-w-7xl sm:px-6 lg:px-8;
+} */
+ 
+@utility container {
+ @apply flex-grow px-6 pt-16 mx-auto max-w-7xl;
+}
+
+body {
+    font-family: "Exo 2", sans-serif;
+  font-optical-sizing: auto;
+}
+
+@utility admin-container {
+  @apply w-full p-4 pt-2 space-y-5;
+}
+
+@config "../tailwind.config.js";
