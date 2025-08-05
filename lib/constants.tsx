@@ -27,12 +27,12 @@ export const siteData = {
     {
       title: "Маникюр",
       description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
-      image: "/images/manicure.png",
+      image: "/images/nail/1.png",
     },
     {
       title: "Педикюр",
       description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
-      image: "/images/pedicure.png",
+      image: "/images/nail/2.png",
     },
   ],
   detailService: [

@@ -10,12 +10,12 @@ export default function Home() {
       <div className="bg-[url('/images/grid-bg.png')] bg-[url('/images/background.png')] bg-cover bg-no-repeat">
         <section className="container py-10 pb-0 ">
           <div className="flex h-full gap-4">
-            <div className="min-h-[640px] basis-3/5 bg-no-repeat bg-cover relative overflow-hidden rounded-4xl">
-              {/* <Image src={""} width={1200} height={600} className="z-0 object-cover size-full" alt="" />  */}
+            <div className="h-[500px] basis-3/5 bg-no-repeat bg-cover relative overflow-hidden rounded-4xl">
+              <Image src={"/images/nail/1.png"} width={1200} height={400} className="z-0 object-cover h-full" alt="" /> 
               <div className="absolute inset-0 z-10 bg-diagonal-fade"></div>
             </div>
-            <div className="min-h-[640px] relative basis-2/5 overflow-hidden rounded-4xl">
-              {/* <Image src={""} width={1200} height={600} className="z-0 object-cover size-full" alt="" /> */}
+            <div className="h-[500px] relative overflow-hidden basis-2/5 rounded-4xl">
+              <Image src={"/images/nail/2.png"} width={1200} height={400} className="z-0 object-cover h-full" alt="" />
               <div className="absolute inset-0 z-10 bg-diagonal-fade"></div>
             </div>
           </div>
