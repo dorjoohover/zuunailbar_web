@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html suppressHydrationWarning lang="en">
       <head />
-      <body className={clsx("min-h-screen text-foreground bg-background font-sans antialiased", fontSans.variable)}>
+      <body className={clsx("min-h-screen text-foreground bg-background font-sans antialiased scroll-smooth ", fontSans.variable)}>
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <main className="">
             <Navbar />
