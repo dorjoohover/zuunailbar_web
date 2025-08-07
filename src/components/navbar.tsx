@@ -63,7 +63,7 @@ export const Navbar = () => {
   return (
     <div className="flex justify-center w-full">
       <div className={clsx("container fixed mx-auto flex justify-center z-50 py-0 top-3 transition-transform duration-300", show ? "translate-y-0" : "-translate-y-full")}>
-        <HeroUINavbar maxWidth="xl" className="flex justify-center mx-auto bg-no-repeat bg-cover border border-gray-200 rounded-full shadow bg-white/100">
+        <HeroUINavbar maxWidth="xl" className="flex justify-center mx-auto bg-no-repeat bg-cover rounded-full bg-[#101318]/80">
           <NavbarContent className="basis-1/5" justify="start">
             <Link href="/" className="flex justify-start sm:hidden">
             <Image src="/images/logo-black.png" alt="logo" width={100} height={100} className="object-contain w-auto h-8" />
@@ -71,7 +71,7 @@ export const Navbar = () => {
             <ul className="justify-center hidden gap-4 ml-2 sm:flex">
               {siteConfig.navItems.map((item) => (
                 <NavbarItem key={item.href}>
-                  <NextLink className={clsx(linkStyles({ color: "foreground" }), "data-[active=true]:text-primary font-medium data-[active=true]:font-medium")} color="foreground" href={item.href}>
+                  <NextLink className={clsx(linkStyles({ color: "foreground" }), "data-[active=true]:text-primary font-medium data-[active=true]:font-medium text-slate-300 px-4 text-sm")} color="foreground" href={item.href}>
                     {item.label}
                   </NextLink>
                 </NavbarItem>
@@ -80,7 +80,7 @@ export const Navbar = () => {
           </NavbarContent>
           <NavbarContent className="hidden basis-1/5 sm:flex" justify="center">
             <NavbarBrand as="li" className="gap-3 max-w-fit">
-              <Image src="/images/logo-black.png" alt="logo" width={100} height={100} className="object-contain h-10" />
+              <Image src="/images/logo-white.png" alt="logo" width={100} height={100} className="object-contain h-10" />
               <NextLink className="flex flex-col items-center justify-center gap-1" href="/"></NextLink>
             </NavbarBrand>
           </NavbarContent>

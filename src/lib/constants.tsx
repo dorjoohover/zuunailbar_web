@@ -1,26 +1,26 @@
-import { BookMarked, Facebook, Handbag, Instagram, Mail, Sparkle, Tag } from "lucide-react";
+import { Bubbles, Component, Facebook, Handbag, Instagram, Mail, Smartphone, Sparkles } from "lucide-react";
 
 export const siteData = {
   features: [
     {
-      title: "Нүүр",
-      icon: BookMarked,
-      description: "asdasdasd",
+      title: "Мэргэжлийн мастерууд",
+      icon: Sparkles,
+      description: "Туршлагатай мэргэжилтнүүд таны гоо сайхныг хариуцна",
     },
     {
-      title: "Нүүр",
-      icon: Handbag,
-      description: "asdasdasd",
+      title: "Цэвэр орчин",
+      icon: Bubbles,
+      description: "Ариутгал, эрүүл ахуйн стандартыг бүрэн хангасан тав тухтай орчин",
     },
     {
-      title: "Нүүр",
-      icon: Tag,
-      description: "asdasdasd",
+      title: "Өргөн сонголт, загварууд",
+      icon: Component,
+      description: "Олон төрлийн дезайнуудаас сонгох боломжтой",
     },
     {
-      title: "Нүүр",
-      icon: Sparkle,
-      description: "asdasdasd",
+      title: "Онлайн захиалга",
+      icon: Smartphone,
+      description: "Ухаалаг утсаараа цаг захиалаад үйлчлүүлээрэй",
     },
   ],
   mainService: [

@@ -65,8 +65,8 @@ export const products = [
 
 export default function HeroSection() {
   return (
-    <div className="bg-no-repeat bg-cover bg-center bg-[url('/bg/gradient-bg.png')">
-      <HeroParallax products={products} />;
+    <div className="bg-no-repeat bg-cover">
+      <HeroParallax products={products} />
       {/* <section className="container py-10 pb-0 ">
         <div className="flex h-full gap-4">
           <div className="h-[500px] basis-3/5 bg-no-repeat bg-cover relative rounded-4xl ">
@@ -78,19 +78,7 @@ export default function HeroSection() {
           </div>
         </div>
       </section>*/}
-      <section className="border-b border-gray-200">
-        <div className="container grid grid-cols-4 py-16 divide-gray-700 divide-x-1">
-          {siteData.features.map((item, index) => (
-            <div key={index} className="justify-center gap-6 text-center text-white col-center">
-              <div className="text-white bg-[url('/images/glass-frame.png')] bg-no-repeat bg-cover rounded-3xl size-18 aspect-square flex-center shadow-sm">{item.icon ? <item.icon className="" strokeWidth={"1.5px"} /> : <span className="text-xs ">No Icon</span>}</div>
-              <div className="space-y-2">
-                <h3 className="text-xl">Lorem, ipsum.</h3>
-                <p className="text-sm text-gray-500">Lorem ipsum dolor sit </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section> 
+
     </div>
   );
 }

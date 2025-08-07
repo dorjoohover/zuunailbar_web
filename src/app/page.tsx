@@ -1,4 +1,5 @@
 import { Counter } from "@/components/counter";
+import FeatureSection from "@/components/FeatureSection";
 import HeroSection from "@/components/HeroSection";
 import { siteData } from "@/lib/constants";
 import { Button } from "@heroui/button";
@@ -12,36 +13,8 @@ export default function Home() {
     <>
       {/* bg-[url('/images/grid-bg.png')] bg-[url('/images/background.png')]  */}
       {/* bg-[#111315] */}
-    <HeroSection/>
-      <section className="container py-16">
-        <h1 className="text-5xl">Бид юу хийдэг вэ?</h1>
-        <div className="grid grid-cols-2 gap-10 mt-10">
-          {siteData.mainService.map((item, index) => (
-            <div className="space-y-6" key={index}>
-              <div className="aspect-[2/1] bg-gray-200 w-full overflow-hidden rounded-2xl relative">
-                <Image src={item.image} width={800} height={800} alt="logo" className="object-cover size-full" />
-              </div>
-              <div className="space-y-4">
-                <h1 className="text-3xl">{item.title}</h1>
-                <p className="text-gray-500">{item.description}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section className="border-gray-200 border-y-1">
-        <div className="container grid grid-cols-4 py-8 gap-y-1 gap-x-8">
-          {siteData.detailService.map((item, index) => (
-            <Link href={item.title} key={index}>
-              <div className="flex flex-col items-center justify-center py-12 text-center duration-200 group outline-gray-200 hover:outline rounded-3xl gap-y-5">
-                <div className="duration-200 bg-gray-200 rounded-3xl size-24 aspect-square flex-center group-hover:bg-primary-pink">{item.icon ? <item.icon className="size-8" /> : <span className="text-xs text-gray-400">No Icon</span>}</div>
-                <h3 className="text-xl">{item.title}</h3>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-      <section className="h-[70vh] bg-dark w-full"></section>
+      <HeroSection />
+      <FeatureSection />
       <section className="py-24 bg-gray-200 flex-center">
         <div className="flex flex-col items-center w-full max-w-xl p-10 pb-20 bg-white rounded-2xl gap-y-3">
           <h1 className="text-3xl">Join our newsletter</h1>
@@ -65,7 +38,7 @@ export default function Home() {
           </div>
           <div className="col-span-1">
             {/* <div className="w-64 h-64 mask-[url('/masks/corner-mask.svg')] mask-size-cover"> */}
-              {/* <img src="/your-image.jpg" alt="image" className="object-cover w-full h-full" /> */}
+            {/* <img src="/your-image.jpg" alt="image" className="object-cover w-full h-full" /> */}
             {/* </div> */}
           </div>
           <div className="space-y-5">
@@ -75,6 +48,7 @@ export default function Home() {
               Холбогдох
               <ChevronRight className="size-3" />
             </Button>
+            <div className="mask-clip-content border-3 p-1.5 mask-[url(/masks/image-mask.svg)] bg-[url(/images/manicure.png)]"></div>
           </div>
         </div>
       </section>
