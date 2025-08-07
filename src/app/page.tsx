@@ -1,4 +1,5 @@
 import { Counter } from "@/components/counter";
+import HeroSection from "@/components/HeroSection";
 import { siteData } from "@/lib/constants";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
@@ -10,34 +11,8 @@ export default function Home() {
   return (
     <>
       {/* bg-[url('/images/grid-bg.png')] bg-[url('/images/background.png')]  */}
-      <div className="bg-no-repeat bg-cover">
-        <section className="container py-10 pb-0 ">
-          <div className="flex h-full gap-4">
-            <div className="h-[500px] basis-3/5 bg-no-repeat bg-cover relative overflow-hidden rounded-4xl">
-              <Image src={"/images/nail/1.png"} width={1200} height={400} className="z-0 object-cover h-full" alt="" />
-              {/* <div className="absolute inset-0 z-10 bg-diagonal-fade"></div> */}
-            </div>
-            <div className="h-[500px] relative overflow-hidden basis-2/5 rounded-4xl">
-              <Image src={"/images/nail/2.png"} width={1200} height={400} className="z-0 object-cover h-full" alt="" />
-              {/* <div className="absolute inset-0 z-10 bg-diagonal-fade"></div> */}
-            </div>
-          </div>
-        </section>
-        <section className="border-b border-gray-200">
-          <div className="container grid grid-cols-4 py-16 divide-gray-200 divide-x-1">
-            {siteData.features.map((item, index) => (
-              <div key={index} className="justify-center gap-6 text-center col-center">
-                <div className="border-2 rounded-xl size-18 aspect-square flex-center">{item.icon ? <item.icon className="" /> : <span className="text-xs text-gray-400">No Icon</span>}</div>
-                <div className="space-y-2">
-                  <h3 className="text-xl">Lorem, ipsum.</h3>
-                  <p className="text-sm text-gray-500">Lorem ipsum dolor sit </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
+      {/* bg-[#111315] */}
+    <HeroSection/>
       <section className="container py-16">
         <h1 className="text-5xl">Бид юу хийдэг вэ?</h1>
         <div className="grid grid-cols-2 gap-10 mt-10">
@@ -89,9 +64,9 @@ export default function Home() {
             </div>
           </div>
           <div className="col-span-1">
-            <div className="w-64 h-64 mask-[url('/masks/corner-mask.svg')] mask-size-cover">
-              <img src="/your-image.jpg" alt="image" className="object-cover w-full h-full" />
-            </div>
+            {/* <div className="w-64 h-64 mask-[url('/masks/corner-mask.svg')] mask-size-cover"> */}
+              {/* <img src="/your-image.jpg" alt="image" className="object-cover w-full h-full" /> */}
+            {/* </div> */}
           </div>
           <div className="space-y-5">
             <h1 className="text-dark-100">Lorem ipsum dolor sit amet.</h1>

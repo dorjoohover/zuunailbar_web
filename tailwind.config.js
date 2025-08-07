@@ -12,6 +12,7 @@ const config = {
       },
       backgroundImage: {
         "diagonal-fade": "linear-gradient(55deg, #202020 20%, rgba(0,0,0,0) 80%)",
+        "text-gradient": "linear-gradient(to right, #5330f1 12.31%, #c585d8 31.82%, #fa4b9a 55.82%, #ff8c6c 74.32%, #ff3800 95.82%)",
       },
       colors: {
         primary: {
