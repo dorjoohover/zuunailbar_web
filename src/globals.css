@@ -32,6 +32,29 @@ box-shadow:  8px 8px 100px #d59daa,
   @apply bg-gradient-to-r from-[#5330f1] via-[#c585d8] via-40% via-[#fa4b9a] via-60% via-[#ff8c6c] to-[#ff3800] bg-clip-text text-transparent;
 }
 
+@keyframes float {
+	0% {
+		filter: drop-shadow(0 5px 15px 0px rgba(0,0,0,0.6));
+		transform: translatey(0px);
+	}
+	50% {
+		filter: drop-shadow(0 5px 15px 0px rgba(0,0,0,0.2));
+		transform: translatey(-20px);
+	}
+	100% {
+		filter: drop-shadow(0 5px 15px 0px rgba(0,0,0,0.6));
+		transform: translatey(0px);
+	}
+}
+.floating-animation {
+	overflow: hidden;
+		filter: drop-shadow(0 5px 15px 0px rgba(0,0,0,0.6));
+	transform: translatey(0px);
+	animation: float 6s ease-in-out infinite;
+	img { width: 100%; height: auto; }
+}
+
+
 @utility flex-center {
   @apply flex items-center justify-center;
 }
