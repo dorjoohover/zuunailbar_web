@@ -38,42 +38,42 @@ export const siteData = {
   detailService: [
     {
       title: "Гелэн будалт",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description: "50'000₮",
       icon: Handbag,
     },
     {
       title: "Смарт хумстай будалт",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description: "50'000₮",
       icon: Handbag,
     },
     {
       title: "Педикюр",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description: "50'000₮",
       icon: Handbag,
     },
     {
       title: "Нөхөлт гар",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description: "50'000₮",
       icon: Handbag,
     },
     {
       title: "Нөхөлт хөл",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description: "50'000₮",
       icon: Handbag,
     },
     {
       title: "Арилгалт",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description: "50'000₮",
       icon: Handbag,
     },
     {
       title: "Салгалт",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description: "50'000₮",
       icon: Handbag,
     },
     {
       title: "Арилгалт",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description: "50'000₮",
       icon: Handbag,
     },
   ],

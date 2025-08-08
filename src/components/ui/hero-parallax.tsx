@@ -29,9 +29,9 @@ export const HeroParallax = ({
   const rotateX = useSpring(useTransform(scrollYProgress, [0, 0.2], [15, 0]), springConfig);
   const opacity = useSpring(useTransform(scrollYProgress, [0, 0.2], [0.2, 1]), springConfig);
   const rotateZ = useSpring(useTransform(scrollYProgress, [0, 0.2], [20, 0]), springConfig);
-  const translateY = useSpring(useTransform(scrollYProgress, [0, 0.2], [-750, 100]), springConfig);
+  const translateY = useSpring(useTransform(scrollYProgress, [0, 0.2], [-1250, 100]), springConfig);
   return (
-    <div ref={ref} className="h-[230vh] overflow-hidden antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d]">
+    <div ref={ref} className="py-30 overflow-hidden antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d]">
       <Header />
       <motion.div
         style={{
@@ -52,6 +52,11 @@ export const HeroParallax = ({
             <ProductCard product={product} translate={translateXReverse} key={product.title} />
           ))}
         </motion.div>
+        <motion.div className="flex flex-row-reverse space-x-20 space-x-reverse">
+            {thirdRow.map((product) => (
+            <ProductCard product={product} translate={translateX} key={product.title} />
+          ))}
+        </motion.div>
       </motion.div>
     </div>
   );
@@ -59,8 +64,8 @@ export const HeroParallax = ({
 
 export const Header = () => {
   return (
-    <div className="relative top-0 left-0 z-10 w-full px-4 py-40 mx-auto max-w-7xl">
-      <div className="container space-y-8 text-center">
+    <div className="relative top-0 left-0 z-10 w-full px-4 py-20 mx-auto max-w-7xl">
+      <div className="container pt-20 space-y-8 text-center">
         <h1 className="font-semibold text-center text-7xl">
           <span>Zu Nailbar</span>
           <br /> Төгс

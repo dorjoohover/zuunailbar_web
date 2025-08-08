@@ -5,7 +5,7 @@ import React from "react";
 
 export default function Footer() {
   return (
-    <footer className="border-gray-200 border-y">
+    <footer className="-mt-20 border-gray-200 border-y bg-white rounded-[50px]">
       <div className="container grid grid-cols-3 gap-20 py-12">
         {/* <Image src={"/images/logo.png"} /> */}
         <div className="space-y-6">
