@@ -1,11 +1,19 @@
+"use client";
+
 import { siteData } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  const isHome = pathname === "/";
+
   return (
-    <footer className="-mt-20 border-gray-200 border-y bg-white rounded-[50px]">
+    <footer className={cn(isHome && "-mt-20", "-mt-20 border-gray-200 border-y bg-white z-10 relative rounded-[50px]")}>
       <div className="container grid grid-cols-3 gap-20 py-12">
         {/* <Image src={"/images/logo.png"} /> */}
         <div className="space-y-6">

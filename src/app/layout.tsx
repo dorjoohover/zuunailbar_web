@@ -9,6 +9,7 @@ import { siteConfig } from "@/lib/site";
 import { fontSans } from "@/lib/fonts";
 import { Navbar } from "@/components/navbar";
 import Footer from "@/components/footer";
+import ScrollToTopButton from "@/components/scrollToTopButton";
 
 export const metadata: Metadata = {
   title: {
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={clsx("min-h-screen text-foreground bg-background font-sans antialiased scroll-smooth ", fontSans.variable)}>
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <main className="">
+            <ScrollToTopButton />
             <Navbar />
             {children}
             <Footer />

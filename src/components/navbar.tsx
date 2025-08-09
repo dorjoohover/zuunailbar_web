@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Navbar as HeroUINavbar, NavbarContent, NavbarMenu, NavbarMenuToggle, NavbarBrand, NavbarItem, NavbarMenuItem } from "@heroui/navbar";
-import { Button, ButtonGroup } from "@heroui/button";
 import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
@@ -15,8 +14,10 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/lib/site";
 import { ThemeSwitch } from "@/components/theme-switch";
-import { TwitterIcon, GithubIcon, DiscordIcon, HeartFilledIcon, SearchIcon, Logo } from "@/components/icons";
+import { SearchIcon } from "@/components/icons";
 import Image from "next/image";
+import { Button } from "@heroui/button";
+import { User } from "lucide-react";
 
 export const Navbar = () => {
   const pathname = usePathname();
@@ -66,8 +67,8 @@ export const Navbar = () => {
         <HeroUINavbar maxWidth="xl" className="flex justify-center mx-auto bg-no-repeat bg-cover rounded-full bg-[#101318]/80">
           <NavbarContent className="basis-1/5" justify="start">
             <Link href="/" className="flex justify-start sm:hidden">
-            <Image src="/images/logo-black.png" alt="logo" width={100} height={100} className="object-contain w-auto h-8" />
-          </Link>
+              <Image src="/images/logo-black.png" alt="logo" width={100} height={100} className="object-contain w-auto h-8" />
+            </Link>
             <ul className="justify-center hidden gap-4 ml-2 sm:flex">
               {siteConfig.navItems.map((item) => (
                 <NavbarItem key={item.href}>
@@ -88,7 +89,12 @@ export const Navbar = () => {
           <NavbarContent className="justify-center hidden sm:flex basis-2/5" justify="end">
             <NavbarItem className="hidden gap-2 sm:flex">
               <ThemeSwitch />
-              <Button className="bg-primary-pink">Захиалга</Button>
+              <Button href="/login" as={Link}>
+                <User />
+              </Button>
+              <Button href="/order" as={Link} className="bg-white">
+                Захиалга
+              </Button>
             </NavbarItem>
             {/* <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem> */}
           </NavbarContent>
