@@ -17,21 +17,22 @@ import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon } from "@/components/icons";
 import Image from "next/image";
 import { Button } from "@heroui/button";
-import { User } from "lucide-react";
+import Login from "./Login";
 
 export const Navbar = () => {
   const pathname = usePathname();
   const [show, setShow] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [value, setValue] = useState("");
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
       if (currentScrollY > 100) {
-        setShow(currentScrollY < lastScrollY); // scroll up => show, scroll down => hide
+        setShow(currentScrollY < lastScrollY); 
       } else {
-        setShow(true); // always show when near top
+        setShow(true);  
       }
 
       setLastScrollY(currentScrollY);
@@ -87,11 +88,13 @@ export const Navbar = () => {
           </NavbarContent>
 
           <NavbarContent className="justify-center hidden sm:flex basis-2/5" justify="end">
-            <NavbarItem className="hidden gap-2 sm:flex">
+            <NavbarItem className="items-center hidden gap-2 sm:flex">
               <ThemeSwitch />
-              <Button href="/login" as={Link}>
-                <User />
-              </Button>
+              {/* <Button href="/login" as={Link} className="bg-transparent">
+                <UserIcon className="text-white" />
+              </Button> */}
+              <Login />
+
               <Button href="/order" as={Link} className="bg-white">
                 Захиалга
               </Button>
