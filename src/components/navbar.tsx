@@ -13,7 +13,7 @@ import NextLink from "next/link";
 import clsx from "clsx";
 
 import { siteConfig } from "@/lib/site";
-import { ThemeSwitch } from "@/components/theme-switch";
+// import { ThemeSwitch } from "@/components/theme-switch";
 import { SearchIcon } from "@/components/icons";
 import Image from "next/image";
 import { Button } from "@heroui/button";
@@ -89,7 +89,7 @@ export const Navbar = () => {
 
           <NavbarContent className="justify-center hidden sm:flex basis-2/5" justify="end">
             <NavbarItem className="items-center hidden gap-2 sm:flex">
-              <ThemeSwitch />
+              {/* <ThemeSwitch /> */}
               {/* <Button href="/login" as={Link} className="bg-transparent">
                 <UserIcon className="text-white" />
               </Button> */}
@@ -103,7 +103,7 @@ export const Navbar = () => {
           </NavbarContent>
 
           <NavbarContent className="pl-4 sm:hidden basis-1" justify="end">
-            <ThemeSwitch />
+            {/* <ThemeSwitch /> */}
             <NavbarMenuToggle />
           </NavbarContent>
 
