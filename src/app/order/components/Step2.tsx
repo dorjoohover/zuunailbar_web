@@ -16,6 +16,7 @@ import {
 import { useLocale } from "@react-aria/i18n";
 import {
   Booking,
+  BookingSchedule,
   IBooking,
   IOrder,
   IUserService,
@@ -24,7 +25,7 @@ import {
 } from "@/models";
 import { dateValueToDate, ListType, mnDate } from "@/lib/const";
 import { formatTime, selectDate, usernameFormatter } from "@/lib/functions";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 interface Step2Props {
   // date: CalendarDate | null;
@@ -41,8 +42,8 @@ interface Step2Props {
   showError: boolean;
   values: { date?: Date; time?: string; user?: string };
   // eniig hiine
-  users: User[];
-  booking: ListType<IBooking>;
+  users: ListType<User>;
+  booking: BookingSchedule;
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
   // clearError: (field: string) => void;
 }
@@ -63,17 +64,6 @@ export default function Step2({
   values,
   // clearError,
 }: Step2Props) {
-  const isDateUnavailable = (date: DateValue) => {
-    return booking.items.some((b) => {
-      const bd = new Date(b.date);
-
-      return (
-        bd.getFullYear() === date.year &&
-        bd.getMonth() + 1 === date.month &&
-        bd.getUTCDate() === date.day
-      );
-    });
-  };
   const isSameDayTZ = (a: Date, b: Date, tz = "Asia/Ulaanbaatar") => {
     const ymd = (d: Date) => {
       const p = new Intl.DateTimeFormat("en-CA", {
@@ -89,47 +79,122 @@ export default function Step2({
     return ymd(a) === ymd(b);
   };
   const overlapInfo = useMemo(() => {
-    if (!values.date || !booking?.items?.length)
-      return { hours: [], userIds: [] as string[] };
+    if (!values.date || !booking?.overlap)
+      return { hours: [] as number[], userIds: [] as string[] };
 
     const d = values.date as Date;
     const hourSeen: Record<number, 1> = {};
-    const userSeen: Record<string, 1> = {};
+    const userIds: string[] = [];
 
-    (booking.items as any[]).forEach((b) => {
-      (b?.overlap ?? []).forEach((o: any) => {
-        if (!o?.times) return;
+    // booking.overlap: Record<string, { date: Date | string; times: number[] }[]>
+    for (const [userId, entries] of Object.entries(booking.overlap)) {
+      let touched = false;
 
-        const od = new Date(b.date.substring(0, 10));
-        if (!isSameDayTZ(od, d)) return;
+      for (const e of entries ?? []) {
+        const od = e.date instanceof Date ? e.date : new Date(e.date);
+        if (!isSameDayTZ(od, d)) continue;
 
-        const parts = Array.isArray(o.times)
-          ? o.times
-          : String(o.times).split("|");
-        for (let i = 0; i < parts.length; i++) {
-          const n = Number(String(parts[i]).trim());
+        // times нь number[] гэж интерфэйстээ заасан тул шууд явуулна
+        for (const n of e.times ?? []) {
           if (Number.isFinite(n)) hourSeen[n] = 1;
         }
-        if (o.user_id) userSeen[o.user_id] = 1;
-      });
-    });
+        touched = true;
+      }
+
+      // Тухайн өдөрт дор хаяж 1 давхцсан цагтай бол л нэмнэ
+      if (touched) userIds.push(userId);
+    }
 
     const hours = Object.keys(hourSeen)
       .map(Number)
       .sort((a, b) => a - b);
-    const userIds = Object.keys(userSeen);
     return { hours, userIds };
-  }, [booking?.items, values.date]);
+  }, [booking?.overlap, values.date]);
+  const ymdUB = (d: Date | string) =>
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Ulaanbaatar",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(d instanceof Date ? d : new Date(d));
+  const ymdFromDV = (dv: { year: number; month: number; day: number }) =>
+    `${dv.year}-${String(dv.month).padStart(2, "0")}-${String(dv.day).padStart(2, "0")}`;
+
+  const unavailableDays = useMemo(() => {
+    const days: Record<string, 1> = {};
+    if (!booking?.overlap) return days;
+
+    for (const entries of Object.values(booking.overlap)) {
+      for (const e of entries ?? []) {
+        // times хоосон бол алгасъя (жинхэнэ “давхцсан” өдөр л идэвхжсэн байг)
+        if (!e?.date || !Array.isArray(e.times) || e.times.length === 0)
+          continue;
+        days[ymdUB(e.date)] = 1;
+      }
+    }
+    return days;
+  }, [booking?.overlap]);
+  const isDateUnavailable = useCallback(
+    (dv: DateValue) => {
+      return !!unavailableDays[ymdFromDV(dv)];
+    },
+    [unavailableDays]
+  );
   const overlap = overlapInfo.hours;
   const suitableUsers = useMemo(() => {
-    if (!users?.length) return [];
-    // объект lookup ашиглаж, ES5-д найдвартай байлгая
-    const pick: Record<string, 1> = {};
-    for (let i = 0; i < overlapInfo.userIds.length; i++) {
-      pick[overlapInfo.userIds[i]] = 1;
-    }
-    return users.filter((u: any) => !!u?.id && pick[u.id] === 1);
-  }, [users, overlapInfo.userIds]);
+    const list = users?.items ?? [];
+    const overlap = booking?.overlap;
+
+    if (!list.length) return [];
+    if (!overlap) return list; // overlap байхгүй бол бүх хэрэглэгч
+
+    const hasDate = !!values?.date;
+    const hasTime =
+      values?.time !== undefined &&
+      values?.time !== null &&
+      values?.time !== "";
+    const timeNum = hasTime ? Number(values.time) : NaN;
+
+    // day-ийг UB-аар нормчлох
+    const ymdUB = (d: Date | string) =>
+      new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Ulaanbaatar",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(d instanceof Date ? d : new Date(d));
+
+    // date/time аль нь ч байхгүй → бүх хэрэглэгч
+    if (!hasDate && !hasTime) return list;
+
+    // сонгосон өдөр (UB)
+    const selDay = hasDate ? ymdUB(values.date as Date) : null;
+
+    return list.filter((u: any) => {
+      if (!u?.id) return false;
+      const entries = overlap[u.id] ?? []; // [{ date, times }]
+
+      for (let i = 0; i < entries.length; i++) {
+        const e = entries[i];
+        if (!e) continue;
+
+        // date шалгалт
+        if (hasDate && ymdUB(e.date) !== selDay) continue;
+
+        // time шалгалт
+        if (hasTime) {
+          const arr = Array.isArray(e.times) ? e.times : [];
+          const ok = arr.some((t: any) => Number(t) === timeNum);
+          if (!ok) continue;
+        }
+
+        // бүх нөхцөл тэнцлээ
+        return true;
+      }
+
+      return false;
+    });
+  }, [users?.items, booking?.overlap, values?.date, values?.time]);
   return (
     <div className="w-full space-y-6">
       <div>
@@ -144,6 +209,7 @@ export default function Step2({
             if (!isDateUnavailable(val)) return;
 
             onChange("order_date", selectDate(val));
+            onChange("start_time", undefined);
             // if (errors.date) clearError("date");
           }}
           isDateUnavailable={(v) => !isDateUnavailable(v)}
