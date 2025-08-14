@@ -24,14 +24,47 @@ export const HeroParallax = ({
 
   const springConfig = { stiffness: 300, damping: 50, bounce: 100 };
 
+const [breakpoint, setBreakpoint] = React.useState<"sm" | "md" | "lg" | "xl">("lg");
+
+React.useEffect(() => {
+  const checkSize = () => {
+    const width = window.innerWidth;
+    if (width < 640) setBreakpoint("sm");       // < sm
+    else if (width < 1024) setBreakpoint("md"); // sm to < lg
+    else if (width < 1280) setBreakpoint("lg"); // lg to < xl
+    else setBreakpoint("xl");                   // >= xl
+  };
+  checkSize();
+  window.addEventListener("resize", checkSize);
+  return () => window.removeEventListener("resize", checkSize);
+}, []);
+
+const translateYStartMap: Record<typeof breakpoint, number> = {
+  sm: -850,
+  md: -900,
+  lg: -1200,
+  xl: -1200,
+};
+
+const translateYStart = translateYStartMap[breakpoint];
+
+
   const translateX = useSpring(useTransform(scrollYProgress, [0, 1], [0, 1000]), springConfig);
   const translateXReverse = useSpring(useTransform(scrollYProgress, [0, 1], [0, -1000]), springConfig);
   const rotateX = useSpring(useTransform(scrollYProgress, [0, 0.2], [15, 0]), springConfig);
   const opacity = useSpring(useTransform(scrollYProgress, [0, 0.2], [0.2, 1]), springConfig);
   const rotateZ = useSpring(useTransform(scrollYProgress, [0, 0.2], [20, 0]), springConfig);
-  const translateY = useSpring(useTransform(scrollYProgress, [0, 0.2], [-1250, 100]), springConfig);
+  // const translateY = useSpring(useTransform(scrollYProgress, [0, 0.2], [-900, 100]), springConfig);
+  // Use different start values depending on screen size
+ const translateY = useSpring(
+  useTransform(scrollYProgress, [0, 0.2], [translateYStart, 100]),
+  springConfig
+);
+
+
+  
   return (
-    <div ref={ref} className="py-30 overflow-hidden antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d]">
+    <div ref={ref} className="overflow-hidden antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d] py-30">
       <Header />
       <motion.div
         style={{
@@ -42,17 +75,17 @@ export const HeroParallax = ({
         }}
         className="bg-[url(/bg/blue-gradient.png)] bg-cover bg-center"
       >
-        <motion.div className="flex flex-row-reverse mb-20 space-x-20 space-x-reverse">
+        <motion.div className="flex flex-row-reverse mb-10 space-x-reverse space-x-15 sm:mb-14">
           {firstRow.map((product) => (
             <ProductCard product={product} translate={translateX} key={product.title} />
           ))}
         </motion.div>
-        <motion.div className="flex flex-row mb-20 space-x-20 ">
+        <motion.div className="flex flex-row mb-10 space-x-15 sm:mb-14 ">
           {secondRow.map((product) => (
             <ProductCard product={product} translate={translateXReverse} key={product.title} />
           ))}
         </motion.div>
-        <motion.div className="flex flex-row-reverse space-x-20 space-x-reverse">
+        <motion.div className="flex flex-row-reverse space-x-reverse space-x-15">
             {thirdRow.map((product) => (
             <ProductCard product={product} translate={translateX} key={product.title} />
           ))}
@@ -64,14 +97,14 @@ export const HeroParallax = ({
 
 export const Header = () => {
   return (
-    <div className="relative top-0 left-0 z-10 w-full px-4 py-20 mx-auto max-w-7xl">
+    <div className="relative top-0 left-0 z-10 w-full px-4 py-20 web-container">
       <div className="container pt-20 space-y-8 text-center">
-        <h1 className="font-semibold text-center text-7xl">
+        <h1 className="text-5xl font-semibold text-center sm:text-7xl">
           <span>Zu Nailbar</span>
           <br /> Төгс
           <span className="gradient-text"> гоо сайхан</span>
         </h1>
-        <p className="max-w-2xl mx-auto text-xl text-dark-200"> Орчин үеийн хумсны урлаг, амралт, гоо сайхныг хослуулсан үйлчилгээ. Бид таны хумсыг төгс болгож, өөртөө итгэх итгэлийг тань нэмэгдүүлнэ. Zu Nailbar — таны гоо сайхны шинэ түвшин.</p>
+        <p className="max-w-2xl mx-auto text-lg sm:text-xl text-dark-200"> Орчин үеийн хумсны урлаг, амралт, гоо сайхныг хослуулсан үйлчилгээ. Бид таны хумсыг төгс болгож, өөртөө итгэх итгэлийг тань нэмэгдүүлнэ. Zu Nailbar — таны гоо сайхны шинэ түвшин.</p>
         <Button className="bg-primary-pink">Захиалга өгөх</Button>
       </div>
     </div>
@@ -94,19 +127,20 @@ export const ProductCard = ({
       style={{
         x: translate,
       }}
-      // whileHover={{
-      //   y: -20,
-      // }}
+      whileHover={{
+scale: 1.02,
+      }}
       key={product.title}
-      className="h-[20rem] shadow-lg sm:h-[30rem] aspect-[3/4] relative shrink-0 bg-clip-padding backdrop-filter backdrop-blur-lg rounded-2xl overflow-hidden"
+      className="h-[20rem] shadow-lg sm:h-[22rem] lg:h-[30rem] aspect-[3/4] relative shrink-0 bg-clip-padding backdrop-filter backdrop-blur-lg rounded-2xl overflow-hidden group"
     >
       <div
         // href={product.link}
         className="relative flex items-end justify-center overflow-hidden size-full group-hover/product:shadow-2xl"
       >
         <img src={product.thumbnail} height="600" width="600" className="inset-0 object-cover object-left-top size-full" alt={product.title} />
-        <div className="absolute flex items-end justify-center text-white pb-7 size-full bg-gradient-to-t from-black/90 to-transparent">
+        <div className="absolute flex flex-col items-center justify-end text-white pb-7 size-full bg-gradient-to-t from-black/90 to-transparent">
           <h1 className="text-xl font-bold uppercase">Гелен будалт</h1>
+          <h3>Artist name</h3>
         </div>
         {/* <h1 className="text-xl font-black uppercase">Гелен будалт</h1> */}
       </div>

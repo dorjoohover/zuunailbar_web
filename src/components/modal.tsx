@@ -18,6 +18,7 @@ type AppModalProps = {
   children?: ReactNode; 
   cancelText?: string;   
   confirmText?: string;  
+  onConfirm?: () => void;
 };
 
 export default function AppModal({
@@ -28,6 +29,7 @@ export default function AppModal({
   children,
   cancelText = "Цуцлах",
   confirmText = "Баталгаажуулах",
+  onConfirm = () => {},
 }: AppModalProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -39,7 +41,7 @@ export default function AppModal({
         as={useLink ? Link : undefined}
         href={useLink ? href : undefined}
         onPress={onOpen}
-        className="mb-4"
+        className=""
       >
         {btn}
       </ButtonComponent>
@@ -54,7 +56,7 @@ export default function AppModal({
                 <Button color="danger" variant="light" onPress={onClose}>
                   {cancelText}
                 </Button>
-                <Button color="primary" onPress={onClose}>
+                <Button color="primary" onPress={onConfirm}>
                   {confirmText}
                 </Button>
               </ModalFooter>

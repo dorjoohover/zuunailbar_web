@@ -30,9 +30,9 @@ export const Navbar = () => {
       const currentScrollY = window.scrollY;
 
       if (currentScrollY > 100) {
-        setShow(currentScrollY < lastScrollY); 
+        setShow(currentScrollY < lastScrollY);
       } else {
-        setShow(true);  
+        setShow(true);
       }
 
       setLastScrollY(currentScrollY);
