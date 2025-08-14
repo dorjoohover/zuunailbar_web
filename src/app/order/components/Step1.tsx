@@ -1,46 +1,76 @@
 "use client";
 
+import { ListType } from "@/lib/const";
+import { money } from "@/lib/functions";
+import { Branch, IOrder, Service } from "@/models";
 import { Select, SelectItem } from "@heroui/select";
 import { useState } from "react";
 
 interface Step1Props {
-  branch: string;
-  service: string;
-  setBranch: (val: string) => void;
-  setService: (val: string) => void;
-  errors: Record<string, string>;
-  clearError: (field: string) => void;
+  branches: ListType<Branch>;
+  services: ListType<Service>;
+  onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
+  errors: { branch?: string; service?: string };
+  values: { branch?: string; services?: string[] };
+  showError: boolean;
 }
 
-export default function Step1({ branch, service, setBranch, setService, errors, clearError }: Step1Props) {
+export default function Step1({
+  branches,
+  onChange,
+  services,
+  values,
+  errors,
+  showError,
+}: Step1Props) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       <Select
         label="Салбар сонгох"
-        selectedKeys={branch ? [branch] : []}
+        value={values.branch}
         onChange={(e) => {
-          setBranch(e.target.value);
-          if (errors.branch) clearError("branch");
+          const value = e.target.value;
+
+          if (value) onChange("branch_id", value);
         }}
-        isInvalid={!!errors.branch}
+        isInvalid={showError && !!errors.branch}
         errorMessage={errors.branch}
       >
-        <SelectItem key="a">Option A</SelectItem>
-        <SelectItem key="b">Option B</SelectItem>
+        {branches.items.map((branch) => (
+          <SelectItem key={branch.id}>{branch.name}</SelectItem>
+        ))}
       </Select>
 
       <Select
         label="Үйлчилгээ сонгох"
-        selectedKeys={service ? [service] : []}
+        value={values.services}
         onChange={(e) => {
-          setService(e.target.value);
-          if (errors.service) clearError("service");
+          const value = e.target.value;
+          const values = value.split(",");
+          value
+            ? onChange(
+                "details",
+                values.map((v) => {
+                  const service = services.items.filter((s) => s.id == v)?.[0];
+                  return {
+                    service_id: v,
+                    service_name: service.name ?? "",
+                    duration: service.duration,
+                  };
+                })
+              )
+            : onChange("details", []);
         }}
-        isInvalid={!!errors.service}
+        selectionMode="multiple"
+        isInvalid={showError && !!errors.service}
         errorMessage={errors.service}
       >
-        <SelectItem key="x">Option X</SelectItem>
-        <SelectItem key="y">Option Y</SelectItem>
+        {services.items.map((service) => (
+          <SelectItem key={service.id}>
+            {service.name} {money(service.min_price.toString(), "₮")}{" "}
+            {`${service.max_price ? `- ${money(service.max_price.toString(), "₮")}` : ""}`}
+          </SelectItem>
+        ))}
       </Select>
     </div>
   );
