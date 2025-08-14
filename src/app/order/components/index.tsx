@@ -219,9 +219,7 @@ export default function OrderPage({
                   .filter((d) => d != null) ?? [],
               time: selected.start_time ?? "",
               user: usernameFormatter(
-                userService.items.filter(
-                  (us) => us.user_id == selected.user_id
-                )[0].user
+                users.items.filter((us) => us.id == selected.user_id)[0]
               ),
             }}
           />
