@@ -32,6 +32,13 @@ box-shadow:  8px 8px 100px #d59daa,
 @utility gradient-text {
   @apply bg-gradient-to-r from-[#5330f1] via-[#c585d8] via-40% via-[#fa4b9a] via-60% via-[#ff8c6c] to-[#ff3800] bg-clip-text text-transparent;
 }
+@utility glass-button {
+  @apply px-20 text-white border shadow-xl h-14 border-white/5 bg-gray-500/20 rounded-xl aspect-square flex-center;
+}
+
+@utility web-container {
+  @apply px-4 mx-auto max-w-7xl sm:px-6 lg:px-8;
+}
 
 @keyframes float {
 	0% {
