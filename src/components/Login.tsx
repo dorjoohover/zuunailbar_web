@@ -1,20 +1,25 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { InputOtp } from "@heroui/input-otp";
-import AppModal from "./modal";
 import PasswordInput from "./shared/PasswordInput";
 import { cn } from "@/lib/utils";
-import { register, sendOtp } from "@/app/(api)/auth";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@heroui/modal";
+import { Form } from "@heroui/form";
+import { addToast } from "@heroui/toast";
+import { login, register, sendOtp } from "@/app/(api)/auth";
 import { useRouter } from "next/navigation";
-import { toast } from "@heroui/theme";
 
 export default function AuthModal() {
   const [tab, setTab] = useState<"login" | "register">("login");
-
-  // Бүртгүүлэх
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -22,6 +27,7 @@ export default function AuthModal() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [timer, setTimer] = useState(0);
   const [error, setError] = useState("");
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const handleSendOtp = async () => {
     if (!phone) return;
@@ -33,9 +39,9 @@ export default function AuthModal() {
   };
 
   useEffect(() => {
-    if (timer === 0) return;
-    const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
-    return () => clearInterval(interval);
+    if (!timer) return;
+    const t = setInterval(() => setTimer((p) => p - 1), 1000);
+    return () => clearInterval(t);
   }, [timer]);
 
   const handleRegister = async () => {
@@ -54,6 +60,33 @@ export default function AuthModal() {
       save(data.accessToken, data.merchant_id);
       alert(data.accessToken);
       // end modal haana
+      addToast({
+        title: "Амжилттай бүртгүүллээ",
+        size: "lg",
+        color: "success",
+      });
+    }
+  };
+  const handleLogin = async () => {
+    if (password !== passwordConfirm) {
+      setError("Нууц үг таарахгүй байна");
+      return;
+    }
+    setError("");
+    const res = await login({
+      mobile: phone,
+      password: password,
+    });
+    const data = res.data;
+    if (data?.accessToken) {
+      save(data.accessToken, data.merchant_id);
+      alert(data.accessToken);
+      // end modal haana
+      addToast({
+        title: "Амжилттай бүртгүүллээ",
+        size: "lg",
+        color: "success",
+      });
     }
   };
   const router = useRouter();
@@ -72,95 +105,155 @@ export default function AuthModal() {
     router.refresh();
   };
 
-  const handleLogin = () => {
-    console.log("Login submit");
-  };
-
   return (
-    <AppModal
-      btn="Нэвтрэх"
-      title={tab === "login" ? "Нэвтрэх" : "Бүртгүүлэх"}
-      confirmText={tab === "login" ? "Нэвтрэх" : "Бүртгүүлэх"}
-      onConfirm={tab === "login" ? handleLogin : handleRegister}
-    >
-      {/* Tab toggle */}
-      <div className="flex gap-2 p-1 mb-4 bg-gray-200 border rounded-full">
-        <Button
-          className={cn(
-            "flex-1",
-            tab === "login" ? "bg-dark text-white" : "bg-gray-200"
-          )}
-          onClick={() => setTab("login")}
-        >
-          Нэвтрэх
-        </Button>
-        <Button
-          className={cn(
-            "flex-1",
-            tab === "register" ? "bg-dark text-white" : "bg-gray-200"
-          )}
-          onClick={() => setTab("register")}
-        >
-          Бүртгүүлэх
-        </Button>
-      </div>
-
-      {/* Login Tab */}
-      {tab === "login" && (
-        <div className="flex flex-col w-full gap-4">
-          <Input label="Утасны дугаар" className="flex-grow" />
-          <PasswordInput label="Нууц үг" />
-        </div>
-      )}
-
-      {/* Register Tab */}
-      {tab === "register" && (
-        <div className="flex flex-col w-full gap-4">
-          <div className="flex items-center space-x-3 h-14">
-            <Input
-              label="Утасны дугаар"
-              className="flex-grow"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            <Button
-              className={cn("text-white bg-dark")}
-              onClick={handleSendOtp}
-              isDisabled={timer > 0}
-            >
-              {timer > 0
-                ? `Дахин илгээх ${timer < 10 ? `0${timer}` : timer}`
-                : "Илгээх"}
-            </Button>
-          </div>
-
-          {otpSent && (
+    <>
+      <Button
+        size="sm"
+        onPress={() => {
+          onOpen();
+        }}
+        className="text-sm font-semibold text-white bg-transparent size-10 aspect-square"
+      >
+        {/* <UserRound className="size-4" /> */}
+        Нэвтрэх
+      </Button>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent className="p-4">
+          {(onClose) => (
             <>
-              <InputOtp
-                size="lg"
-                length={4}
-                value={otp}
-                onValueChange={setOtp}
-              />
-              <div className="flex flex-col w-full gap-2 mt-4">
-                <PasswordInput
-                  label="Нууц үг"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <PasswordInput
-                  label="Нууц үг давтах"
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  required
-                />
-                {error && <p className="text-sm text-red-500">{error}</p>}
-              </div>
+              <ModalHeader>
+                {tab === "login" ? "Нэвтрэх" : "Бүртгүүлэх"}
+              </ModalHeader>
+              <Form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  tab === "login" && handleLogin();
+                  tab === "register" && otpSent && handleRegister();
+                }}
+              >
+                <ModalBody className="w-full">
+                  {/* Tab Switch */}
+                  <div className="flex mb-4 bg-white border rounded-full">
+                    {["login", "register"].map((t) => (
+                      <Button
+                        key={t}
+                        className={cn(
+                          "flex-1 bg-cover bg-no-repeat",
+                          tab === t
+                            ? "bg-dark text-white bg-[url(/bg/banner-gradient.png)]"
+                            : "bg-transparent",
+                          t === "login" ? "rounded-l-full" : "rounded-r-full"
+                        )}
+                        onPress={() => {
+                          setTab(t as typeof tab);
+                          setError("");
+                        }}
+                      >
+                        {t === "login" ? "Нэвтрэх" : "Бүртгүүлэх"}
+                      </Button>
+                    ))}
+                  </div>
+                  {/* Login tab */}
+                  {tab === "login" && (
+                    <div className="flex flex-col gap-4">
+                      <Input
+                        label="Утасны дугаар"
+                        onChange={(e) => setPhone(e.target.value)}
+                        isRequired
+                      />
+                      <PasswordInput
+                        label="Нууц үг"
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+                  {/* Register tab */}
+                  {tab === "register" && (
+                    <div className="flex flex-col gap-4">
+                      <div className="relative flex">
+                        <Input
+                          type="tel"
+                          label="Утасны дугаар"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          isRequired
+                        />
+                        <Button
+                          className="text-white px-2 bg-dark bg-[url(/bg/banner-gradient.png)] bg-no-repeat bg-cover absolute right-2 top-[50%] -translate-y-[50%] rounded-"
+                          onPress={handleSendOtp}
+                          isDisabled={timer > 0}
+                        >
+                          {timer > 0
+                            ? `Илгээх ${timer < 10 ? `0${timer}` : timer}`
+                            : "Илгээх"}
+                        </Button>
+                      </div>
+                      <div className="flex flex-col items-center w-full">
+                        <h1 className="text-sm text-left">
+                          Баталгаажуулах дугаар
+                        </h1>
+                        <div className="flex items-center justify-center gap-4">
+                          <InputOtp
+                            size="lg"
+                            length={4}
+                            value={otp}
+                            onValueChange={setOtp}
+                            placeholder="x"
+                            isRequired
+                          />
+                        </div>
+                      </div>
+                      {otpSent && (
+                        <>
+                          <PasswordInput
+                            label="Нууц үг"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                          />
+                          <PasswordInput
+                            label="Нууц үг давтах"
+                            value={passwordConfirm}
+                            onChange={(e) => setPasswordConfirm(e.target.value)}
+                            required
+                          />
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {error && <p className="text-sm text-red-500">{error}</p>}
+                </ModalBody>
+                {/* Modal footer */}
+                <ModalFooter className="flex justify-center w-full">
+                  {/* <Button color="danger" variant="light" onPress={() => onClose()}>
+                    Цуцлах
+                  </Button> */}
+                  {/* Login footer */}
+                  {tab === "login" && (
+                    <Button color="primary" type="submit" className="px-10">
+                      Нэвтрэх
+                    </Button>
+                  )}
+                  {/* Register footer */}
+                  {tab === "register" && otpSent && (
+                    <Button
+                      color="primary"
+                      type="submit"
+                      className="px-10"
+                      onSubmit={() => {
+                        handleRegister();
+                      }}
+                    >
+                      Баталгаажуулах
+                    </Button>
+                  )}
+                </ModalFooter>
+              </Form>
             </>
           )}
-        </div>
-      )}
-    </AppModal>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

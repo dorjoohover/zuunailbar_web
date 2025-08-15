@@ -15,16 +15,9 @@ interface Step1Props {
   showError: boolean;
 }
 
-export default function Step1({
-  branches,
-  onChange,
-  services,
-  values,
-  errors,
-  showError,
-}: Step1Props) {
+export default function Step1({ branches, onChange, services, values, errors, showError }: Step1Props) {
   return (
-    <div className="space-y-4 w-full">
+    <div className="flex flex-col items-center justify-center w-full space-y-4">
       <Select
         label="Салбар сонгох"
         value={values.branch}
@@ -67,8 +60,8 @@ export default function Step1({
       >
         {services.items.map((service) => (
           <SelectItem key={service.id}>
-            {service.name} {money(service.min_price.toString(), "₮")}{" "}
-            {`${service.max_price ? `- ${money(service.max_price.toString(), "₮")}` : ""}`}
+            {`${service.name} ${money(service.min_price.toString(), "₮")}${service.max_price ? ` - ${money(service.max_price.toString(), "₮")}` : ""}`}
+
           </SelectItem>
         ))}
       </Select>

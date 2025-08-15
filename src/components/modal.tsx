@@ -1,48 +1,28 @@
 import { ReactNode } from "react";
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@heroui/modal";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
 import { Link } from "@heroui/link";
 import { Button } from "@heroui/button";
 
 type AppModalProps = {
-  useLink?: boolean; 
-  href?: string;  
-  btn?: string;  
-  title?: string;    
-  children?: ReactNode; 
-  cancelText?: string;   
-  confirmText?: string;  
+  useLink?: boolean;
+  href?: string;
+  btn?: string;
+  title?: string;
+  children?: ReactNode;
+  cancelText?: string;
+  confirmText?: string;
   onConfirm?: () => void;
+  footer?: boolean;
 };
 
-export default function AppModal({
-  useLink = false,
-  href = "/order",
-  btn = "Modal",
-  title = "Modal Title",
-  children,
-  cancelText = "Цуцлах",
-  confirmText = "Баталгаажуулах",
-  onConfirm = () => {},
-}: AppModalProps) {
+export default function AppModal({ useLink = false, href = "/order", btn = "Modal", title = "Modal Title", children, cancelText = "Цуцлах", confirmText = "Баталгаажуулах", onConfirm = () => {}, footer = true }: AppModalProps) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const ButtonComponent = Button;
 
   return (
     <>
-      <ButtonComponent
-        as={useLink ? Link : undefined}
-        href={useLink ? href : undefined}
-        onPress={onOpen}
-        className=""
-      >
+      <ButtonComponent as={useLink ? Link : undefined} href={useLink ? href : undefined} onPress={onOpen} className="">
         {btn}
       </ButtonComponent>
 
@@ -52,14 +32,20 @@ export default function AppModal({
             <>
               <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
               <ModalBody>{children}</ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  {cancelText}
-                </Button>
-                <Button color="primary" onPress={onConfirm}>
-                  {confirmText}
-                </Button>
-              </ModalFooter>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    {cancelText}
+                  </Button>
+                  <Button
+                    color="primary"
+                    onPress={() => {
+                      onConfirm();
+                      onClose();
+                    }}
+                  >
+                    {confirmText}
+                  </Button>
+                </ModalFooter>
             </>
           )}
         </ModalContent>

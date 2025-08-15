@@ -167,7 +167,7 @@ export default function OrderPage({
           ))}
         </div>
         <Form
-          className="w-full max-w-xs flex flex-col gap-4"
+          className="flex flex-col justify-center w-full gap-4"
           onReset={() => setSelected({ details: [] })}
           onSubmit={(e) => {
             e.preventDefault();
@@ -230,7 +230,7 @@ export default function OrderPage({
         {/* Navigation buttons */}
         <div className="flex justify-between mt-6">
           <Button
-            onClick={prev}
+            onPress={prev}
             disabled={step === 1}
             variant="bordered"
             className="h-12 w-28"
@@ -244,13 +244,13 @@ export default function OrderPage({
                 "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
                 "bg-dark bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)]"
               )}
-              onClick={handleNext}
+              onPress={handleNext}
             >
               Дараах
             </Button>
           ) : (
             <Button
-              onClick={() => onSubmit()}
+              onPress={() => onSubmit()}
               className="text-white bg-teal-500"
             >
               ???

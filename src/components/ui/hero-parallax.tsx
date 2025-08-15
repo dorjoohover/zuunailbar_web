@@ -42,8 +42,8 @@ React.useEffect(() => {
 const translateYStartMap: Record<typeof breakpoint, number> = {
   sm: -850,
   md: -900,
-  lg: -1200,
-  xl: -1200,
+  lg: -1100,
+  xl: -1100,
 };
 
 const translateYStart = translateYStartMap[breakpoint];
@@ -105,7 +105,7 @@ export const Header = () => {
           <span className="gradient-text"> гоо сайхан</span>
         </h1>
         <p className="max-w-2xl mx-auto text-lg sm:text-xl text-dark-200"> Орчин үеийн хумсны урлаг, амралт, гоо сайхныг хослуулсан үйлчилгээ. Бид таны хумсыг төгс болгож, өөртөө итгэх итгэлийг тань нэмэгдүүлнэ. Zu Nailbar — таны гоо сайхны шинэ түвшин.</p>
-        <Button className="bg-primary-pink">Захиалга өгөх</Button>
+        <Button size="lg" className="text-white bg-dark">Захиалга өгөх</Button>
       </div>
     </div>
   );
