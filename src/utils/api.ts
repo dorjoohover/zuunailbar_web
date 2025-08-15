@@ -18,7 +18,9 @@ export enum Api {
   user = "user",
   user_product = "user_product",
   branch = "branch",
+  otp = "otp",
   file = "file",
+  send_otp = "send_otp",
   category = "category",
   service = "service",
   order = "order",
@@ -32,11 +34,15 @@ export enum Api {
   product_log = "product_log",
   brand = "brand",
   upload = "upload",
+  forget = "forget",
 }
 
 export const API = {
   [Api.login]: BASE + "login",
   [Api.register]: BASE + "register",
+  [Api.otp]: BASE + "otp",
+  [Api.send_otp]: BASE + "send/otp",
+  [Api.forget]: BASE + "forget",
   [Api.user]: BASE + "user",
   [Api.product]: BASE + "product",
   [Api.order]: BASE + "order",
@@ -57,4 +63,4 @@ export const API = {
 };
 
 export const baseUrl =
-  process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001";

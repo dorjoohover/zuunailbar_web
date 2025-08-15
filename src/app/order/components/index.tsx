@@ -37,8 +37,10 @@ function useStepper(total = 3) {
 export default function OrderPage({
   data,
   branches,
+  token,
   users,
 }: {
+  token?: string;
   data: ListType<Service>;
   branches: ListType<Branch>;
   users: ListType<User>;

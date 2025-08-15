@@ -7,11 +7,14 @@ import { InputOtp } from "@heroui/input-otp";
 import AppModal from "./modal";
 import PasswordInput from "./shared/PasswordInput";
 import { cn } from "@/lib/utils";
+import { register, sendOtp } from "@/app/(api)/auth";
+import { useRouter } from "next/navigation";
+import { toast } from "@heroui/theme";
 
 export default function AuthModal() {
   const [tab, setTab] = useState<"login" | "register">("login");
 
-  // Бүртгүүлэх 
+  // Бүртгүүлэх
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -20,9 +23,12 @@ export default function AuthModal() {
   const [timer, setTimer] = useState(0);
   const [error, setError] = useState("");
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
     if (!phone) return;
     setOtpSent(true);
+
+    const res = (await sendOtp(phone)).data;
+    console.log(res);
     setTimer(59);
   };
 
@@ -32,13 +38,38 @@ export default function AuthModal() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (password !== passwordConfirm) {
       setError("Нууц үг таарахгүй байна");
       return;
     }
     setError("");
-    console.log({ phone, otp, password });
+    const res = await register({
+      mobile: phone,
+      otp: otp,
+      password: password,
+    });
+    const data = res.data;
+    if (data?.accessToken) {
+      save(data.accessToken, data.merchant_id);
+      alert(data.accessToken);
+      // end modal haana
+    }
+  };
+  const router = useRouter();
+
+  const save = async (token: string, merchant: string) => {
+    await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token,
+        merchant,
+      }),
+    });
+    router.refresh();
   };
 
   const handleLogin = () => {
@@ -55,13 +86,19 @@ export default function AuthModal() {
       {/* Tab toggle */}
       <div className="flex gap-2 p-1 mb-4 bg-gray-200 border rounded-full">
         <Button
-          className={cn("flex-1", tab === "login" ? "bg-dark text-white" : "bg-gray-200")}
+          className={cn(
+            "flex-1",
+            tab === "login" ? "bg-dark text-white" : "bg-gray-200"
+          )}
           onClick={() => setTab("login")}
         >
           Нэвтрэх
         </Button>
         <Button
-          className={cn("flex-1", tab === "register" ? "bg-dark text-white" : "bg-gray-200")}
+          className={cn(
+            "flex-1",
+            tab === "register" ? "bg-dark text-white" : "bg-gray-200"
+          )}
           onClick={() => setTab("register")}
         >
           Бүртгүүлэх
@@ -80,20 +117,47 @@ export default function AuthModal() {
       {tab === "register" && (
         <div className="flex flex-col w-full gap-4">
           <div className="flex items-center space-x-3 h-14">
-            <Input label="Утасны дугаар" className="flex-grow" value={phone} onChange={(e) => setPhone(e.target.value)} />
-            <Button className={cn("text-white bg-dark")} onClick={handleSendOtp} isDisabled={timer > 0}>
-              {timer > 0 ? `Дахин илгээх ${timer < 10 ? `0${timer}` : timer}` : "Илгээх"}
+            <Input
+              label="Утасны дугаар"
+              className="flex-grow"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+            <Button
+              className={cn("text-white bg-dark")}
+              onClick={handleSendOtp}
+              isDisabled={timer > 0}
+            >
+              {timer > 0
+                ? `Дахин илгээх ${timer < 10 ? `0${timer}` : timer}`
+                : "Илгээх"}
             </Button>
           </div>
 
-          <InputOtp size="lg" length={4} value={otp} onValueChange={setOtp} />
-
           {otpSent && (
-            <div className="flex flex-col w-full gap-2 mt-4">
-              <PasswordInput label="Нууц үг" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              <PasswordInput label="Нууц үг давтах" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required />
-              {error && <p className="text-sm text-red-500">{error}</p>}
-            </div>
+            <>
+              <InputOtp
+                size="lg"
+                length={4}
+                value={otp}
+                onValueChange={setOtp}
+              />
+              <div className="flex flex-col w-full gap-2 mt-4">
+                <PasswordInput
+                  label="Нууц үг"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <PasswordInput
+                  label="Нууц үг давтах"
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  required
+                />
+                {error && <p className="text-sm text-red-500">{error}</p>}
+              </div>
+            </>
           )}
         </div>
       )}
