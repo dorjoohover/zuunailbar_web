@@ -53,3 +53,7 @@ export interface Booking {
   created_at?: Date;
   updated_at?: Date;
 }
+
+export interface BookingSchedule {
+  overlap: Record<string, { date: Date; times: number[] }[]>;
+}

@@ -8,6 +8,7 @@ import { Button } from "@heroui/button";
 import { ListDefault, ListType } from "@/lib/const";
 import {
   Booking,
+  BookingSchedule,
   Branch,
   IBooking,
   IOrder,
@@ -36,17 +37,18 @@ function useStepper(total = 3) {
 export default function OrderPage({
   data,
   branches,
+  users,
 }: {
   data: ListType<Service>;
   branches: ListType<Branch>;
+  users: ListType<User>;
 }) {
   // selected бүх мэдээллээ энд төвлөрүүлнэ
   const [selected, setSelected] = useState<
     Partial<IOrder> & { times?: string }
   >({ details: [] });
 
-  const [bookings, setBookings] = useState<ListType<IBooking>>(ListDefault);
-  const [users, setUsers] = useState<User[]>([]);
+  const [bookings, setBookings] = useState<BookingSchedule>({ overlap: {} });
   const [userService, setUserService] =
     useState<ListType<IUserService>>(ListDefault);
   const [showError, setShowError] = useState(false);
@@ -110,23 +112,15 @@ export default function OrderPage({
         limit: -1,
       }).then((d) => {
         setUserService(d.data);
-        setUsers(
-          Object.values(
-            d.data.items.reduce((acc: Record<string, any>, i: any) => {
-              const id = i.user_id;
-              if (!id) return acc;
-              if (!acc[id] || i.user) acc[id] = i.user ?? { id };
-              return { ...acc };
-            }, {})
-          )
-        );
       });
 
       await find<IBooking>(Api.booking, {
         start_date: new Date(),
         branch_id: selected.branch_id,
         limit: -1,
-      }).then((d) => setBookings(d.data));
+      }).then((d) => {
+        setBookings(d.data.items?.[0] as unknown as BookingSchedule);
+      });
     }
   };
 
@@ -137,7 +131,7 @@ export default function OrderPage({
   const reset = () => {
     setSelected({ details: [] });
     setUserService(ListDefault);
-    setBookings(ListDefault);
+    setBookings({ overlap: {} });
     go(1);
   };
   const onSubmit = async () => {
@@ -225,9 +219,7 @@ export default function OrderPage({
                   .filter((d) => d != null) ?? [],
               time: selected.start_time ?? "",
               user: usernameFormatter(
-                userService.items.filter(
-                  (us) => us.user_id == selected.user_id
-                )[0].user
+                users.items.filter((us) => us.id == selected.user_id)[0]
               ),
             }}
           />
