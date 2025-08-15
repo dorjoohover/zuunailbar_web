@@ -15,13 +15,13 @@ interface PasswordInputProps {
 }
 
 export default function PasswordInput({ label = "Нууц үг", placeholder, required, className, size = "md", value, onChange }: PasswordInputProps) {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   return (
     <Input
       label={label}
       placeholder={placeholder}
-      required={required}
+      isRequired={required}
       size="md"
       value={value}
       onChange={onChange}
