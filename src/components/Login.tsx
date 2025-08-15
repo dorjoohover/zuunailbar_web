@@ -32,10 +32,19 @@ export default function AuthModal() {
     return () => clearInterval(t);
   }, [timer]);
 
+  const handleLogin = () => {
+    if (!phone) return setError("Утасны дугаар оруулна уу");
+    if (!password) return setError("Нууц үг оруулна уу");
+    setError("");
+    console.log("Login:", { phone, password });
+  };
+
   const handleRegister = () => {
+    if (!otp) return setError("OTP оруулна уу");
+    if (!password) return setError("Нууц үг оруулна уу");
     if (password !== passwordConfirm) return setError("Нууц үг таарахгүй байна");
     setError("");
-    console.log({ phone, otp, password });
+    console.log("Register:", { phone, password });
   };
 
   return (
@@ -49,13 +58,22 @@ export default function AuthModal() {
               <Form
                 onSubmit={(e) => {
                   e.preventDefault();
+                  tab === "login" && handleLogin();
+                  tab === "register" && otpSent && handleRegister();
                 }}
               >
                 <ModalBody className="w-full">
                   {/* Tab Switch */}
                   <div className="flex mb-4 bg-white border rounded-full">
                     {["login", "register"].map((t) => (
-                      <Button key={t} className={cn("flex-1 bg-cover bg-no-repeat", tab === t ? "bg-dark text-white bg-[url(/bg/banner-gradient.png)]" : "bg-transparent", t === "login" ? "rounded-l-full" : "rounded-r-full")} onPress={() => setTab(t as typeof tab)}>
+                      <Button
+                        key={t}
+                        className={cn("flex-1 bg-cover bg-no-repeat", tab === t ? "bg-dark text-white bg-[url(/bg/banner-gradient.png)]" : "bg-transparent", t === "login" ? "rounded-l-full" : "rounded-r-full")}
+                        onPress={() => {
+                          setTab(t as typeof tab);
+                          setError("");
+                        }}
+                      >
                         {t === "login" ? "Нэвтрэх" : "Бүртгүүлэх"}
                       </Button>
                     ))}
@@ -63,8 +81,8 @@ export default function AuthModal() {
                   {/* Login tab */}
                   {tab === "login" && (
                     <div className="flex flex-col gap-4">
-                      <Input label="Утасны дугаар" isRequired />
-                      <PasswordInput label="Нууц үг" required />
+                      <Input label="Утасны дугаар" onChange={(e) => setPhone(e.target.value)} isRequired />
+                      <PasswordInput label="Нууц үг" onChange={(e) => setPassword(e.target.value)} required />
                     </div>
                   )}
                   {/* Register tab */}
@@ -89,21 +107,22 @@ export default function AuthModal() {
                       )}
                     </div>
                   )}
+                  {error && <p className="text-sm text-red-500">{error}</p>}
                 </ModalBody>
                 {/* Modal footer */}
                 <ModalFooter className="w-full">
-                  <Button color="danger" variant="light" onPress={onClose}>
+                  <Button color="danger" variant="light" onPress={() => onClose()}>
                     Цуцлах
                   </Button>
                   {/* Login footer */}
                   {tab === "login" && (
-                    <Button color="primary" type="submit" onSubmit={() => console.log("Login submit")}>
+                    <Button color="primary" type="submit">
                       Нэвтрэх
                     </Button>
                   )}
                   {/* Register footer */}
                   {tab === "register" && otpSent && (
-                    <Button color="primary" type="submit" onSubmit={handleRegister}>
+                    <Button color="primary" type="submit" onSubmit={() => handleRegister()}>
                       Баталгаажуулах
                     </Button>
                   )}
