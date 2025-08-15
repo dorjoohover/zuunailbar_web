@@ -10,6 +10,7 @@ import { fontSans } from "@/lib/fonts";
 import { Navbar } from "@/components/navbar";
 import Footer from "@/components/footer";
 import ScrollToTopButton from "@/components/scrollToTopButton";
+import { NavbarDemo } from "@/components/NavbarDemo";
 
 export const metadata: Metadata = {
   title: {
@@ -30,6 +31,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  
   return (
     <html suppressHydrationWarning lang="en">
       <head />
@@ -37,7 +39,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <main className="">
             <ScrollToTopButton />
-            <Navbar />
+            {/* <Navbar /> */}
+            <NavbarDemo />
             {children}
             <Footer />
             <div className="flex items-center justify-center w-full py-10">

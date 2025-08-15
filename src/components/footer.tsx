@@ -11,9 +11,10 @@ export default function Footer() {
   const pathname = usePathname();
 
   const isHome = pathname === "/";
+  const isService = pathname === "/service";
 
   return (
-    <footer className={cn(isHome && "-mt-20", "-mt-20 border-gray-200 border-y bg-white z-10 relative rounded-[50px]")}>
+    <footer className={cn("border-gray-200 border-y bg-white z-10 relative rounded-[50px]",isHome  && "-mt-20", )}>
       <div className="container grid grid-cols-3 gap-20 py-12">
         {/* <Image src={"/images/logo.png"} /> */}
         <div className="space-y-6">

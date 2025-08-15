@@ -7,86 +7,91 @@ export const products = [
   {
     title: "1",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/1.jpg",
   },
   {
     title: "2",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/2.JPG",
   },
   {
     title: "3",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/3.JPG",
   },
 
   {
     title: "4",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/4.JPG",
   },
   {
     title: "5",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/5.JPG",
   },
   {
     title: "6",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/6.JPG",
   },
 
   {
     title: "7",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/7.JPG",
   },
   {
     title: "8",
     link: "/.com",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/8.JPG",
   },
   {
     title: "9",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/9.JPG",
   },
   {
     title: "10",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/10.JPG",
   },
   {
     title: "11",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/11.JPG",
   },
 
   {
     title: "7",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/12.JPG",
   },
   {
     title: "8",
     link: "/.com",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/13.png",
   },
   {
     title: "9",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/14.JPG",
   },
   {
     title: "10",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/15.JPG",
   },
   {
-    title: "11",
+    title: "10",
     link: "/",
-    thumbnail: "/nail/image.png",
+    thumbnail: "/nail/15.JPG",
   },
+  // {
+  //   title: "11",
+  //   link: "/",
+  //   thumbnail: "/nail/16.png",
+  // },
 ];
 
 export default function HeroSection() {

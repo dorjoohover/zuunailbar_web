@@ -1,23 +1,27 @@
-import { Bubbles, Component, Facebook, Handbag, Instagram, Mail, Smartphone, Sparkles } from "lucide-react";
+import { Brush, BrushCleaning, Bubbles, Component, Eraser, Facebook, Footprints, Hand, Instagram, Mail, Scissors, Smartphone, Sparkles } from "lucide-react";
 
 export const siteData = {
   features: [
     {
+      id: 1,
       title: "Мэргэжлийн мастерууд",
       icon: Sparkles,
       description: "Туршлагатай мэргэжилтнүүд таны гоо сайхныг хариуцна",
     },
     {
+      id: 2,
       title: "Цэвэр орчин",
       icon: Bubbles,
       description: "Ариутгал, эрүүл ахуйн стандартыг бүрэн хангасан тав тухтай орчин",
     },
     {
+      id: 3,
       title: "Өргөн сонголт, загварууд",
       icon: Component,
       description: "Олон төрлийн дезайнуудаас сонгох боломжтой",
     },
     {
+      id: 4,
       title: "Онлайн захиалга",
       icon: Smartphone,
       description: "Ухаалаг утсаараа цаг захиалаад үйлчлүүлээрэй",
@@ -37,44 +41,73 @@ export const siteData = {
   ],
   detailService: [
     {
+      id: 1,
       title: "Гелэн будалт",
-      description: "50'000₮",
-      icon: Handbag,
+      price: "50'000₮",
+      description: "Удаан эдэлгээтэй, өнгөлөг гелэн будалтаар хумсаа чимэглэе.",
+      icon: Brush,
     },
     {
+      id: 2,
       title: "Смарт хумстай будалт",
-      description: "50'000₮",
-      icon: Handbag,
+      price: "50'000₮",
+      description: "Өнгө, дизайн, чимэглэлээ өөртөө тааруулан сонгох ухаалаг будалт.",
+      icon: Sparkles,
     },
     {
+      id: 3,
       title: "Педикюр",
-      description: "50'000₮",
-      icon: Handbag,
+      price: "50'000₮",
+      description: "Хөлийн эрүүл мэнд, гоо үзэсгэлэнг хослуулсан иж бүрэн педикюр үйлчилгээ.",
+      icon: Footprints,
     },
     {
+      id: 4,
       title: "Нөхөлт гар",
-      description: "50'000₮",
-      icon: Handbag,
+      price: "50'000₮",
+      description: "Хумсны эвдэрсэн хэсгийг сэргээж, анхны хэлбэрийг нь хадгална.",
+      icon: Hand,
     },
     {
+      id: 5,
       title: "Нөхөлт хөл",
-      description: "50'000₮",
-      icon: Handbag,
+      price: "50'000₮",
+      description: "Хөлийн хумсны гэмтэл, ховхролтыг сэргээж, цэвэрхэн харагдуулна.",
+      icon: BrushCleaning,
     },
     {
+      id: 6,
       title: "Арилгалт",
-      description: "50'000₮",
-      icon: Handbag,
+      price: "50'000₮",
+      description: "Хумсны хуучин будалтыг зөөлөн, гэмтээлгүйгээр арилгана.",
+      icon: Eraser,
     },
     {
+      id: 7,
       title: "Салгалт",
-      description: "50'000₮",
-      icon: Handbag,
+      price: "50'000₮",
+      description: "Хуучин хиймэл хумс, чимэглэлийг гэмтээлгүйгээр салгана.",
+      icon: Scissors,
     },
     {
-      title: "Арилгалт",
-      description: "50'000₮",
-      icon: Handbag,
+      id: 8,
+      title: "Цэвэрлэгээ",
+      price: "50'000₮",
+      description: "Хумс болон арьсны эрүүл мэндийг хамгаалсан гүн цэвэрлэгээ.",
+      icon: BrushCleaning,
+    },
+  ],
+
+  address: [
+    {
+      id: 1,
+      name: "ХАА-н яамны замын урд талд Орчлон комплекс 3 давхар 311 тоот",
+      city: "Улаанбаатар хот",
+    },
+    {
+      id: 2,
+      name: "Crystal town хотхоны замын урд ХИМЧАН оффис 6 давхар 603 тоот",
+      city: "Улаанбаатар хот",
     },
   ],
   footerLinks: [

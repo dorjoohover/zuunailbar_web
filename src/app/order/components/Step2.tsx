@@ -213,6 +213,9 @@ export default function Step2({
             // if (errors.date) clearError("date");
           }}
           isDateUnavailable={(v) => !isDateUnavailable(v)}
+          calendarWidth={'100%'}
+          className="w-full"
+          // weekdayStyle='long'
         />
         {errors.date && showError && (
           <p className="mt-1 text-sm text-red-600">{errors.date}</p>
@@ -271,7 +274,7 @@ export default function Step2({
                     width={100}
                     height={100}
                     alt={usernameFormatter(user)}
-                    className="overflow-hidden bg-gray-200 rounded-lg size-18"
+                    className="object-cover overflow-hidden bg-gray-200 rounded-lg size-18 aspect-square"
                   />
                   <span className="truncate">{usernameFormatter(user)}</span>
                 </Button>
