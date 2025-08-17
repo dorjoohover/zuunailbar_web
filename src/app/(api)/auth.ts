@@ -16,8 +16,8 @@ export const sendOtp = async (mobile: string) => {
         mobile,
       }),
     });
-    console.log(res);
     const data = await res.json();
+
     if (!res.ok)
       return {
         error: data.message,

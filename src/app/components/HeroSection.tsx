@@ -1,7 +1,10 @@
-import { siteData } from "@/lib/constants";
-import Image from "next/image";
-import React from "react";
+"use client";
+import React, { useMemo, useState } from "react";
 import { HeroParallax } from "../../components/ui/hero-parallax";
+import { ListType } from "@/lib/const";
+import { Home } from "@/models/home.model";
+import Loading from "../loading";
+import Loader from "@/components/shared/Loader";
 
 export const products = [
   {
@@ -94,10 +97,36 @@ export const products = [
   // },
 ];
 
-export default function HeroSection() {
+export default function HeroSection({ data }: { data: ListType<Home> }) {
+  function useAllImagesLoaded(urls: string[]) {
+    const [loaded, setLoaded] = useState(0);
+    const total = urls.length;
+    const done = total === 0 || loaded >= total;
+
+    const handleDone = () => setLoaded((c) => c + 1);
+
+    return { done, total, loaded, handleDone };
+  }
+  const urls = useMemo(
+    () => data.items.map((p) => `/api/file/${p.image}`),
+    [data]
+  );
+
+  const { done, total, loaded, handleDone } = useAllImagesLoaded(urls);
+
   return (
     <div className="bg-no-repeat bg-cover">
-      <HeroParallax products={products} />
+      {!done && (
+        <div className="absolute inset-0 z-10 bg-white/70 backdrop-blur-sm flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <div className="h-8 w-8 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+            <div className="text-sm text-gray-600">
+              Зургууд: {loaded}/{total}
+            </div>
+          </div>
+        </div>
+      )}
+      <HeroParallax data={data?.items ?? []} handleDone={handleDone} />
       {/* <section className="container py-10 pb-0 ">
         <div className="flex h-full gap-4">
           <div className="h-[500px] basis-3/5 bg-no-repeat bg-cover relative rounded-4xl ">

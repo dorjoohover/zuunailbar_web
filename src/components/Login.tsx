@@ -16,7 +16,7 @@ import {
 import { Form } from "@heroui/form";
 import { addToast } from "@heroui/toast";
 import { login, register, sendOtp } from "@/app/(api)/auth";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function AuthModal() {
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -27,15 +27,31 @@ export default function AuthModal() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [timer, setTimer] = useState(0);
   const [error, setError] = useState("");
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const handleSendOtp = async () => {
     if (!phone) return;
-    setOtpSent(true);
 
-    const res = (await sendOtp(phone)).data;
-    console.log(res);
-    setTimer(59);
+    const { data, error } = await sendOtp(phone);
+    if (error) {
+      addToast({
+        title: error,
+        size: "lg",
+        color: "danger",
+      });
+      setOtpSent(false);
+      setTimer(0);
+    } else {
+      if (data) {
+        setOtpSent(true);
+        setTimer(59);
+        addToast({
+          title: "Нэг удаагийн нууц үг илгээлээ",
+          size: "lg",
+          color: "success",
+        });
+      }
+    }
   };
 
   useEffect(() => {
@@ -50,28 +66,32 @@ export default function AuthModal() {
       return;
     }
     setError("");
-    const res = await register({
+    const { data, error } = await register({
       mobile: phone,
       otp: otp,
       password: password,
     });
-    const data = res.data;
+    if (error) {
+      addToast({
+        title: error,
+        size: "lg",
+        color: "danger",
+      });
+      return;
+    }
     if (data?.accessToken) {
       save(data.accessToken, data.merchant_id);
-      alert(data.accessToken);
+
       // end modal haana
       addToast({
         title: "Амжилттай бүртгүүллээ",
         size: "lg",
         color: "success",
       });
+      onClose();
     }
   };
   const handleLogin = async () => {
-    if (password !== passwordConfirm) {
-      setError("Нууц үг таарахгүй байна");
-      return;
-    }
     setError("");
     const res = await login({
       mobile: phone,
@@ -80,10 +100,10 @@ export default function AuthModal() {
     const data = res.data;
     if (data?.accessToken) {
       save(data.accessToken, data.merchant_id);
-      alert(data.accessToken);
       // end modal haana
+      onClose();
       addToast({
-        title: "Амжилттай бүртгүүллээ",
+        title: "Амжилттай Нэвтэрлээ",
         size: "lg",
         color: "success",
       });
@@ -104,7 +124,10 @@ export default function AuthModal() {
     });
     router.refresh();
   };
-
+  const pathname = usePathname();
+  useEffect(() => {
+    if (pathname.includes("/order")) onOpen();
+  }, [pathname]);
   return (
     <>
       <Button
@@ -117,7 +140,10 @@ export default function AuthModal() {
         {/* <UserRound className="size-4" /> */}
         Нэвтрэх
       </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal
+        isOpen={pathname.includes("/order") ? true : isOpen}
+        onOpenChange={onOpenChange}
+      >
         <ModalContent className="p-4">
           {(onClose) => (
             <>
@@ -189,21 +215,23 @@ export default function AuthModal() {
                             : "Илгээх"}
                         </Button>
                       </div>
-                      <div className="flex flex-col items-center w-full">
-                        <h1 className="text-sm text-left">
-                          Баталгаажуулах дугаар
-                        </h1>
-                        <div className="flex items-center justify-center gap-4">
-                          <InputOtp
-                            size="lg"
-                            length={4}
-                            value={otp}
-                            onValueChange={setOtp}
-                            placeholder="x"
-                            isRequired
-                          />
+                      {otpSent && (
+                        <div className="flex flex-col items-center w-full">
+                          <h1 className="text-sm text-left">
+                            Баталгаажуулах дугаар
+                          </h1>
+                          <div className="flex items-center justify-center gap-4">
+                            <InputOtp
+                              size="lg"
+                              length={4}
+                              value={otp}
+                              onValueChange={setOtp}
+                              placeholder="x"
+                              isRequired
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
                       {otpSent && (
                         <>
                           <PasswordInput

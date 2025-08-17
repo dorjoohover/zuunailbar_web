@@ -14,6 +14,7 @@ const BASE = process.env.API
 
 export enum Api {
   login = "login",
+  home = "home",
   register = "register",
   user = "user",
   user_product = "user_product",
@@ -43,6 +44,7 @@ export const API = {
   [Api.otp]: BASE + "otp",
   [Api.send_otp]: BASE + "send/otp",
   [Api.forget]: BASE + "forget",
+  [Api.home]: BASE + "home",
   [Api.user]: BASE + "user",
   [Api.product]: BASE + "product",
   [Api.order]: BASE + "order",
@@ -63,4 +65,4 @@ export const API = {
 };
 
 export const baseUrl =
-  process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001";
+  process.env.NEXT_PUBLIC_BASE_URL || "https://zuunailbar-admin-jzsw.vercel.app/";

@@ -11,6 +11,7 @@ import { Navbar } from "@/components/navbar";
 import Footer from "@/components/footer";
 import ScrollToTopButton from "@/components/scrollToTopButton";
 import { NavbarDemo } from "@/components/NavbarDemo";
+import { cookies } from "next/headers";
 
 export const metadata: Metadata = {
   title: {
@@ -30,21 +31,36 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const store = await cookies();
+  const token = store.get("token")?.value;
   return (
     <html suppressHydrationWarning lang="en">
       <head />
-      <body className={clsx("min-h-screen text-foreground bg-background font-sans antialiased scroll-smooth ", fontSans.variable)}>
+      <body
+        className={clsx(
+          "min-h-screen text-foreground bg-background font-sans antialiased scroll-smooth ",
+          fontSans.variable
+        )}
+      >
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <main className="">
             <ScrollToTopButton />
             {/* <Navbar /> */}
-            <NavbarDemo />
+            <NavbarDemo token={token} />
             {children}
             <Footer />
             <div className="flex items-center justify-center w-full py-10">
-              <Link isExternal className="flex items-center gap-1 text-current" href="https://heroui.com?utm_source=next-app-template" title="heroui.com homepage">
+              <Link
+                isExternal
+                className="flex items-center gap-1 text-current"
+                href="https://heroui.com?utm_source=next-app-template"
+                title="heroui.com homepage"
+              >
                 <span className="text-dark-100">© 2025 Zu Nailbar by</span>
                 <p className="">Lorem</p>
                 <span className="text-dark-100">| All Rigth Reserved</span>
