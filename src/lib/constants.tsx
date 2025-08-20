@@ -1,6 +1,16 @@
 import { Brush, BrushCleaning, Bubbles, Component, Eraser, Facebook, Footprints, Hand, Instagram, Mail, Scissors, Smartphone, Sparkles } from "lucide-react";
 
 export const siteData = {
+  navItems: [
+      {
+      name: "Үйлчилгээ",
+      link: "/service",
+    },
+    {
+      name: "Бидний тухай",
+      link: "/about",
+    },
+  ],
   features: [
     {
       id: 1,
@@ -103,25 +113,27 @@ export const siteData = {
       id: 1,
       name: "ХАА-н яамны замын урд талд Орчлон комплекс 3 давхар 311 тоот",
       city: "Улаанбаатар хот",
+      link: 'https://maps.app.goo.gl/m5moYfUYC1f6aJXx9'
     },
     {
       id: 2,
       name: "Crystal town хотхоны замын урд ХИМЧАН оффис 6 давхар 603 тоот",
       city: "Улаанбаатар хот",
+      link: 'https://maps.app.goo.gl/VwZqcs7PsH1ddk41A'
     },
   ],
   footerLinks: [
     {
       icon: Facebook,
-      url: "https://www.facebook.com/zunailbar",
+      url: "https://www.facebook.com/profile.php?id=100090649232252",
     },
     {
       icon: Instagram,
-      url: "https://www.facebook.com/zunailbar",
+      url: "https://www.instagram.com/zu_nailbar",
     },
-    {
-      icon: Mail,
-      url: "https://www.facebook.com/zunailbar",
-    },
+    // {
+    //   icon: Mail,
+    //   url: "https://www.facebook.com/zunailbar",
+    // },
   ],
 };

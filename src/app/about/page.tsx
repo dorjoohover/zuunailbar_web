@@ -1,11 +1,12 @@
 import { siteData } from "@/lib/constants";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Page() {
   return (
     <div className="relative py-24 web-container">
-      <Image src={"/images/logo-black.png"} width={1000} height={1000} alt="logo" className="absolute top-0 left-0 object-contain w-full opacity-5" />
+      <Image src={"/logo/zu-black.png"} width={1000} height={1000} alt="logo" className="absolute top-0 left-0 object-contain w-full opacity-5" />
       <div className="relative flex flex-col items-start w-full pt-10 space-y-20">
         <div className="space-y-8">
           <h1 className="text-5xl font-semibold sm:text-7xl">
@@ -19,21 +20,23 @@ export default function Page() {
         <section className="rounded-[50px] relative z-10 bg-no-repeat bg-cover bg-black bg-[url(/bg/banner-gradient.png)]">
           <div className="container grid grid-cols-1 gap-5 p-10 divide-gray-700 lg:grid-cols-3 sm:grid-cols-2">
             {siteData.address.map((item, index) => (
-              <div key={index} className="flex flex-col justify-center gap-6 p-10 border shadow-md border-white/5 bg-gray-500/30 backdrop-blur-3xl rounded-3xl ">
+              <Link href={item.link} target="_blank" key={index} className="flex flex-col justify-center gap-6 p-10 duration-150 border shadow-md border-white/5 bg-gray-500/30 backdrop-blur-3xl rounded-3xl hover:bg-gray-500/50">
                 {/* bg-[url('/images/glass-frame.png')] */}
-                <div className="flex items-center justify-start gap-4 text-white">
-                  <div className="border shadow-xl border-white/5 bg-gray-500/20 rounded-xl size-14 aspect-square flex-center">
-                    {/*  */}
-                    <MapPin className="text-white" strokeWidth={"1.5px"} />
+                <>
+                  <div className="flex items-center justify-start gap-4 text-white">
+                    <div className="border shadow-xl border-white/5 bg-gray-500/20 rounded-xl size-14 aspect-square flex-center">
+                      {/*  */}
+                      <MapPin className="text-white" strokeWidth={"1.5px"} />
+                    </div>
+                    <h1 className="text-lg font-semibold">Салбар {item.id}</h1>
                   </div>
-                  <h1 className="text-lg font-semibold">Салбар {item.id}</h1>
-                </div>
 
-                <div className="space-y-4">
-                  <h1 className="text-white text-md">{item.name}</h1>
-                  <p className="text-sm text-gray-400">{item.city}</p>
-                </div>
-              </div>
+                  <div className="space-y-4">
+                    <h1 className="text-white text-md">{item.name}</h1>
+                    <p className="text-sm text-gray-400">{item.city}</p>
+                  </div>
+                </>
+              </Link>
             ))}
           </div>
         </section>

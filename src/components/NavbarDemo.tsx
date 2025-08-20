@@ -14,18 +14,9 @@ import { useState } from "react";
 import Login from "./Login";
 import { Button } from "@heroui/button";
 import Link from "next/link";
+import { siteData } from "@/lib/constants";
 
 export function NavbarDemo({ token }: { token?: string }) {
-  const navItems = [
-    {
-      name: "Үйлчилгээ",
-      link: "/service",
-    },
-    {
-      name: "Бидний тухай",
-      link: "/about",
-    },
-  ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -33,7 +24,7 @@ export function NavbarDemo({ token }: { token?: string }) {
     <Navbar>
       {/* Desktop Navigation */}
       <NavBody>
-        <NavItems items={navItems} />
+        <NavItems items={siteData.navItems} />
         <NavbarLogo />
         <div className="flex items-center gap-4">
           {!token && <Login />}
@@ -63,12 +54,12 @@ export function NavbarDemo({ token }: { token?: string }) {
           isOpen={isMobileMenuOpen}
           onClose={() => setIsMobileMenuOpen(false)}
         >
-          {navItems.map((item, idx) => (
+          {siteData.navItems.map((item, idx) => (
             <a
               key={`mobile-link-${idx}`}
               href={item.link}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="relative text-neutral-600 dark:text-neutral-300"
+              className="relative text-white"
             >
               <span className="block">{item.name}</span>
             </a>
@@ -79,14 +70,14 @@ export function NavbarDemo({ token }: { token?: string }) {
               variant="primary"
               className="w-full"
             >
-              Login
+              Нэвтрэх
             </NavbarButton>
             <NavbarButton
               onClick={() => setIsMobileMenuOpen(false)}
               variant="primary"
               className="w-full"
             >
-              Book a call
+              Захиалга өгөх
             </NavbarButton>
           </div>
         </MobileNavMenu>

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@heroui/button";
 import { ChevronUp } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -26,13 +27,13 @@ export default function ScrollToTopButton() {
   if (!showButton) return null;
 
   return (
-    <button
-      onClick={scrollToTop}
+    <Button
+      onPress={scrollToTop}
       aria-label="Scroll to top"
       className="fixed text-white transition border shadow-2xl flex-center border-neutral-700 rounded-xl size-16 bottom-10 right-10 bg-dark"
       style={{ zIndex: 1000 }}
     >
       <ChevronUp className="size-4" />
-    </button>
+    </Button>
   );
 }

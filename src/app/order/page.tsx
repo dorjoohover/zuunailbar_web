@@ -3,6 +3,7 @@ import { find } from "../(api)";
 import OrderPage from "./components";
 import { Branch, Service, User } from "@/models";
 import { cookies } from "next/headers";
+import ButterflyLoader from "@/components/shared/butterflyLoader";
 
 export default async function Page() {
   const { data, error } = await find<Service>(Api.service);

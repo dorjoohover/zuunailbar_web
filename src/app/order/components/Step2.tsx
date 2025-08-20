@@ -6,26 +6,13 @@ import { Clock } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import {
-  CalendarDate,
-  DateValue,
-  fromDate,
-  getLocalTimeZone,
-  isWeekend,
-} from "@internationalized/date";
+import { CalendarDate, DateValue, fromDate, getLocalTimeZone, isWeekend } from "@internationalized/date";
 import { useLocale } from "@react-aria/i18n";
-import {
-  Booking,
-  BookingSchedule,
-  IBooking,
-  IOrder,
-  IUserService,
-  User,
-  UserService,
-} from "@/models";
+import { Booking, BookingSchedule, IBooking, IOrder, IUserService, User, UserService } from "@/models";
 import { dateValueToDate, ListType, mnDate } from "@/lib/const";
 import { formatTime, selectDate, usernameFormatter } from "@/lib/functions";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Textarea } from "@heroui/input";
 
 interface Step2Props {
   // date: CalendarDate | null;
@@ -72,15 +59,13 @@ export default function Step2({
         month: "2-digit",
         day: "2-digit",
       }).formatToParts(d);
-      const pick = (t: string) =>
-        String(p.find((x) => x.type === t)?.value).padStart(2, "0");
+      const pick = (t: string) => String(p.find((x) => x.type === t)?.value).padStart(2, "0");
       return `${p.find((x) => x.type === "year")?.value}-${pick("month")}-${pick("day")}`;
     };
     return ymd(a) === ymd(b);
   };
   const overlapInfo = useMemo(() => {
-    if (!values.date || !booking?.overlap)
-      return { hours: [] as number[], userIds: [] as string[] };
+    if (!values.date || !booking?.overlap) return { hours: [] as number[], userIds: [] as string[] };
 
     const d = values.date as Date;
     const hourSeen: Record<number, 1> = {};
@@ -117,8 +102,7 @@ export default function Step2({
       month: "2-digit",
       day: "2-digit",
     }).format(d instanceof Date ? d : new Date(d));
-  const ymdFromDV = (dv: { year: number; month: number; day: number }) =>
-    `${dv.year}-${String(dv.month).padStart(2, "0")}-${String(dv.day).padStart(2, "0")}`;
+  const ymdFromDV = (dv: { year: number; month: number; day: number }) => `${dv.year}-${String(dv.month).padStart(2, "0")}-${String(dv.day).padStart(2, "0")}`;
 
   const unavailableDays = useMemo(() => {
     const days: Record<string, 1> = {};
@@ -127,8 +111,7 @@ export default function Step2({
     for (const entries of Object.values(booking.overlap)) {
       for (const e of entries ?? []) {
         // times хоосон бол алгасъя (жинхэнэ “давхцсан” өдөр л идэвхжсэн байг)
-        if (!e?.date || !Array.isArray(e.times) || e.times.length === 0)
-          continue;
+        if (!e?.date || !Array.isArray(e.times) || e.times.length === 0) continue;
         days[ymdUB(e.date)] = 1;
       }
     }
@@ -149,10 +132,7 @@ export default function Step2({
     if (!overlap) return list; // overlap байхгүй бол бүх хэрэглэгч
 
     const hasDate = !!values?.date;
-    const hasTime =
-      values?.time !== undefined &&
-      values?.time !== null &&
-      values?.time !== "";
+    const hasTime = values?.time !== undefined && values?.time !== null && values?.time !== "";
     const timeNum = hasTime ? Number(values.time) : NaN;
 
     // day-ийг UB-аар нормчлох
@@ -197,14 +177,12 @@ export default function Step2({
   }, [users?.items, booking?.overlap, values?.date, values?.time]);
   return (
     <div className="w-full space-y-6">
-      <div>
-        <p className="mb-2 font-medium">Захиалга өгөх өдөр сонгох:</p>
+      <div className="space-y-2">
+        <p className="font-medium">Захиалга өгөх өдөр сонгох:</p>
 
         <Calendar
           aria-label="Select date"
-          value={
-            values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : undefined
-          }
+          value={values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : undefined}
           onChange={(val) => {
             if (!isDateUnavailable(val)) return;
 
@@ -213,27 +191,21 @@ export default function Step2({
             // if (errors.date) clearError("date");
           }}
           isDateUnavailable={(v) => !isDateUnavailable(v)}
-          calendarWidth={'100%'}
+          calendarWidth={"100%"}
           className="w-full"
           // weekdayStyle='long'
         />
-        {errors.date && showError && (
-          <p className="mt-1 text-sm text-red-600">{errors.date}</p>
-        )}
+        {errors.date && showError && <p className="mt-1 text-sm text-red-600">{errors.date}</p>}
       </div>
 
-      <div className="w-full">
-        <p className="mb-2 font-medium">Захиалга өгөх цагийг сонгох:</p>
+      <div className="w-full space-y-2">
+        <p className="font-medium">Захиалга өгөх цагийг сонгох:</p>
         <div className="flex w-full space-x-2">
           {overlap.map((c) => (
             <Button
               key={c}
-              className={
-                values.time === c.toString()
-                  ? "order-button-solid bg-dark text-white"
-                  : "border border-gray-400 bg-white"
-              }
-              onClick={() => {
+              className={values.time === c.toString() ? "order-button-solid bg-dark text-white" : "border border-gray-400 bg-white"}
+              onPress={() => {
                 onChange("start_time", c.toString());
               }}
             >
@@ -242,41 +214,23 @@ export default function Step2({
             </Button>
           ))}
         </div>
-        {errors.time && showError && (
-          <p className="mt-1 text-sm text-red-600">{errors.time}</p>
-        )}
+        {errors.time && showError && <p className="mt-1 text-sm text-red-600">{errors.time}</p>}
       </div>
 
-      <div>
-        <p className="mb-2 font-medium">Артист сонгох:</p>
+      <div className="space-y-2">
+        <p className="font-medium">Артист сонгох:</p>
         <ScrollArea className="w-full whitespace-normal">
           <div className="flex pb-4 space-x-4">
             {suitableUsers.map((user) => {
               const isSelected = values.user === user.id;
 
               return (
-                <Button
-                  key={user.id}
-                  onClick={() => onChange("user_id", user.id)}
-                  className={cn(
-                    isSelected
-                      ? "order-button-solid bg-dark text-white"
-                      : "border border-gray-400 bg-white",
-                    "h-24 aspect-[2/1] flex justify-start items-center p-4 gap-4"
-                  )}
-                >
-                  <Image
-                    src={
-                      user.profile_img
-                        ? `/api/file/${user.profile_img}`
-                        : "/images/logo-black.png"
-                    }
-                    width={100}
-                    height={100}
-                    alt={usernameFormatter(user)}
-                    className="object-cover overflow-hidden bg-gray-200 rounded-lg size-18 aspect-square"
-                  />
-                  <span className="truncate">{usernameFormatter(user)}</span>
+                <Button variant="solid" key={user.id} onPress={() => onChange("user_id", user.id)} className={cn(isSelected ? "bg-neutral-300" : " border-neutral-200 bg-gray-100", "h-20 aspect-[7/3] flex justify-start items-center p-2 gap-4")}>
+                  <Image src={user.profile_img ? `/api/file/${user.profile_img}` : "/images/logo-black.png"} width={100} height={100} alt={usernameFormatter(user)} className="object-cover overflow-hidden bg-gray-200 rounded-lg size-17 aspect-square" />
+                  <div className="text-left">
+                    <h1 className="">Artist:</h1>
+                    <span className="font-semibold truncate">{usernameFormatter(user)}</span>
+                  </div>
                 </Button>
               );
             })}
@@ -284,9 +238,12 @@ export default function Step2({
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
 
-        {errors.user && showError && (
-          <p className="mt-1 text-sm text-red-600">{errors.user}</p>
-        )}
+        {errors.user && showError && <p className="mt-1 text-sm text-red-600">{errors.user}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <h1 className="font-medium">Захиалгын дэлгэрэнгүй</h1>
+        <Textarea minRows={5} placeholder="Хумс хүнд гэмтэлтэй гэх мэт..." className="placeholder:text-gray-100" />
       </div>
     </div>
   );
