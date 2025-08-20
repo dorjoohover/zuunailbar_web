@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React from "react";
 import {
   motion,
   useScroll,
@@ -136,15 +136,15 @@ export const HeroParallax = ({
 
 export const Header = () => {
   return (
-    <div className="relative top-0 left-0 z-10 w-full px-4 py-20 web-container">
+    <div className="container relative top-0 left-0 z-10 w-full px-4 py-20">
       <div className="container pt-20 space-y-8 text-center">
         <h1 className="text-5xl font-semibold text-center sm:text-7xl">
           <span>Zu Nailbar</span>
           <br /> Төгс
+          
           <span className="gradient-text"> гоо сайхан</span>
         </h1>
         <p className="max-w-2xl mx-auto text-lg sm:text-xl text-dark-200">
-          {" "}
           Орчин үеийн хумсны урлаг, амралт, гоо сайхныг хослуулсан үйлчилгээ.
           Бид таны хумсыг төгс болгож, өөртөө итгэх итгэлийг тань нэмэгдүүлнэ.
           Zu Nailbar — таны гоо сайхны шинэ түвшин.

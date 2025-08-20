@@ -3,7 +3,6 @@ import { find } from "../(api)";
 import OrderPage from "./components";
 import { Branch, Service, User } from "@/models";
 import { cookies } from "next/headers";
-import ButterflyLoader from "@/components/shared/butterflyLoader";
 
 export default async function Page() {
   const { data, error } = await find<Service>(Api.service);
@@ -12,13 +11,13 @@ export default async function Page() {
   const store = await cookies();
   const token = store.get("token")?.value;
   return (
-    <>
+    <div className="relative">
       <OrderPage
         data={data}
         token={token}
         branches={branch.data}
         users={user.data}
       />
-    </>
+    </div>
   );
 }

@@ -6,12 +6,11 @@ import { Clock } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { CalendarDate, DateValue, fromDate, getLocalTimeZone, isWeekend } from "@internationalized/date";
-import { useLocale } from "@react-aria/i18n";
-import { Booking, BookingSchedule, IBooking, IOrder, IUserService, User, UserService } from "@/models";
-import { dateValueToDate, ListType, mnDate } from "@/lib/const";
+import { DateValue, fromDate } from "@internationalized/date";
+import { BookingSchedule, IOrder, User } from "@/models";
+import { ListType } from "@/lib/const";
 import { formatTime, selectDate, usernameFormatter } from "@/lib/functions";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { Textarea } from "@heroui/input";
 
 interface Step2Props {
@@ -28,6 +27,7 @@ interface Step2Props {
   };
   showError: boolean;
   values: { date?: Date; time?: string; user?: string };
+  
   // eniig hiine
   users: ListType<User>;
   booking: BookingSchedule;

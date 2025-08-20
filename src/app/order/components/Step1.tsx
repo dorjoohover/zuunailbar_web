@@ -4,7 +4,6 @@ import { ListType } from "@/lib/const";
 import { money } from "@/lib/functions";
 import { Branch, IOrder, Service } from "@/models";
 import { Select, SelectItem } from "@heroui/select";
-import { useState } from "react";
 
 interface Step1Props {
   branches: ListType<Branch>;
@@ -59,10 +58,7 @@ export default function Step1({ branches, onChange, services, values, errors, sh
         errorMessage={errors.service}
       >
         {services.items.map((service) => (
-          <SelectItem key={service.id}>
-            {`${service.name} ${money(service.min_price.toString(), "₮")}${service.max_price ? ` - ${money(service.max_price.toString(), "₮")}` : ""}`}
-
-          </SelectItem>
+          <SelectItem key={service.id}>{`${service.name} ${money(service.min_price.toString(), "₮")}${service.max_price ? ` - ${money(service.max_price.toString(), "₮")}` : ""}`}</SelectItem>
         ))}
       </Select>
     </div>

@@ -106,7 +106,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       //   minWidth: "800px",
       // }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-6xl flex-row items-center justify-between self-start rounded-full px-4 py-2 lg:flex bg-dark/90 bg-[url(/bg/navbar-bg.png)] bg-center bg-cover",
+        "relative z-[60] mx-auto hidden w-full max-w-6xl flex-row items-center justify-between self-start rounded-full px-4 h-16 lg:flex bg-dark/90 bg-[url(/bg/navbar-bg.png)] bg-center bg-cover",
         visible && "bg-dark/90 bg-[url(/bg/navbar-bg.png)] bg-center bg-cover",
         className,
       )}
@@ -240,12 +240,12 @@ export const NavbarLogo = () => {
       className="relative z-20 flex items-center px-2 py-1 mr-4 space-x-2 text-sm font-normal text-black"
     >
       <Image
-        src="/images/logo-white.png"
+        src="/logo/zu-white.png"
         alt="logo"
         width={50}
         height={50}
       />
-      <span className="font-medium text-white">Zu Nailbar</span>
+      {/* <span className="font-medium text-white">Zu Nailbar</span> */}
     </Link>
   );
 };

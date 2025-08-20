@@ -1,3 +1,5 @@
+'use client'
+
 import { siteData } from "@/lib/constants";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
@@ -5,8 +7,8 @@ import Link from "next/link";
 
 export default function Page() {
   return (
-    <div className="relative py-24 web-container">
-      <Image src={"/logo/zu-black.png"} width={1000} height={1000} alt="logo" className="absolute top-0 left-0 object-contain w-full opacity-5" />
+    <div className="container relative py-24">
+      <Image src={"/logo/zu-black.png"} width={1000} height={1000} alt="logo" className="absolute top-[35%] left-[50%] -translate-y-[50%] -translate-x-[50%] object-contain lg:w-2/3 w-full opacity-5" />
       <div className="relative flex flex-col items-start w-full pt-10 space-y-20">
         <div className="space-y-8">
           <h1 className="text-5xl font-semibold sm:text-7xl">
