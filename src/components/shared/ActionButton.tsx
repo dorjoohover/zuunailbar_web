@@ -23,7 +23,7 @@ export function ActionButton({ href, children, className, onClick }: ActionButto
   }
 
   return (
-    <Button className={cn(baseClasses, className)} onClick={onClick}>
+    <Button className={cn(baseClasses, className)} onPress={onClick}>
       {children}
     </Button>
   );

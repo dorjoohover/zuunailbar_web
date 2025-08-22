@@ -1,5 +1,5 @@
-import Loader from "@/components/shared/Loader";
+import ButterflyLoader from "@/components/shared/butterflyLoader";
 
 export default function Loading() {
-  return <Loader />;
+  return <ButterflyLoader />;
 }

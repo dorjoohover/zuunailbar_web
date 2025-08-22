@@ -11,13 +11,13 @@ export default async function Page() {
   const store = await cookies();
   const token = store.get("token")?.value;
   return (
-    <>
+    <div className="relative">
       <OrderPage
         data={data}
         token={token}
         branches={branch.data}
         users={user.data}
       />
-    </>
+    </div>
   );
 }

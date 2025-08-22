@@ -1,8 +1,5 @@
 import { siteData } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
-import Link from "next/link";
-import React from "react";
 import ServicesSection from "./ServicesSection";
 
 export default function FeatureSection() {
@@ -30,7 +27,7 @@ export default function FeatureSection() {
       {/* What we do */}
       <section className="container py-16 text-dark">
         <h1 className="text-5xl">Бид юу хийдэг вэ?</h1>
-        <div className="grid grid-cols-2 gap-10 mt-10">
+        <div className="grid grid-cols-1 gap-10 mt-10 sm:grid-cols-2">
           {siteData.mainService.map((item, index) => (
             <div className="space-y-6" key={index}>
               <div className="aspect-[2/1] bg-gray-200 w-full overflow-hidden rounded-2xl relative">

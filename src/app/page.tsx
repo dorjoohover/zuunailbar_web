@@ -11,8 +11,6 @@ export default async function Page() {
   console.log(res.data);
   return (
     <>
-      {/* bg-[url('/images/grid-bg.png')] bg-[url('/images/background.png')]  */}
-      {/* bg-[#111315] */}
       <HeroSection data={res.data} />
       <FeatureSection />
       <ContactSection />

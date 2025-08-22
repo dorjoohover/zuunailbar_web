@@ -5,11 +5,7 @@ import { paginationToQuery } from "@/lib/functions";
 import { API, METHOD } from "@/utils/api";
 import { cookies } from "next/headers";
 
-export const find = async <T>(
-  uri: keyof typeof API,
-  p: Pagination = {},
-  route?: string
-): Promise<{ data: ListType<T>; error?: string }> => {
+export const find = async <T>(uri: keyof typeof API, p: Pagination = {}, route?: string): Promise<{ data: ListType<T>; error?: string }> => {
   try {
     const store = await cookies();
     const token = store.get("token")?.value;
@@ -48,18 +44,12 @@ export const find = async <T>(
     };
   }
 };
-export const findOne = async (
-  uri: keyof typeof API,
-  id: string,
-  route?: string
-) => {
+export const findOne = async (uri: keyof typeof API, id: string, route?: string) => {
   const store = await cookies();
   const token = store.get("token")?.value;
   const branch = store.get("branch_id")?.value;
   const merchant = store.get("merchant_id")?.value;
-  const url = `${API[uri as keyof typeof API]}${
-    route ? `/${route}/` : "/"
-  }${id}`;
+  const url = `${API[uri as keyof typeof API]}${route ? `/${route}/` : "/"}${id}`;
   const res = await fetch(url, {
     cache: "no-store",
     headers: {
@@ -75,19 +65,13 @@ export const findOne = async (
 
   return await res.json();
 };
-export const deleteOne = async (
-  uri: keyof typeof API,
-  id: string,
-  route?: string
-): Promise<PPDT> => {
+export const deleteOne = async (uri: keyof typeof API, id: string, route?: string): Promise<PPDT> => {
   try {
     const store = await cookies();
     const token = store.get("token")?.value;
     const branch = store.get("branch_id")?.value;
     const merchant = store.get("merchant_id")?.value;
-    const url = `${API[uri as keyof typeof API]}${
-      route ? `/${route}/` : "/"
-    }${id}`;
+    const url = `${API[uri as keyof typeof API]}${route ? `/${route}/` : "/"}${id}`;
     const res = await fetch(url, {
       cache: "no-store",
       method: METHOD.delete,
@@ -117,12 +101,7 @@ export const deleteOne = async (
     };
   }
 };
-export const updateOne = async <T>(
-  uri: keyof typeof API,
-  id: string,
-  body: T,
-  route?: string
-): Promise<PPDT> => {
+export const updateOne = async <T>(uri: keyof typeof API, id: string, body: T, route?: string): Promise<PPDT> => {
   try {
     const store = await cookies();
     const token = store.get("token")?.value;
@@ -154,17 +133,11 @@ export const updateOne = async <T>(
     return { error: (error as Error).message, success: false };
   }
 };
-export const create = async <T>(
-  uri: keyof typeof API,
-  body: T,
-  route?: string
-): Promise<PPDT> => {
+export const create = async <T>(uri: keyof typeof API, body: T, route?: string): Promise<PPDT> => {
   try {
     const store = await cookies();
     const token = store.get("token")?.value;
-    const branch = (body as any)?.branch_id
-      ? (body as any).branch_id
-      : store.get("branch_id")?.value;
+    const branch = (body as any)?.branch_id ? (body as any).branch_id : store.get("branch_id")?.value;
     const merchant = store.get("merchant_id")?.value;
 
     const url = `${API[uri]}${route ? `/${route}` : ""}`;
@@ -196,11 +169,7 @@ export const create = async <T>(
   }
 };
 
-export const search = async <T>(
-  uri: keyof typeof API,
-  p = {},
-  route?: string
-): Promise<{ data: SearchType<T>[]; error?: string }> => {
+export const search = async <T>(uri: keyof typeof API, p = {}, route?: string): Promise<{ data: SearchType<T>[]; error?: string }> => {
   try {
     const store = await cookies();
     const token = store.get("token")?.value;
