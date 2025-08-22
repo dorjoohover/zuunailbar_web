@@ -22,7 +22,7 @@ export const find = async <T>(
     };
 
     const url = paginationToQuery(uri, merged, route);
-
+    console.log(url);
     const res = await fetch(url, {
       cache: "no-store",
       headers: {

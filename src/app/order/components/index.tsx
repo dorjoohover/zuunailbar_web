@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import { CalendarDate } from "@internationalized/date";
 import { cn } from "@/lib/utils";
 import { Button } from "@heroui/button";
-import { ListDefault, ListType } from "@/lib/const";
+import { ListDefault, ListType, mnDate } from "@/lib/const";
 import {
   Booking,
   BookingSchedule,
@@ -117,10 +117,11 @@ export default function OrderPage({
       });
 
       await find<IBooking>(Api.booking, {
-        start_date: new Date(),
+        start_date: mnDate(),
         branch_id: selected.branch_id,
         limit: -1,
       }).then((d) => {
+        console.log(d)
         setBookings(d.data.items?.[0] as unknown as BookingSchedule);
       });
     }

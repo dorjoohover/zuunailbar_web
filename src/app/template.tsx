@@ -24,24 +24,26 @@ export default function Template({
     }
   };
   const me = async () => {
-    try {
-      const res = await fetch(`${baseUrl}/api/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      });
-      const data = await res.json();
-      console.log(data);
-      if (!res.ok) {
+    if (token) {
+      try {
+        const res = await fetch(`${baseUrl}/api/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          cache: "no-store",
+        });
+        const data = await res.json();
+        console.log(data);
+        if (!res.ok) {
+          // deleteCookie();
+        } else {
+          data.payload.user.role > ROLE.ADMIN ? deleteCookie() : null;
+        }
+      } catch (error) {
+        console.log("error", error);
         // deleteCookie();
-      } else {
-        data.payload.user.role > ROLE.ADMIN ? deleteCookie() : null;
       }
-    } catch (error) {
-      console.log("error", error);
-      // deleteCookie();
     }
   };
 
