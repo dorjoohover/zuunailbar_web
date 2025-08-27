@@ -33,12 +33,25 @@ function useStepper(total = 3) {
 
   return { step, go, next, prev, total };
 }
-export default function OrderPage({ data, branches, token, users }: { token?: string; data: ListType<Service>; branches: ListType<Branch>; users: ListType<User> }) {
+export default function OrderPage({
+  data,
+  branches,
+  token,
+  users,
+}: {
+  token?: string;
+  data: ListType<Service>;
+  branches: ListType<Branch>;
+  users: ListType<User>;
+}) {
   // selected бүх мэдээллээ энд төвлөрүүлнэ
-  const [selected, setSelected] = useState<Partial<IOrder> & { times?: string }>({ details: [] });
+  const [selected, setSelected] = useState<
+    Partial<IOrder> & { times?: string }
+  >({ details: [] });
 
   const [bookings, setBookings] = useState<BookingSchedule>({ overlap: {} });
-  const [userService, setUserService] = useState<ListType<IUserService>>(ListDefault);
+  const [userService, setUserService] =
+    useState<ListType<IUserService>>(ListDefault);
   const [showError, setShowError] = useState(false);
   function setField<K extends keyof IOrder>(key: K, value: IOrder[K]) {
     setSelected((prev) => ({ ...prev, [key]: value }));
@@ -47,7 +60,9 @@ export default function OrderPage({ data, branches, token, users }: { token?: st
   const step1Errors = useMemo(
     () => ({
       branch: selected.branch_id ? undefined : "Салбараа сонгоно уу!",
-      service: selected.details?.some((d) => d?.service_id != undefined) ? undefined : "Үйлчилгээгээ сонгоно уу!",
+      service: selected.details?.some((d) => d?.service_id != undefined)
+        ? undefined
+        : "Үйлчилгээгээ сонгоно уу!",
     }),
     [selected.branch_id, selected.details]
   );
@@ -62,8 +77,16 @@ export default function OrderPage({ data, branches, token, users }: { token?: st
   );
   const { step, go, next, prev, total } = useStepper(3);
 
-  const activeErrors = step === 1 ? step1Errors : step === 2 ? step2Errors : ({} as Record<string, string | undefined>);
-  const isStepComplete = useMemo(() => Object.values(activeErrors).every((v) => !v), [activeErrors]);
+  const activeErrors =
+    step === 1
+      ? step1Errors
+      : step === 2
+        ? step2Errors
+        : ({} as Record<string, string | undefined>);
+  const isStepComplete = useMemo(
+    () => Object.values(activeErrors).every((v) => !v),
+    [activeErrors]
+  );
 
   // индикатор дээр үсрэх зөвшөөрөл
   function canJump(target: number) {
@@ -97,7 +120,7 @@ export default function OrderPage({ data, branches, token, users }: { token?: st
         branch_id: selected.branch_id,
         limit: -1,
       }).then((d) => {
-        console.log(d)
+        console.log(d);
         setBookings(d.data.items?.[0] as unknown as BookingSchedule);
       });
     }
@@ -188,26 +211,48 @@ export default function OrderPage({ data, branches, token, users }: { token?: st
         {step === 3 && (
           <Step3
             values={{
-              branch: branches.items.filter((b) => b.id == selected.branch_id)[0].name,
+              branch: branches.items.filter(
+                (b) => b.id == selected.branch_id
+              )[0].name,
               date: selected.order_date ?? new Date(),
-              services: selected.details!.map((d) => d.service_name).filter((d) => d != null) ?? [],
+              services:
+                selected
+                  .details!.map((d) => d.service_name)
+                  .filter((d) => d != null) ?? [],
               time: selected.start_time ?? "",
-              user: usernameFormatter(users.items.filter((us) => us.id == selected.user_id)[0]),
+              user: usernameFormatter(
+                users.items.filter((us) => us.id == selected.user_id)[0]
+              ),
             }}
           />
         )}
 
         {/* Navigation buttons */}
         <div className="flex justify-between mt-6">
-          <Button onPress={prev} disabled={step === 1} variant="bordered" className="h-12 w-28">
+          <Button
+            onPress={prev}
+            disabled={step === 1}
+            variant="bordered"
+            className="h-12 w-28"
+          >
             Буцах
           </Button>
           {step < total ? (
-            <Button className={cn(isStepComplete ? "" : "", "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center", "bg-dark bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)]")} onPress={handleNext}>
+            <Button
+              className={cn(
+                isStepComplete ? "" : "",
+                "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
+                "bg-dark bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)]"
+              )}
+              onPress={handleNext}
+            >
               Дараах
             </Button>
           ) : (
-            <Button onPress={() => onSubmit()} className="text-white bg-teal-500">
+            <Button
+              onPress={() => onSubmit()}
+              className="text-white bg-teal-500"
+            >
               ???
             </Button>
           )}

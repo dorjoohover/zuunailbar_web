@@ -17,13 +17,12 @@ import Link from "next/link";
 import { siteData } from "@/lib/constants";
 
 export function NavbarDemo({ token }: { token?: string }) {
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <Navbar>
       {/* Desktop Navigation */}
-      <NavBody>
+      <NavBody className="min-w-[630px]">
         <NavItems items={siteData.navItems} />
         <NavbarLogo />
         <div className="flex items-center gap-4">
@@ -32,7 +31,7 @@ export function NavbarDemo({ token }: { token?: string }) {
           <Button
             href="/order"
             as={Link}
-            className="px-4 bg-white rounded-full"
+            className="px-4 bg-white text-black rounded-full"
           >
             Захиалга
           </Button>
