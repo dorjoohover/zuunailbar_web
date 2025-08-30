@@ -34,16 +34,16 @@ export default function ServicesPage() {
               className="object-cover"
             />
             <div className="absolute bottom-0 left-0 z-10 from-dark via-transparent bg-gradient-to-t to-transparent size-full"></div>
-            <div className="absolute bottom-0 left-0 z-20 p-10 text-white">
+            <div className="absolute bottom-0 left-0 z-20 p-10 text-lg text-white">
               <p>{siteData.detailService[activeIndex].description}</p>
             </div>
           </div>
         </div>
 
         {/* Right list */}
-        <div className="flex flex-col overflow-y-auto">
+        <div className="flex flex-col">
           {siteData.detailService.map((service, idx) => (
-            <div key={service.id} onMouseEnter={() => setActiveIndex(idx)} className={`flex justify-between items-center py-6 border-b border-dark cursor-pointer transition-opacity duration-300 ${idx === activeIndex ? "opacity-100" : "opacity-30"}`}>
+            <div key={service.id} onMouseEnter={() => setActiveIndex(idx)} className={`flex justify-between items-center py-6 border-b border-dark transition-all duration-300 ${idx === activeIndex ? "opacity-100 translate-x-2" : "opacity-30 translate-x-0"}`}>
               <div className="flex items-center gap-2">
                 <span className="font-bold">00{service.id}</span>
                 <h2 className="text-lg font-medium">{service.title}</h2>

@@ -106,7 +106,7 @@ html {
 } */
 
 @utility container {
-  @apply flex-grow pt-16 mx-auto sm:px-6 lg:px-8 max-w-7xl;
+  @apply flex-grow px-6 pt-16 mx-auto lg:px-8 max-w-7xl;
 }
 
 @utility order-button-outline {

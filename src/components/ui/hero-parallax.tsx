@@ -17,9 +17,11 @@ export const HeroParallax = ({
   data: Home[];
   handleDone: () => void;
 }) => {
-  const firstRow = data.slice(0, 5);
-  const secondRow = data.slice(5, 10);
-  const thirdRow = data.slice(10, 15);
+  const interval = Math.ceil(data.length / 3)
+  const firstRow = data.slice(0, interval);
+  const secondRow = data.slice(interval, interval * 2);
+  const thirdRow = data.slice(interval * 2, interval * 3);
+  
   const ref = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -171,9 +173,9 @@ export const ProductCard = ({
       style={{
         x: translate,
       }}
-      whileHover={{
-        scale: 1.02,
-      }}
+      // whileHover={{
+      //   scale: 1.02,
+      // }}
       key={product.name}
       className="h-[20rem] shadow-lg sm:h-[22rem] lg:h-[30rem] aspect-[3/4] relative shrink-0 bg-clip-padding backdrop-filter backdrop-blur-lg rounded-2xl overflow-hidden group"
     >

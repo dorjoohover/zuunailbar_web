@@ -36,7 +36,7 @@ export default function Step1({
         errorMessage={errors.branch}
       >
         {branches.items.map((branch) => (
-          <SelectItem className="text-white" key={branch.id}>
+          <SelectItem className="" key={branch.id}>
             {branch.name}
           </SelectItem>
         ))}
@@ -68,7 +68,7 @@ export default function Step1({
       >
         {services.items.map((service) => (
           <SelectItem
-            className="text-white"
+            className=""
             key={service.id}
           >{`${service.name} ${money(service.min_price.toString(), "₮")}${service.max_price ? ` - ${money(service.max_price.toString(), "₮")}` : ""}`}</SelectItem>
         ))}

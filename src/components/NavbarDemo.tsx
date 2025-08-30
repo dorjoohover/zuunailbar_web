@@ -31,7 +31,7 @@ export function NavbarDemo({ token }: { token?: string }) {
           <Button
             href="/order"
             as={Link}
-            className="px-4 bg-white text-black rounded-full"
+            className="px-4 text-black bg-white rounded-full"
           >
             Захиалга
           </Button>
@@ -54,14 +54,14 @@ export function NavbarDemo({ token }: { token?: string }) {
           onClose={() => setIsMobileMenuOpen(false)}
         >
           {siteData.navItems.map((item, idx) => (
-            <a
+            <Link
               key={`mobile-link-${idx}`}
               href={item.link}
               onClick={() => setIsMobileMenuOpen(false)}
               className="relative text-white"
             >
               <span className="block">{item.name}</span>
-            </a>
+            </Link>
           ))}
           <div className="flex flex-col w-full gap-4">
             <NavbarButton
