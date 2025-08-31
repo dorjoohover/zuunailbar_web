@@ -40,7 +40,7 @@ export enum Api {
 }
 
 export const API = {
-  [Api.login]: BASE + "login",
+  [Api.login]: BASE + "client/login",
   [Api.register]: BASE + "register",
   [Api.otp]: BASE + "otp",
   [Api.send_otp]: BASE + "send/otp",

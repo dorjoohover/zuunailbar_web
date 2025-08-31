@@ -9,6 +9,7 @@ import {
 } from "motion/react";
 import { Button } from "@heroui/button";
 import { Home } from "@/models/home.model";
+import Link from "next/link";
 
 export const HeroParallax = ({
   data,
@@ -17,11 +18,11 @@ export const HeroParallax = ({
   data: Home[];
   handleDone: () => void;
 }) => {
-  const interval = Math.ceil(data.length / 3)
+  const interval = Math.ceil(data.length / 3);
   const firstRow = data.slice(0, interval);
   const secondRow = data.slice(interval, interval * 2);
   const thirdRow = data.slice(interval * 2, interval * 3);
-  
+
   const ref = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -143,7 +144,6 @@ export const Header = () => {
         <h1 className="text-5xl font-semibold text-center sm:text-7xl">
           <span>Zu Nailbar</span>
           <br /> Төгс
-          
           <span className="gradient-text"> гоо сайхан</span>
         </h1>
         <p className="max-w-2xl mx-auto text-lg sm:text-xl text-dark-200">
@@ -151,9 +151,11 @@ export const Header = () => {
           Бид таны хумсыг төгс болгож, өөртөө итгэх итгэлийг тань нэмэгдүүлнэ.
           Zu Nailbar — таны гоо сайхны шинэ түвшин.
         </p>
-        <Button size="lg" className="text-white bg-dark">
-          Захиалга өгөх
-        </Button>
+        <Link href={"/order"}>
+          <Button size="lg" className="text-white bg-dark">
+            Захиалга өгөх
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -98,6 +98,15 @@ export default function AuthModal() {
         mobile: phone,
         password: password,
       });
+      console.log(res);
+      if (res.error) {
+        addToast({
+          title: res.error,
+          size: "lg",
+          color: "danger",
+        });
+        return;
+      }
       const data = res.data;
       if (data?.accessToken) {
         save(data.accessToken, data.merchant_id);

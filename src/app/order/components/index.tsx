@@ -24,6 +24,7 @@ import { Form } from "@heroui/form";
 import { create, find } from "@/app/(api)";
 import { Api } from "@/utils/api";
 import { usernameFormatter } from "@/lib/functions";
+import { addToast } from "@heroui/toast";
 function useStepper(total = 3) {
   const [step, setStep] = useState(1);
   const go = (n: number) => setStep(Math.min(Math.max(1, n), total));
@@ -144,7 +145,7 @@ export default function OrderPage({
       start_time: selected.start_time,
       user_id: selected.user_id,
     });
-    alert(res.success);
+    addToast({ title: res.success });
     reset();
   };
 

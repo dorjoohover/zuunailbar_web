@@ -8,7 +8,6 @@ import { Api } from "@/utils/api";
 export default async function Page() {
   const res = await find<Home>(Api.home, {}, "web/home");
 
-  console.log(res.data);
   return (
     <>
       <HeroSection data={res.data} />
