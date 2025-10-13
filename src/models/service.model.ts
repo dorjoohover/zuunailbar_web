@@ -15,15 +15,19 @@ export interface IService {
   created_by?: string;
   created_at?: Date;
   min: Discounted;
+  description?: string;
+  duplicated: boolean;
   max?: Discounted;
 }
 export interface Service {
   id: string;
   branch_id: string;
+  description?: string;
   name?: string;
   max_price: number;
   min_price: number;
   duration: number;
+  duplicated: boolean;
   created_by: string;
   created_at?: Date;
   min: Discounted;

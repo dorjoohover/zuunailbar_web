@@ -1,8 +1,22 @@
-import { Brush, BrushCleaning, Bubbles, Component, Eraser, Facebook, Footprints, Hand, Instagram, Mail, Scissors, Smartphone, Sparkles } from "lucide-react";
+import {
+  Brush,
+  BrushCleaning,
+  Bubbles,
+  Component,
+  Eraser,
+  Facebook,
+  Footprints,
+  Hand,
+  Instagram,
+  Mail,
+  Scissors,
+  Smartphone,
+  Sparkles,
+} from "lucide-react";
 
 export const siteData = {
   navItems: [
-      {
+    {
       name: "Үйлчилгээ",
       link: "/service",
     },
@@ -22,7 +36,8 @@ export const siteData = {
       id: 2,
       title: "Цэвэр орчин",
       icon: Bubbles,
-      description: "Ариутгал, эрүүл ахуйн стандартыг бүрэн хангасан тав тухтай орчин",
+      description:
+        "Ариутгал, эрүүл ахуйн стандартыг бүрэн хангасан тав тухтай орчин",
     },
     {
       id: 3,
@@ -40,12 +55,14 @@ export const siteData = {
   mainService: [
     {
       title: "Маникюр",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
       image: "/images/nail/1.png",
     },
     {
       title: "Педикюр",
-      description: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ex, inventore enim obcaecati rerum eius tempora? Ipsa iure incidunt dicta reiciendis?",
       image: "/images/nail/2.png",
     },
   ],
@@ -61,28 +78,32 @@ export const siteData = {
       id: 2,
       title: "Смарт хумстай будалт",
       price: "50'000₮",
-      description: "Өнгө, дизайн, чимэглэлээ өөртөө тааруулан сонгох ухаалаг будалт.",
+      description:
+        "Өнгө, дизайн, чимэглэлээ өөртөө тааруулан сонгох ухаалаг будалт.",
       icon: Sparkles,
     },
     {
       id: 3,
       title: "Педикюр",
       price: "50'000₮",
-      description: "Хөлийн эрүүл мэнд, гоо үзэсгэлэнг хослуулсан иж бүрэн педикюр үйлчилгээ.",
+      description:
+        "Хөлийн эрүүл мэнд, гоо үзэсгэлэнг хослуулсан иж бүрэн педикюр үйлчилгээ.",
       icon: Footprints,
     },
     {
       id: 4,
       title: "Нөхөлт гар",
       price: "50'000₮",
-      description: "Хумсны эвдэрсэн хэсгийг сэргээж, анхны хэлбэрийг нь хадгална.",
+      description:
+        "Хумсны эвдэрсэн хэсгийг сэргээж, анхны хэлбэрийг нь хадгална.",
       icon: Hand,
     },
     {
       id: 5,
       title: "Нөхөлт хөл",
       price: "50'000₮",
-      description: "Хөлийн хумсны гэмтэл, ховхролтыг сэргээж, цэвэрхэн харагдуулна.",
+      description:
+        "Хөлийн хумсны гэмтэл, ховхролтыг сэргээж, цэвэрхэн харагдуулна.",
       icon: BrushCleaning,
     },
     {
@@ -113,13 +134,13 @@ export const siteData = {
       id: 1,
       name: "ХАА-н яамны замын урд талд Орчлон комплекс 3 давхар 311 тоот",
       city: "Улаанбаатар хот",
-      link: 'https://maps.app.goo.gl/m5moYfUYC1f6aJXx9'
+      link: "https://maps.app.goo.gl/m5moYfUYC1f6aJXx9",
     },
     {
       id: 2,
       name: "Crystal town хотхоны замын урд ХИМЧАН оффис 6 давхар 603 тоот",
       city: "Улаанбаатар хот",
-      link: 'https://maps.app.goo.gl/VwZqcs7PsH1ddk41A'
+      link: "https://maps.app.goo.gl/VwZqcs7PsH1ddk41A",
     },
   ],
   footerLinks: [
@@ -137,3 +158,18 @@ export const siteData = {
     // },
   ],
 };
+
+export const orderSteps = [
+  {
+    name: "Үйлчилгээ сонгох",
+  },
+  {
+    name: "Артист сонгох (заавал биш)",
+  },
+  {
+    name: "Огноо ба цаг сонгох",
+  },
+  {
+    name: "Баталгаажуулах",
+  },
+];

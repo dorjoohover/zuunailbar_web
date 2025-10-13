@@ -5,7 +5,7 @@ import { Branch, Service, User } from "@/models";
 import { cookies } from "next/headers";
 
 export default async function Page() {
-  const { data, error } = await find<Service>(Api.service);
+  const { data, error } = await find<Service>(Api.service, {limit: -1});
   const branch = await find<Branch>(Api.branch);
   const user = await find<User>(Api.user, { limit: -1 }, "client");
   const store = await cookies();

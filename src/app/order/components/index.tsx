@@ -11,6 +11,7 @@ import {
   Branch,
   IBooking,
   IOrder,
+  IOrderDetail,
   IUserService,
   Schedule,
   Service,
@@ -23,8 +24,11 @@ import Step3 from "./Step3";
 import { Form } from "@heroui/form";
 import { create, find } from "@/app/(api)";
 import { Api } from "@/utils/api";
+
+import { Progress } from "@heroui/progress";
 import { usernameFormatter } from "@/lib/functions";
 import { addToast } from "@heroui/toast";
+import { orderSteps } from "@/lib/constants";
 function useStepper(total = 3) {
   const [step, setStep] = useState(1);
   const go = (n: number) => setStep(Math.min(Math.max(1, n), total));
@@ -61,11 +65,13 @@ export default function OrderPage({
   const step1Errors = useMemo(
     () => ({
       branch: selected.branch_id ? undefined : "Салбараа сонгоно уу!",
-      service: selected.details?.some((d) => d?.service_id != undefined)
+      service: (selected.details as IOrderDetail[])?.some(
+        (d) => d?.service_id != undefined
+      )
         ? undefined
         : "Үйлчилгээгээ сонгоно уу!",
     }),
-    [selected.branch_id, selected.details]
+    [selected.branch_id, selected.details as IOrderDetail[]]
   );
 
   const step2Errors = useMemo(
@@ -109,7 +115,8 @@ export default function OrderPage({
   const fetcher = async () => {
     if (step == 2) {
       await find<IUserService>(Api.user_service, {
-        services: selected.details?.map((d) => d.service_id) ?? [],
+        services:
+          (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
         branch_id: selected.branch_id,
         limit: -1,
       }).then((d) => {
@@ -140,9 +147,10 @@ export default function OrderPage({
   const onSubmit = async () => {
     const res = await create<IOrder>(Api.order, {
       branch_id: selected.branch_id,
-      details: selected.details,
+      details: selected.details as IOrderDetail[],
       order_date: selected.order_date,
       start_time: selected.start_time,
+      customer_desc: selected.customer_desc,
       user_id: selected.user_id,
     });
     addToast({ title: res.success });
@@ -151,24 +159,32 @@ export default function OrderPage({
 
   return (
     <div className="relative py-10">
-      <div className="flex flex-col justify-center max-w-xl p-6 py-32 mx-auto space-y-6 ">
+      <div className="flex flex-col justify-center max-w-3xl p-6 py-32 mx-auto space-y-6 ">
         {/* Step indicator */}
-        <div className="relative flex justify-between w-full px-10">
-          <div className="absolute top-[50%] -translate-y-[50%] left-[50%] -translate-x-[50%] w-3/4 border-[0.5px] border-gray-400 h-[1px] border-dashed"></div>
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={`size-10 space-x-2 z-10 cursor-pointer relative rounded-full flex-center font-semibold text-sm ${s === step ? "bg-dark-200 text-white" : "border-2 bg-background border-dark"}`}
-              onClick={() => {
-                if (canJump(s)) go(s);
-              }}
-            >
-              <span>0{s}</span>
-            </div>
-          ))}
+        <div>
+          <Progress
+            aria-label="Loading..."
+            className="w-full pb-3 px-2"
+            size="sm"
+            value={(step / 4) * 100}
+          />
+          <div className="relative flex justify-between w-full ">
+            <div className="absolute top-[50%] -translate-y-[50%]  left-[50%] -translate-x-[50%] w-3/4 border-[0.5px] border-gray-400 h-[1px] border-dashed"></div>
+            {orderSteps.map((s, i) => (
+              <div
+                key={i}
+                className={`space-x-2 z-10 cursor-pointer relative px-2 bg-white flex-center font-semibold text-xs `}
+                onClick={() => {
+                  // if (canJump(s)) go(s);
+                }}
+              >
+                <span>{s.name}</span>
+              </div>
+            ))}
+          </div>
         </div>
         <Form
-          className="flex flex-col justify-center w-full gap-4"
+          className="flex flex-col justify-center w-full gap-4 px-2"
           onReset={() => setSelected({ details: [] })}
           onSubmit={(e) => {
             e.preventDefault();
@@ -182,7 +198,10 @@ export default function OrderPage({
             <Step1
               values={{
                 branch: selected.branch_id,
-                services: selected.details?.map((d) => d.service_id) ?? [],
+                services:
+                  (selected.details as IOrderDetail[])?.map(
+                    (d) => d.service_id
+                  ) ?? [],
               }}
               showError={showError}
               branches={branches}
@@ -197,39 +216,37 @@ export default function OrderPage({
         {step === 2 && (
           <Step2
             showError={showError}
-            values={{
-              date: selected.order_date,
-              time: selected.start_time,
-              user: selected.user_id,
-            }}
+            values={selected.details ?? []}
             users={users}
-            booking={bookings}
             onChange={setField}
+            userServices={[]}
             errors={step2Errors}
           />
         )}
 
         {step === 3 && (
-          <Step3
-            values={{
-              branch: branches.items.filter(
-                (b) => b.id == selected.branch_id
-              )[0].name,
-              date: selected.order_date ?? new Date(),
-              services:
-                selected
-                  .details!.map((d) => d.service_name)
-                  .filter((d) => d != null) ?? [],
-              time: selected.start_time ?? "",
-              user: usernameFormatter(
-                users.items.filter((us) => us.id == selected.user_id)[0]
-              ),
-            }}
-          />
+          <></>
+          // <Step3
+            // values={{
+            //   branch: branches.items.filter(
+            //     (b) => b.id == selected.branch_id
+            //   )[0].name,
+            //   date: selected.order_date ?? new Date(),
+            //   services:
+            //     (selected.details as IOrderDetail[])!
+            //       .map((d) => d.service_name)
+            //       .filter((d) => d != null) ?? [],
+            //   time: selected.start_time ?? "",
+            //   user: usernameFormatter(
+            //     users.items.filter((us) => us.id == selected.user_id)[0]
+            //   ),
+            //   description: selected.customer_desc,
+            // }}
+          // />
         )}
 
         {/* Navigation buttons */}
-        <div className="flex justify-between mt-6">
+        <div className="flex justify-between mt-6 px-2">
           <Button
             onPress={prev}
             disabled={step === 1}

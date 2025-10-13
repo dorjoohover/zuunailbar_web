@@ -126,13 +126,19 @@ export const usernameFormatter = (user: User) => {
     }`
   );
 };
-export const money = (value: string, currency = "", round = 1) => {
+export const money = (
+  value: string,
+  currency = "",
+  round = 1,
+  slice?: number
+) => {
   let v = Math.round(+value / round) * round;
-  return `${currency}${v
+  const result = `${currency}${v
     .toString()
     .replaceAll(",", "")
     .toString()
     .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
+  return slice ? result.slice(0, result.length - slice) : result;
 };
 
 export function paginationToQuery(

@@ -1,6 +1,7 @@
 export interface IOrder {
   user_id?: string;
   customer_id?: string;
+  customer_desc?: string;
   branch_id?: string;
   order_date?: Date;
   start_time?: string;

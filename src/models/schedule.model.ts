@@ -3,7 +3,7 @@ export interface ISchedule {
   user_id: string;
   approved_by?: string;
   branch_id?: string;
-  date: Date;
+  index: number;
   start_time?: Date;
   end_time?: Date;
   times: string[];
@@ -16,7 +16,7 @@ export interface Schedule {
   user_id: string;
   approved_by: string;
   branch_id: string;
-  date: Date;
+  index: number;
   start_time: Date;
   end_time: Date;
   schedule_status: number;
@@ -29,7 +29,7 @@ export interface IBooking {
   approved_by?: string;
   merchant_id?: string;
   branch_id: string;
-  date: Date;
+  index: number;
   start_time?: Date;
   end_time?: Date;
   status?: number;
@@ -44,7 +44,7 @@ export interface Booking {
   approved_by: string;
   merchant_id: string;
   branch_id: string;
-  date: Date;
+  index: number;
   start_time: Date;
   end_time: Date;
   status: number;
