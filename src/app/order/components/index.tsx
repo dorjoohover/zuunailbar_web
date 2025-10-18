@@ -54,7 +54,7 @@ export default function OrderPage({
     Partial<IOrder> & { times?: string }
   >({ details: [] });
 
-  const [bookings, setBookings] = useState<BookingSchedule>({ overlap: {} });
+  const [bookings, setBookings] = useState<BookingSchedule | null>(null);
   const [userService, setUserService] =
     useState<ListType<IUserService>>(ListDefault);
   const [showError, setShowError] = useState(false);
@@ -74,7 +74,7 @@ export default function OrderPage({
     [selected.branch_id, selected.details as IOrderDetail[]]
   );
 
-  const step2Errors = useMemo(
+  const step3Errors = useMemo(
     () => ({
       date: selected.order_date ? undefined : "Захиалгын өдрөө сонгоно уу!",
       time: selected.start_time ? undefined : "Захиалгын цагаа сонгоно уу!",
@@ -82,13 +82,14 @@ export default function OrderPage({
     }),
     [selected.order_date, selected.start_time, selected.user_id]
   );
+
   const { step, go, next, prev, total } = useStepper(3);
 
   const activeErrors =
     step === 1
       ? step1Errors
-      : step === 2
-        ? step2Errors
+      : step === 3
+        ? step3Errors
         : ({} as Record<string, string | undefined>);
   const isStepComplete = useMemo(
     () => Object.values(activeErrors).every((v) => !v),
@@ -101,7 +102,7 @@ export default function OrderPage({
     if (target <= 1) return true;
     if (!Object.values(step1Errors).every((v) => !v)) return false;
     if (target <= 2) return true;
-    if (!Object.values(step2Errors).every((v) => !v)) return false;
+    if (!Object.values(step3Errors).every((v) => !v)) return false;
     return true;
   }
   const handleNext = () => {
@@ -122,16 +123,25 @@ export default function OrderPage({
       }).then((d) => {
         setUserService(d.data);
       });
-
-      await find<IBooking>(Api.booking, {
-        start_date: mnDate(),
-        branch_id: selected.branch_id,
-        limit: -1,
-      }).then((d) => {
-        console.log(d);
-        setBookings(d.data.items?.[0] as unknown as BookingSchedule);
-      });
     }
+    if (step == 3) {
+      await getAvailableTime();
+    }
+  };
+
+  const getAvailableTime = async (date?: Date) => {
+    await create(
+      Api.order,
+      {
+        serviceArtist: selected.users,
+        branch_id: selected.branch_id ?? "",
+        date,
+      },
+      "available_times"
+    ).then((d) => {
+      console.log(d);
+      setBookings(d.data.payload);
+    });
   };
 
   useEffect(() => {
@@ -141,7 +151,7 @@ export default function OrderPage({
   const reset = () => {
     setSelected({ details: [] });
     setUserService(ListDefault);
-    setBookings({ overlap: {} });
+    setBookings(null);
     go(1);
   };
   const onSubmit = async () => {
@@ -152,6 +162,7 @@ export default function OrderPage({
       start_time: selected.start_time,
       customer_desc: selected.customer_desc,
       user_id: selected.user_id,
+      users: selected.users,
     });
     addToast({ title: res.success });
     reset();
@@ -216,33 +227,30 @@ export default function OrderPage({
         {step === 2 && (
           <Step2
             showError={showError}
-            values={selected.details ?? []}
+            values={{
+              details: selected.details ?? [],
+              users: selected.users ?? {},
+            }}
             users={users}
             onChange={setField}
-            userServices={[]}
-            errors={step2Errors}
+            userServices={userService.items}
           />
         )}
 
         {step === 3 && (
-          <></>
-          // <Step3
-            // values={{
-            //   branch: branches.items.filter(
-            //     (b) => b.id == selected.branch_id
-            //   )[0].name,
-            //   date: selected.order_date ?? new Date(),
-            //   services:
-            //     (selected.details as IOrderDetail[])!
-            //       .map((d) => d.service_name)
-            //       .filter((d) => d != null) ?? [],
-            //   time: selected.start_time ?? "",
-            //   user: usernameFormatter(
-            //     users.items.filter((us) => us.id == selected.user_id)[0]
-            //   ),
-            //   description: selected.customer_desc,
-            // }}
-          // />
+          <Step3
+            values={{
+              date: selected.order_date ?? new Date(),
+              time: selected.start_time,
+              details: selected.details ?? [],
+              description: selected.customer_desc,
+            }}
+            booking={bookings}
+            errors={step3Errors}
+            onChange={setField}
+            showError={showError}
+            users={users}
+          />
         )}
 
         {/* Navigation buttons */}

@@ -6,6 +6,7 @@ export interface IOrder {
   order_date?: Date;
   start_time?: string;
   // pre_amount: number;
+  users?: Record<string, string>;
   user_desc?: string;
   details?: IOrderDetail[];
 }
@@ -32,7 +33,10 @@ export interface IOrderDetail {
   id?: string;
   order_id?: string;
   service_id: string;
+  max_price?: number;
+  min_price?: number;
   service_name?: string;
   duration?: number;
+  duplicated?: boolean;
   created_at?: Date;
 }

@@ -58,12 +58,19 @@ export default function Step1({
                         ? details.filter((u) => u != id)
                         : [...details, id];
                       const updatedDetail = updatedDetails?.map((v) => {
+                        const value = services.items.filter(
+                          (s) => s.id == v
+                        )[0];
                         return {
                           service_id: v,
-                          service_name: service.name ?? "",
-                          duration: service.duration,
+                          service_name: value.name ?? "",
+                          duration: value.duration,
+                          max_price: value.max_price,
+                          min_price: value.min_price,
+                          duplicated: value.duplicated,
                         };
                       });
+                      console.log(updatedDetail);
 
                       onChange("details", updatedDetail);
                     }}

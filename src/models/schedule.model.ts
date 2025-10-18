@@ -55,5 +55,7 @@ export interface Booking {
 }
 
 export interface BookingSchedule {
-  overlap: Record<string, { date: Date; times: number[] }[]>;
+  date: Date;
+  times: number[];
+  limit: number
 }

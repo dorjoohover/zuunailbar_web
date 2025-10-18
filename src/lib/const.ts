@@ -89,7 +89,7 @@ export const DEFAULT_PG: Required<PG> = {
 // });
 
 // patch put delete type
-export type PPDT = { success: boolean; error?: string };
+export type PPDT = { success: boolean; error?: string, data?: any };
 
 export const MODAL_ACTION = {
   add_emp: "add_emp",

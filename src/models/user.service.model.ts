@@ -19,6 +19,7 @@ export interface UserService {
   user_name?: string;
   updated_at?: Date;
   created_at?: Date;
+  user?: User
 }
 
 // ajiltnii service

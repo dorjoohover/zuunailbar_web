@@ -36,7 +36,7 @@ export const ServiceCard = ({
 }) => {
   return (
     <div
-      className={`h-[80px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"}`}
+      className={`h-[90px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"}`}
       onClick={() => onClick(data.id)}
     >
       <div className="flex items-start">
@@ -47,14 +47,14 @@ export const ServiceCard = ({
           color="default"
         ></Checkbox>
         <div>
-          <h2 className="text-sm font-medium mb-1">{data.name}</h2>
+          <h2 className="text-sm font-medium mb-1 min-h-[2.4em]">{data.name}</h2>
           <p className="text-gray-500 text-sm">{data.description}</p>
           <div className="flex gap-2">
             <div className="flex gap-0.5 py-1">
               <Clock size={15} />
               <p className="text-xs">{data.duration} мин</p>
             </div>
-            {!data.duplicated && (
+            {data.duplicated && (
               <div className="flex gap-0.5 px-2 py-1 rounded-xl bg-gray-200 ">
                 <Users size={15} />
                 <p className="text-xs">зэрэг хийж болох</p>
@@ -63,7 +63,7 @@ export const ServiceCard = ({
           </div>
         </div>
       </div>
-      <p className="text-md font-bolder">
+      <p className="text-md font-bolder whitespace-nowrap">
         {money(
           data.min_price.toString(),
           "",
@@ -80,17 +80,49 @@ export const ArtistCard = ({
   data,
   onClick,
   selected,
+  disabled,
+  mini = false,
 }: {
   data: User;
+  mini?: boolean;
   onClick: (id: string) => void;
   selected: boolean;
+  disabled?: boolean;
 }) => {
+  if (mini)
+    return (
+      <div
+        className={`h-[60px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-black bg-[#00000030] opacity-50" :selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
+        onClick={() => onClick(data.id)}
+      >
+        <div className="flex items-start gap-2">
+          <div className="w-[40px] h-[40px]">
+            <CustomImage img={data.profile_img} w={40} h={40} />
+          </div>
+          <div>
+            <h2 className="text-sm font-medium mb-1">{data.nickname}</h2>
+            <p className="text-gray-500 text-sm">{data.description}</p>
+            <div className="flex gap-2">
+              {/* <div className="flex gap-0.5 py-1">
+              <Clock size={15} />
+              <p className="text-xs">{data.duration} мин</p>
+            </div> */}
+              {data.experience && (
+                <div className="flex gap-0.5 px-2 py-0.5 rounded-xl bg-gray-200 ">
+                  <p className="text-xs">{data.experience} жил</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   return (
     <div
-      className={`h-[80px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"}`}
+      className={`h-[80px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
       onClick={() => onClick(data.id)}
     >
-      <div className="flex items-start">
+      <div className="flex items-start gap-2">
         <div className="w-[50px] h-[50px]">
           <CustomImage img={data.profile_img} />
         </div>
