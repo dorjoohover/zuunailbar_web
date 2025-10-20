@@ -29,7 +29,19 @@ import { Progress } from "@heroui/progress";
 import { usernameFormatter } from "@/lib/functions";
 import { addToast } from "@heroui/toast";
 import { orderSteps } from "@/lib/constants";
-function useStepper(total = 3) {
+import { checkboxGroup, select } from "@heroui/theme";
+import Step4 from "./Step4";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@heroui/modal";
+import { PaymentView } from "./payment";
+import { Invoice } from "@/types";
+function useStepper(total = 4) {
   const [step, setStep] = useState(1);
   const go = (n: number) => setStep(Math.min(Math.max(1, n), total));
 
@@ -54,7 +66,10 @@ export default function OrderPage({
     Partial<IOrder> & { times?: string }
   >({ details: [] });
 
-  const [bookings, setBookings] = useState<BookingSchedule | null>(null);
+  const [times, setTimes] = useState<number[] | null>(null);
+  const [limit, setLimit] = useState(7);
+  const [date, setDate] = useState<Date | null>(null);
+  const [loading, setLoading] = useState(false);
   const [userService, setUserService] =
     useState<ListType<IUserService>>(ListDefault);
   const [showError, setShowError] = useState(false);
@@ -78,13 +93,12 @@ export default function OrderPage({
     () => ({
       date: selected.order_date ? undefined : "Захиалгын өдрөө сонгоно уу!",
       time: selected.start_time ? undefined : "Захиалгын цагаа сонгоно уу!",
-      user: selected.user_id ? undefined : "Артистыг сонгоно уу!",
     }),
-    [selected.order_date, selected.start_time, selected.user_id]
+    [selected.order_date, selected.start_time]
   );
 
-  const { step, go, next, prev, total } = useStepper(3);
-
+  const { step, go, next, prev, total } = useStepper(4);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const activeErrors =
     step === 1
       ? step1Errors
@@ -106,6 +120,7 @@ export default function OrderPage({
     return true;
   }
   const handleNext = () => {
+    console.log(isStepComplete);
     if (!isStepComplete) {
       setShowError(true);
       return;
@@ -129,44 +144,85 @@ export default function OrderPage({
     }
   };
 
-  const getAvailableTime = async (date?: Date) => {
+  const getAvailableTime = async (d?: Date) => {
+    setLoading(true);
     await create(
       Api.order,
       {
         serviceArtist: selected.users,
         branch_id: selected.branch_id ?? "",
-        date,
+        date: d,
       },
       "available_times"
-    ).then((d) => {
-      console.log(d);
-      setBookings(d.data.payload);
+    ).then((data) => {
+      const { date, limit, times } = data.data.payload;
+      if (d) {
+        setTimes(times);
+      } else {
+        setTimes(times);
+        const nd = mnDate(date);
+        const d = new Date(
+          Date.UTC(nd.getFullYear(), nd.getMonth(), nd.getDate(), 0)
+        );
+        setSelected((prev) => ({ ...prev, order_date: d }));
+        setDate(date);
+        setLimit(limit);
+      }
     });
+    setLoading(false);
   };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     fetcher();
   }, [step]);
+
+  useEffect(() => {
+    if (selected.order_date) getAvailableTime(selected.order_date);
+  }, [selected.order_date]);
   const reset = () => {
     setSelected({ details: [] });
     setUserService(ListDefault);
-    setBookings(null);
+    setTimes(null);
+    setDate(null);
+    setLimit(7);
     go(1);
   };
+
+  const [invoice, setInvoice] = useState<Invoice | null>(null);
+  const [order, setOrder] = useState<string | null>(null);
   const onSubmit = async () => {
+    const st = selected.start_time?.slice(0, 2);
     const res = await create<IOrder>(Api.order, {
       branch_id: selected.branch_id,
       details: selected.details as IOrderDetail[],
       order_date: selected.order_date,
-      start_time: selected.start_time,
+      start_time: st,
       customer_desc: selected.customer_desc,
-      user_id: selected.user_id,
+      user_id: selected.users?.[0],
       users: selected.users,
     });
-    addToast({ title: res.success });
-    reset();
+    if (!res.success) {
+      addToast({
+        title: res.error ?? "Алдаа гарлаа дахин оролдоно уу",
+        color: "danger",
+      });
+      return;
+    }
+    if (res.data?.payload?.invoice) {
+      setInvoice(res.data.payload.invoice);
+      setOrder(res.data.payload.id);
+    } else {
+      addToast({ title: "Амжилттай.", color: "success" });
+      reset();
+    }
   };
+  if (invoice != null && order != null)
+    return (
+      <div>
+        <PaymentView invoice={invoice} id={order} />
+      </div>
+    );
 
   return (
     <div className="relative py-10">
@@ -245,10 +301,21 @@ export default function OrderPage({
               details: selected.details ?? [],
               description: selected.customer_desc,
             }}
-            booking={bookings}
+            times={times}
+            loading={loading}
+            date={date}
+            limit={limit}
             errors={step3Errors}
             onChange={setField}
             showError={showError}
+            users={users}
+          />
+        )}
+        {step === 4 && (
+          <Step4
+            values={selected}
+            branches={branches}
+            services={data}
             users={users}
           />
         )}
@@ -276,14 +343,40 @@ export default function OrderPage({
             </Button>
           ) : (
             <Button
-              onPress={() => onSubmit()}
-              className="text-white bg-teal-500"
+              onPress={() => onOpen()}
+              className="text-white bg-gray-500"
             >
-              ???
+              Илгээх
             </Button>
           )}
         </div>
       </div>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Та итгэлтэй байна уу
+              </ModalHeader>
+
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Буцах
+                </Button>
+                <Button
+                  color="primary"
+                  onPress={() => {
+                    onClose();
+                    onSubmit();
+                  }}
+                >
+                  Баталгаажсан
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

@@ -2,9 +2,10 @@ import { money } from "@/lib/functions";
 import { Branch, Service, User } from "@/models";
 import { Api } from "@/utils/api";
 import { Checkbox } from "@heroui/checkbox";
-import { Clock, Users } from "lucide-react";
+import { Clock, LocationEdit, Users } from "lucide-react";
 import Image from "next/image";
 import CustomImage from "./image";
+import { ReactNode } from "react";
 export const LocationCard = ({
   data,
   selected,
@@ -47,7 +48,9 @@ export const ServiceCard = ({
           color="default"
         ></Checkbox>
         <div>
-          <h2 className="text-sm font-medium mb-1 min-h-[2.4em]">{data.name}</h2>
+          <h2 className="text-sm font-medium mb-1 min-h-[2.4em]">
+            {data.name}
+          </h2>
           <p className="text-gray-500 text-sm">{data.description}</p>
           <div className="flex gap-2">
             <div className="flex gap-0.5 py-1">
@@ -92,7 +95,7 @@ export const ArtistCard = ({
   if (mini)
     return (
       <div
-        className={`h-[60px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-black bg-[#00000030] opacity-50" :selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
+        className={`h-[60px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-black bg-[#00000030] opacity-50" : selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
         onClick={() => onClick(data.id)}
       >
         <div className="flex items-start gap-2">
@@ -141,6 +144,30 @@ export const ArtistCard = ({
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+export const ReviewCard = ({
+  Icon,
+  bold,
+  title,
+  children,
+}: {
+  bold?: boolean;
+  title: string;
+  Icon: typeof LocationEdit;
+  children: ReactNode;
+}) => {
+  return (
+    <div className="border-b  border-gray-300 py-3 flex w-full items-start justify-start gap-3">
+      <span className="w-[35px] h-[35px] rounded-full flex items-center justify-center bg-gray-200">
+        <Icon size={18}  color="#242526"/>
+      </span>
+      <div className="w-full">
+        <p className={`text-md ${bold && "font-bolder"}`}>{title}</p>
+        {children}
       </div>
     </div>
   );

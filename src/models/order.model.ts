@@ -39,4 +39,5 @@ export interface IOrderDetail {
   duration?: number;
   duplicated?: boolean;
   created_at?: Date;
+  pre?: number;
 }

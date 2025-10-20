@@ -91,7 +91,7 @@ export default function Step2({
                   (user) => user.id == values.users[key]
                 )?.[0] ?? null;
               return (
-                <div className="flex w-full gap-3">
+                <div className="flex w-full gap-3" key={i}>
                   <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
                     <span>{i + 1}</span>
                   </div>

@@ -12,7 +12,8 @@ import { ListType, mnDate } from "@/lib/const";
 import { formatTime, selectDate, usernameFormatter } from "@/lib/functions";
 import { useCallback, useMemo } from "react";
 import { Textarea } from "@heroui/input";
-
+import { motion } from "motion/react";
+import LoadingScreen from "./loading";
 interface Step3Props {
   // date: CalendarDate | null;
   // setDate: (val: CalendarDate | null) => void;
@@ -34,7 +35,10 @@ interface Step3Props {
   };
   // eniig hiine
   users: ListType<User>;
-  booking: BookingSchedule | null;
+  limit: number;
+  loading: boolean;
+  times: number[] | null;
+  date: Date | null;
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
   // clearError: (field: string) => void;
 }
@@ -43,7 +47,10 @@ export default function Step3({
   // date,
   onChange,
   users,
-  booking,
+  times,
+  date,
+  limit,
+  loading,
   // setDate,
   // choiceTime,
   // setChoiceTime,
@@ -55,17 +62,14 @@ export default function Step3({
   values,
   // clearError,
 }: Step3Props) {
-  const date = mnDate(booking?.date);
-  const times = booking?.times;
+  const formattedDate = date ? mnDate(date) : mnDate();
   const isDateUnavailable = (value: DateValue) => {
-    const today = date;
+    const today = formattedDate;
     const currentDay = today.getDate();
 
-    const limit = booking?.limit ?? 7;
-
     // Огнооны объект гаргаж харьцуулалт хийх
-    const maxAvailableDate = new Date(today);
-    maxAvailableDate.setDate(currentDay + limit - 1);
+    const maxAvailableDate = mnDate();
+    maxAvailableDate.setDate(maxAvailableDate.getDate() + limit - 1);
 
     const valueDate = new Date(value.year, value.month - 1, value.day);
 
@@ -91,7 +95,6 @@ export default function Step3({
               }
               onChange={(val) => {
                 // if (!isDateUnavailable(val)) return;
-
                 onChange("order_date", selectDate(val));
                 onChange("start_time", undefined);
                 // if (errors.date) clearError("date");
@@ -105,27 +108,34 @@ export default function Step3({
               <p className="mt-1 text-sm text-red-600">{errors.date}</p>
             )}
           </div>
-          <div className="flex-1">
+          <div className="flex-1 ">
             <p className="text-gray-500 text-xs mb-1">Цаг сонгох</p>
-            <div className="flex rounded-xl mb-2 justify-between border bg-gray-200 p-2">
-              <div className="flex items-center gap-1.5">
+            <div className="flex rounded-xl mb-2 justify-between border bg-gray-200 p-2 border border-gray-300">
+              <div className="flex items-center gap-1.5 ">
                 <Clock1 size={15} color="gray" />
                 <p className="text-sm">Хугацаа:</p>
               </div>
 
               {duration ? <p className="text-sm">{duration} мин</p> : <span />}
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              {booking?.times.map((time, i) => {
-                return (
-                  <button
-                    className="text-start text-sm border p-2 border-gray-300 transition-all duration-300 hover:shadow-lg  rounded-md"
-                    key={i}
-                  >
-                    {formatTime(time)}
-                  </button>
-                );
-              })}
+            <div className="grid grid-cols-3 gap-2">
+              {loading ? (
+                <motion.div exit={{ opacity: 0 }} className="w-full col-span-3">
+                  <LoadingScreen />
+                </motion.div>
+              ) : (
+                times?.map((time, i) => {
+                  return (
+                    <button
+                      className={`text-start text-sm border p-2 border-gray-300 transition-all duration-300 hover:shadow-lg  rounded-md ${values.time == `${time}` ? "bg-gray-400" : ""}`}
+                      key={i}
+                      onClick={() => onChange("start_time", `${time}`)}
+                    >
+                      {formatTime(time)}
+                    </button>
+                  );
+                })
+              )}
             </div>
             {errors.date && showError && (
               <p className="mt-1 text-sm text-red-600">{errors.date}</p>

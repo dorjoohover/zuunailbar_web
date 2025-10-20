@@ -68,9 +68,9 @@ export default function Step1({
                           max_price: value.max_price,
                           min_price: value.min_price,
                           duplicated: value.duplicated,
+                          pre: value.pre,
                         };
                       });
-                      console.log(updatedDetail);
 
                       onChange("details", updatedDetail);
                     }}
@@ -92,8 +92,7 @@ export default function Step1({
     </div>
   );
 }
-
-const Price = ({
+export const totalPrice = ({
   services,
   values,
 }: {
@@ -116,6 +115,17 @@ const Price = ({
     totalMin === totalMax
       ? money(totalMin.toString())
       : `${money(totalMin.toString())} - ${money(totalMax.toString())}`;
+  return totalDisplay;
+};
+
+const Price = ({
+  services,
+  values,
+}: {
+  services: Service[];
+  values: string[];
+}) => {
+  const totalDisplay = totalPrice({ services: services, values: values });
 
   return (
     <div className="border w-full border-gray-500 bg-gray-100 px-2.5 py-2 rounded-md flex justify-between">
