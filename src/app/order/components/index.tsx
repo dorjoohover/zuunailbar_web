@@ -277,79 +277,80 @@ export default function OrderPage({
               errors={step1Errors}
             />
           )}
-        </Form>
-        {/* Step Components */}
 
-        {step === 2 && (
-          <Step2
-            showError={showError}
-            values={{
-              details: selected.details ?? [],
-              users: selected.users ?? {},
-            }}
-            users={users}
-            onChange={setField}
-            userServices={userService.items}
-          />
-        )}
+          {/* Step Components */}
 
-        {step === 3 && (
-          <Step3
-            values={{
-              date: selected.order_date ?? new Date(),
-              time: selected.start_time,
-              details: selected.details ?? [],
-              description: selected.customer_desc,
-            }}
-            times={times}
-            loading={loading}
-            date={date}
-            limit={limit}
-            errors={step3Errors}
-            onChange={setField}
-            showError={showError}
-            users={users}
-          />
-        )}
-        {step === 4 && (
-          <Step4
-            values={selected}
-            branches={branches}
-            services={data}
-            users={users}
-          />
-        )}
-
-        {/* Navigation buttons */}
-        <div className="flex justify-between mt-6 px-2">
-          <Button
-            onPress={prev}
-            disabled={step === 1}
-            variant="bordered"
-            className="h-12 w-28"
-          >
-            Буцах
-          </Button>
-          {step < total ? (
-            <Button
-              className={cn(
-                isStepComplete ? "" : "",
-                "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
-                "bg-dark bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)]"
-              )}
-              onPress={handleNext}
-            >
-              Дараах
-            </Button>
-          ) : (
-            <Button
-              onPress={() => onOpen()}
-              className="text-white bg-gray-500"
-            >
-              Илгээх
-            </Button>
+          {step === 2 && (
+            <Step2
+              showError={showError}
+              values={{
+                details: selected.details ?? [],
+                users: selected.users ?? {},
+              }}
+              users={users}
+              onChange={setField}
+              userServices={userService.items}
+            />
           )}
-        </div>
+
+          {step === 3 && (
+            <Step3
+              values={{
+                date: selected.order_date ?? new Date(),
+                time: selected.start_time,
+                details: selected.details ?? [],
+                description: selected.customer_desc,
+              }}
+              times={times}
+              loading={loading}
+              date={date}
+              limit={limit}
+              errors={step3Errors}
+              onChange={setField}
+              showError={showError}
+              users={users}
+            />
+          )}
+          {step === 4 && (
+            <Step4
+              values={selected}
+              branches={branches}
+              services={data}
+              users={users}
+            />
+          )}
+
+          {/* Navigation buttons */}
+          <div className="flex w-full justify-between mt-6 px-2">
+            <Button
+              onPress={prev}
+              disabled={step === 1}
+              variant="bordered"
+              className="h-12 w-28"
+            >
+              Буцах
+            </Button>
+            {step < total ? (
+              <Button
+                className={cn(
+                  isStepComplete ? "" : "",
+                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
+                  "bg-dark bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)]"
+                )}
+                onPress={handleNext}
+              >
+                Дараах
+              </Button>
+            ) : (
+              <Button
+                onPress={() => onOpen()}
+                className="text-white bg-gray-500"
+              >
+                Илгээх
+              </Button>
+            )}
+          </div>
+        </Form>
       </div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>

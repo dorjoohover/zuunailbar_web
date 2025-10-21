@@ -63,10 +63,10 @@ export default function Step3({
   // clearError,
 }: Step3Props) {
   const formattedDate = date ? mnDate(date) : mnDate();
+
   const isDateUnavailable = (value: DateValue) => {
     const today = formattedDate;
     const currentDay = today.getDate();
-
     // Огнооны объект гаргаж харьцуулалт хийх
     const maxAvailableDate = mnDate();
     maxAvailableDate.setDate(maxAvailableDate.getDate() + limit - 1);
@@ -123,7 +123,7 @@ export default function Step3({
                 <motion.div exit={{ opacity: 0 }} className="w-full col-span-3">
                   <LoadingScreen />
                 </motion.div>
-              ) : (
+              ) : times && times.length > 0 ? (
                 times?.map((time, i) => {
                   return (
                     <button
@@ -135,6 +135,10 @@ export default function Step3({
                     </button>
                   );
                 })
+              ) : (
+                <div className="w-full mt-4 col-span-3">
+                  <p className="text-lg text-center">Цаг олдсонгүй.</p>
+                </div>
               )}
             </div>
             {errors.date && showError && (

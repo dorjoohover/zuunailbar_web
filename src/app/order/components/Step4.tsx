@@ -53,7 +53,7 @@ export default function Step4({
   const date = values.order_date ?? mnDate();
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 w-full">
       <h2 className="mb-8 text-xl font-semibold text-center gap-y-10">
         Захиалгын тойм
       </h2>
