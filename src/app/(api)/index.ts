@@ -14,7 +14,8 @@ export const find = async <T>(
     const store = await cookies();
     const token = store.get("token")?.value;
     const branch = store.get("branch_id")?.value;
-    const merchant = store.get("merchant_id")?.value;
+    const merchant =
+      store.get("merchant_id")?.value ?? "3f86c0b23a5a4ef89a745269e7849640";
 
     const merged: Pagination = {
       ...defaultPagination,
@@ -57,7 +58,8 @@ export const findOne = async (
   const store = await cookies();
   const token = store.get("token")?.value;
   const branch = store.get("branch_id")?.value;
-  const merchant = store.get("merchant_id")?.value;
+  const merchant =
+    store.get("merchant_id")?.value ?? "3f86c0b23a5a4ef89a745269e7849640";
   const url = `${API[uri as keyof typeof API]}${route ? `/${route}/` : "/"}${id}`;
   const res = await fetch(url, {
     cache: "no-store",
@@ -83,7 +85,8 @@ export const deleteOne = async (
     const store = await cookies();
     const token = store.get("token")?.value;
     const branch = store.get("branch_id")?.value;
-    const merchant = store.get("merchant_id")?.value;
+    const merchant =
+      store.get("merchant_id")?.value ?? "3f86c0b23a5a4ef89a745269e7849640";
     const url = `${API[uri as keyof typeof API]}${route ? `/${route}/` : "/"}${id}`;
     const res = await fetch(url, {
       cache: "no-store",
@@ -162,10 +165,11 @@ export const create = async <T>(
     const branch = (body as any)?.branch_id
       ? (body as any).branch_id
       : store.get("branch_id")?.value;
-    const merchant = store.get("merchant_id")?.value;
+    const merchant =
+      store.get("merchant_id")?.value ?? "3f86c0b23a5a4ef89a745269e7849640";
 
     const url = `${API[uri]}${route ? `/${route}` : ""}`;
-    console.log(url)
+    console.log(url);
     const res = await fetch(url, {
       cache: "no-store",
       method: METHOD.post,
@@ -186,7 +190,7 @@ export const create = async <T>(
 
     return {
       success: true,
-      data: data
+      data: data,
     };
   } catch (error) {
     console.log(error);
@@ -203,7 +207,8 @@ export const search = async <T>(
     const store = await cookies();
     const token = store.get("token")?.value;
     const branch = store.get("branch_id")?.value;
-    const merchant = store.get("merchant_id")?.value;
+    const merchant =
+      store.get("merchant_id")?.value ?? "3f86c0b23a5a4ef89a745269e7849640";
 
     const merged = {
       ...p,
