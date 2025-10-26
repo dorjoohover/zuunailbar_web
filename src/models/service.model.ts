@@ -33,6 +33,8 @@ export interface Service {
   duration: number;
   pre: number;
   created_by: string;
+  duplicated: boolean;
+  category: number;
   created_at?: Date;
   min: Discounted;
   max?: Discounted;
