@@ -30,7 +30,14 @@ export default function AuthModal() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const handleSendOtp = async () => {
-    if (!phone) return;
+    if (!phone) {
+      addToast({
+        title: "Дугаараа оруулна уу",
+        size: "lg",
+        color: "warning",
+      });
+      return;
+    }
 
     const { data, error } = await sendOtp(phone);
     if (error) {
@@ -44,7 +51,7 @@ export default function AuthModal() {
     } else {
       if (data) {
         setOtpSent(true);
-        setTimer(59);
+        setTimer(5);
         addToast({
           title: "Нэг удаагийн нууц үг илгээлээ",
           size: "lg",
@@ -59,7 +66,6 @@ export default function AuthModal() {
     const t = setInterval(() => setTimer((p) => p - 1), 1000);
     return () => clearInterval(t);
   }, [timer]);
-
   const handleRegister = async () => {
     if (password !== passwordConfirm) {
       setError("Нууц үг таарахгүй байна");
@@ -80,15 +86,17 @@ export default function AuthModal() {
       return;
     }
     if (data?.accessToken) {
-      save(data.accessToken, data.merchant_id);
-
-      // end modal haana
       addToast({
         title: "Амжилттай бүртгүүллээ",
         size: "lg",
         color: "success",
       });
+      save(data.accessToken, data.merchant_id);
+
       onClose();
+      setTimeout(() => {
+        window.location.replace(window.location.href);
+      }, 300);
     }
   };
   const handleLogin = async () => {
@@ -98,7 +106,6 @@ export default function AuthModal() {
         mobile: phone,
         password: password,
       });
-      console.log(res);
       if (res.error) {
         addToast({
           title: res.error,
@@ -108,8 +115,10 @@ export default function AuthModal() {
         return;
       }
       const data = res.data;
+
       if (data?.accessToken) {
         save(data.accessToken, data.merchant_id);
+
         // end modal haana
         onClose();
         addToast({
@@ -117,12 +126,14 @@ export default function AuthModal() {
           size: "lg",
           color: "success",
         });
+        setTimeout(() => {
+          window.location.replace(window.location.href);
+        }, 300);
       }
     } catch (error) {
       console.log(error);
     }
   };
-  const router = useRouter();
 
   const save = async (token: string, merchant: string) => {
     await fetch("/api/login", {
@@ -135,7 +146,6 @@ export default function AuthModal() {
         merchant,
       }),
     });
-    router.refresh();
   };
   const pathname = usePathname();
   useEffect(() => {
@@ -148,12 +158,23 @@ export default function AuthModal() {
         onPress={() => {
           onOpen();
         }}
-        className="text-sm font-semibold text-white bg-transparent size-10 aspect-square"
+        className="text-sm md:hidden font-semibold text-white bg-transparent border border-white aspect-square"
+      >
+        {/* <UserRound className="size-4" /> */}
+        Нэвтрэх
+      </Button>
+      <Button
+        size="sm"
+        onPress={() => {
+          onOpen();
+        }}
+        className="text-sm hidden md:block font-semibold text-white bg-transparent size-10 aspect-square"
       >
         {/* <UserRound className="size-4" /> */}
         Нэвтрэх
       </Button>
       <Modal
+        placement="top"
         isOpen={pathname.includes("/order") ? true : isOpen}
         onOpenChange={onOpenChange}
       >
@@ -199,6 +220,7 @@ export default function AuthModal() {
                         label="Утасны дугаар"
                         onChange={(e) => setPhone(e.target.value)}
                         isRequired
+                        errorMessage="Утасны дугаар оруулна уу"
                       />
                       <PasswordInput
                         label="Нууц үг"

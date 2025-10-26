@@ -1,3 +1,5 @@
+import { UserService } from "./user.service.model";
+
 export interface IOrder {
   user_id?: string;
   customer_id?: string;
@@ -5,10 +7,12 @@ export interface IOrder {
   branch_id?: string;
   order_date?: Date;
   start_time?: string;
+  end_time?: string;
   // pre_amount: number;
   users?: Record<string, string>;
   user_desc?: string;
-  details?: IOrderDetail[];
+  details?: IOrderDetail[] | any[];
+  duplicated?: boolean;
 }
 export interface Order {
   id: string;
@@ -36,8 +40,18 @@ export interface IOrderDetail {
   max_price?: number;
   min_price?: number;
   service_name?: string;
+  user_id?: string;
   duration?: number;
   duplicated?: boolean;
+  category?: number | null;
   created_at?: Date;
   pre?: number;
+}
+
+export interface DateTime {
+  [index: number]: number[];
+}
+export interface UserDateTime extends UserService {
+  slots: DateTime;
+  services: string[];
 }

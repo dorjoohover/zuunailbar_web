@@ -39,7 +39,7 @@ export default function Step4({
   users,
 }: Step4Props) {
   const branch = branches.items.filter((a) => a.id == values.branch_id)[0];
-  const user = users.items.filter((a) => a.id == values.users?.[0])?.[0];
+
   const duration = values.details?.reduce(
     (acc, item) => acc + (item?.duration ?? 0),
     0
@@ -88,13 +88,15 @@ export default function Step4({
                   min == max || max == 0
                     ? money(min.toString())
                     : `${money(min.toString())} - ${money(max.toString())}`;
+                const user_id = values.users?.[service.service_id];
+                const user = users.items.filter((u) => u.id == user_id)?.[0];
                 return (
                   <div
-                    className="bg-gray-100 px-2 py-3 rounded-md flex justify-between items-center"
+                    className="bg-gray-100 my-2 px-2 py-3 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
                     key={i}
                   >
-                    <div>
-                      <div className="flex items-center gap-2">
+                    <div className="flex flex-col md:flex-row">
+                      <div className="flex items-center justify-start gap-2">
                         <p className="text-sm">
                           {firstLetterUpper(service.service_name ?? "")}
                         </p>
@@ -102,10 +104,12 @@ export default function Step4({
                           {service.duration} мин
                         </span>
                       </div>
-                      <span className="text-gray-500 flex items-center gap-1 text-xs">
-                        <LUser size={12} color="#6B7280" />{" "}
-                        {firstLetterUpper(user.nickname ?? "")}
-                      </span>
+                      {user && (
+                        <span className="text-gray-500 flex items-center gap-1 text-xs">
+                          <LUser size={12} color="#6B7280" />
+                          {firstLetterUpper(user?.nickname ?? "")}
+                        </span>
+                      )}
                     </div>
                     {min != 0 && <p>{ttl}₮</p>}
                   </div>
@@ -147,7 +151,7 @@ export default function Step4({
           </div>
         </div>
       </div>
-{/* 
+      {/* 
       <Image
         src="/"
         alt="Qpay: QR code"

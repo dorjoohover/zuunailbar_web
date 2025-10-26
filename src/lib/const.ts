@@ -1,4 +1,18 @@
-import { Crown, Shield, User2 } from "lucide-react";
+import {
+  Brush,
+  BrushCleaning,
+  Bubbles,
+  Component,
+  Crown,
+  Eraser,
+  Footprints,
+  Hand,
+  Scissors,
+  Shield,
+  Smartphone,
+  Sparkles,
+  User2,
+} from "lucide-react";
 import {
   ProductLogStatus,
   ProductTransactionStatus,
@@ -89,7 +103,7 @@ export const DEFAULT_PG: Required<PG> = {
 // });
 
 // patch put delete type
-export type PPDT = { success: boolean; error?: string, data?: any };
+export type PPDT = { success: boolean; error?: string; data?: any };
 
 export const MODAL_ACTION = {
   add_emp: "add_emp",
@@ -145,3 +159,22 @@ export const mnDate = (now = new Date()): Date => {
   );
   return mongoliaTime;
 };
+
+export const icons = {
+  [Brush.displayName ?? "Brush"]: Brush,
+  [Bubbles.displayName ?? "Bubbles"]: Bubbles,
+  [BrushCleaning.displayName ?? "BrushCleaning"]: BrushCleaning,
+  [Component.displayName ?? "Component"]: Component,
+  [Eraser.displayName ?? "Eraser"]: Eraser,
+  [Footprints.displayName ?? "Footprints"]: Footprints,
+  [Hand.displayName ?? "Hand"]: Hand,
+  [Scissors.displayName ?? "Scissors"]: Scissors,
+  [Smartphone.displayName ?? "Smartphone"]: Smartphone,
+  [Sparkles.displayName ?? "Sparkles"]: Sparkles,
+};
+
+export enum ServiceView {
+  SPECIAL = 10,
+  DEFAULT = 0,
+  FEATURED = 20,
+}

@@ -9,10 +9,12 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { DateValue, fromDate } from "@internationalized/date";
 import {
   BookingSchedule,
+  DateTime,
   IOrder,
   IOrderDetail,
   IUserService,
   User,
+  UserDateTime,
   UserService,
 } from "@/models";
 import { ListType } from "@/lib/const";
@@ -32,19 +34,28 @@ interface Step2Props {
   values: {
     details: IOrderDetail[];
     users: Record<string, string>;
+    duplicated: boolean;
   };
-  userServices: IUserService[];
+  userDateTimes: UserDateTime[];
   // eniig hiine
   users: ListType<User>;
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
   // clearError: (field: string) => void;
 }
-
+function hasOverlap(a: DateTime, b: DateTime): boolean {
+  for (const day of Object.keys(a)) {
+    const dayIndex = Number(day);
+    if (!b[dayIndex]) continue;
+    const overlap = a[dayIndex].some((time) => b[dayIndex].includes(time));
+    if (overlap) return true;
+  }
+  return false;
+}
 export default function Step2({
   // date,
   onChange,
   users,
-  userServices,
+  userDateTimes,
   showError,
   values,
   // clearError,
@@ -59,7 +70,7 @@ export default function Step2({
       </div>
       {Object.keys(values.users).length === 0 ? (
         <div className="w-full  bg-gray-100 flex justify-center items-center border border-gray-300 rounded-sm h-[60px]">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 px-2 py-2 text-center">
             Артист сонгогдоогүй байна. Автоматаар хуваарилах эсвэл хүссэн
             артистаа сонгоно уу.
           </p>
@@ -81,7 +92,7 @@ export default function Step2({
         </div>
       )}
 
-      {values.details.some((v) => v.duplicated)
+      {values.duplicated
         ? values.details
             .filter((v) => v.duplicated)
             .map((v, i) => {
@@ -123,16 +134,36 @@ export default function Step2({
                         </div>
                       )}
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
-                      {userServices
+                    <div className="grid grid-cols-6 gap-3">
+                      {userDateTimes
                         .filter((u) => u.service_id == v.service_id)
                         .map((user, index) => {
                           const selected =
-                            values.users[key] == user.user.id &&
+                            values.users[key] == user?.user?.id &&
                             key == v.service_id;
-                          const disabled = Object.entries(values.users).some(
-                            ([k, v]) => k != key && v == user.user.id
+                          const prevKey = Object.keys(values.users).find(
+                            (k) => k != key
                           );
+                          const prevArtistId = prevKey
+                            ? values.users[prevKey]
+                            : null;
+                          let duplicated = true;
+                          if (prevArtistId) {
+                            const prevArtist = userDateTimes.find(
+                              (u) => u.user?.id == prevArtistId
+                            );
+                            if (prevArtist)
+                              duplicated = hasOverlap(
+                                prevArtist.slots,
+                                user.slots
+                              );
+                          }
+
+                          // өөр service-д давхцахгүй эсэхийг шалгана
+                          const disabled =
+                            Object.entries(values.users).some(
+                              ([k, v]) => k != key && v == user.user?.id
+                            ) || !duplicated;
                           return (
                             <ArtistCard
                               mini={true}
@@ -157,23 +188,25 @@ export default function Step2({
               );
             })
         : [""].map((v, i) => {
+            console.log(userDateTimes);
             return (
-              <div className="grid grid-cols-2 gap-4">
-                {users.items.map((user, index) => {
+              <div className="grid grid-cols-6 gap-4" key={i}>
+                {userDateTimes.map((user, index) => {
                   const key = "0";
-                  const selected = values.users[key] == user.id;
-                  return (
-                    <ArtistCard
-                      data={user}
-                      onClick={(id: string) => {
-                        if (!selected) {
-                          onChange("users", { ...values.users, [key]: id });
-                        }
-                      }}
-                      selected={selected}
-                      key={index}
-                    />
-                  );
+                  const selected = values.users[key] == user.user?.id;
+                  if (user.user)
+                    return (
+                      <ArtistCard
+                        data={user.user}
+                        onClick={(id: string) => {
+                          if (!selected) {
+                            onChange("users", { ...values.users, [key]: id });
+                          }
+                        }}
+                        selected={selected}
+                        key={index}
+                      />
+                    );
                 })}
               </div>
             );

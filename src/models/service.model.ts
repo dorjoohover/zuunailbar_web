@@ -12,24 +12,26 @@ export interface IService {
   max_price?: number;
   min_price?: number;
   duration?: number;
-  pre?: number;
+  description: string;
   created_by?: string;
+  pre?: number;
+  image?: string;
+  icon?: string;
   created_at?: Date;
   min: Discounted;
-  description?: string;
-  duplicated: boolean;
   max?: Discounted;
 }
 export interface Service {
   id: string;
   branch_id: string;
-  description?: string;
-  name?: string;
+  description: string;
+  name: string;
   max_price: number;
   min_price: number;
-  pre: number;
+  image: string;
+  icon: string;
   duration: number;
-  duplicated: boolean;
+  pre: number;
   created_by: string;
   created_at?: Date;
   min: Discounted;

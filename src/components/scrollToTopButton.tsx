@@ -30,8 +30,8 @@ export default function ScrollToTopButton() {
     <Button
       onPress={scrollToTop}
       aria-label="Scroll to top"
-      className="fixed p-0 text-white transition border shadow-2xl flex-center border-neutral-700 rounded-xl size-16 aspect-square bottom-10 right-10 bg-dark"
-      style={{ zIndex: 1000 }}
+      className="fixed p-0 text-white transition border shadow-2xl flex-center border-neutral-700 rounded-xl size-8 sm:size-16  aspect-square bottom-10 right-10 bg-dark "
+      style={{ zIndex: 50 }}
     >
       <ChevronUp className="size-5" />
     </Button>

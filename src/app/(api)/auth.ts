@@ -33,7 +33,7 @@ export const sendOtp = async (mobile: string) => {
 };
 export const register = async (dto: RegisterDto) => {
   try {
-    const merchant = (await cookies()).get("merchant_id")?.value;
+    const merchant = (await cookies()).get("merchant_id")?.value ?? process.env.MERCHANT;
     const res = await fetch(`${API.register}`, {
       cache: "no-store",
       method: METHOD.post,

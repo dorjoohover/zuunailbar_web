@@ -7,13 +7,20 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { DateValue, fromDate } from "@internationalized/date";
-import { BookingSchedule, IOrder, IOrderDetail, User } from "@/models";
+import {
+  BookingSchedule,
+  DateTime,
+  IOrder,
+  IOrderDetail,
+  User,
+} from "@/models";
 import { ListType, mnDate } from "@/lib/const";
 import { formatTime, selectDate, usernameFormatter } from "@/lib/functions";
 import { useCallback, useMemo } from "react";
 import { Textarea } from "@heroui/input";
 import { motion } from "motion/react";
 import LoadingScreen from "./loading";
+import { I18nProvider } from "@react-aria/i18n";
 interface Step3Props {
   // date: CalendarDate | null;
   // setDate: (val: CalendarDate | null) => void;
@@ -37,8 +44,7 @@ interface Step3Props {
   users: ListType<User>;
   limit: number;
   loading: boolean;
-  times: number[] | null;
-  date: Date | null;
+  slots: DateTime;
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
   // clearError: (field: string) => void;
 }
@@ -47,8 +53,7 @@ export default function Step3({
   // date,
   onChange,
   users,
-  times,
-  date,
+  slots,
   limit,
   loading,
   // setDate,
@@ -62,36 +67,39 @@ export default function Step3({
   values,
   // clearError,
 }: Step3Props) {
-  const formattedDate = date ? mnDate(date) : mnDate();
-
+  const date = mnDate();
+  const today = mnDate(date);
+  date.setDate(date.getDate() + limit);
+  const days = Object.keys(slots).map(Number);
+  let selectedDay = values.date ? mnDate(values.date).getDay() - 1 : undefined;
+  if (selectedDay && selectedDay == -1) selectedDay = 6;
+  const times = selectedDay != undefined ? slots[selectedDay] : null;
   const isDateUnavailable = (value: DateValue) => {
-    const today = formattedDate;
-    const currentDay = today.getDate();
-    // Огнооны объект гаргаж харьцуулалт хийх
-    const maxAvailableDate = mnDate();
-    maxAvailableDate.setDate(maxAvailableDate.getDate() + limit - 1);
-
-    const valueDate = new Date(value.year, value.month - 1, value.day);
-
-    return !(valueDate < today || valueDate > maxAvailableDate);
+    const current = mnDate(new Date(value.year, value.month - 1, value.day));
+    let day = current.getDay() - 1;
+    if (day == -1) day = 6;
+    if (current < today || current > date) return false;
+    if (!days.includes(day)) return false;
+    if (slots[day]?.length == 0) return false;
+    if (slots[day]?.[0] == 0 && slots[day]?.length == 1) return false;
+    return true;
   };
   const duration = values.details?.reduce(
     (acc, item) => acc + (item?.duration ?? 0),
     0 // reduce-ийн анхны утга
   );
+
   return (
     <div className="w-full space-y-6">
       <div className="space-y-2">
         <p className="font-medium">Захиалга өгөх өдөр болон цаг сонгох</p>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row  gap-4">
           <div className="flex-1">
             <p className="text-gray-500 text-xs mb-1">Өдөр сонгох</p>
             <Calendar
-              aria-label="Select date"
+              aria-label="Өдөр сонгох"
               value={
-                values.date
-                  ? fromDate(values.date, "Asia/Ulaanbaatar")
-                  : undefined
+                values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
               }
               onChange={(val) => {
                 // if (!isDateUnavailable(val)) return;
@@ -99,6 +107,10 @@ export default function Step3({
                 onChange("start_time", undefined);
                 // if (errors.date) clearError("date");
               }}
+              defaultValue={
+                values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
+              }
+              errorMessage={"Буруу өдөр сонгосон."}
               isDateUnavailable={(v) => !isDateUnavailable(v)}
               calendarWidth={"100%"}
               className="w-full border border-gray-300"
@@ -125,15 +137,16 @@ export default function Step3({
                 </motion.div>
               ) : times && times.length > 0 ? (
                 times?.map((time, i) => {
-                  return (
-                    <button
-                      className={`text-start text-sm border p-2 border-gray-300 transition-all duration-300 hover:shadow-lg  rounded-md ${values.time == `${time}` ? "bg-gray-400" : ""}`}
-                      key={i}
-                      onClick={() => onChange("start_time", `${time}`)}
-                    >
-                      {formatTime(time)}
-                    </button>
-                  );
+                  if (time! + 0)
+                    return (
+                      <button
+                        className={`text-start text-sm border p-2 border-gray-300 transition-all duration-300 hover:shadow-lg  rounded-md ${values.time == `${time}` ? "bg-gray-400" : ""}`}
+                        key={i}
+                        onClick={() => onChange("start_time", `${time}`)}
+                      >
+                        {formatTime(time)}
+                      </button>
+                    );
                 })
               ) : (
                 <div className="w-full mt-4 col-span-3">
@@ -141,8 +154,8 @@ export default function Step3({
                 </div>
               )}
             </div>
-            {errors.date && showError && (
-              <p className="mt-1 text-sm text-red-600">{errors.date}</p>
+            {errors.time && showError && (
+              <p className="mt-1 text-sm text-red-600">{errors.time}</p>
             )}
           </div>
         </div>

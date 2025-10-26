@@ -16,6 +16,7 @@ import { Progress } from "@heroui/progress";
 import { addToast } from "@heroui/toast";
 import { Clock, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -104,7 +105,6 @@ export const PaymentView = ({
   };
   const cancel = async () => {
     const res = await find(Api.order, {}, `cancel/${id}`);
-    console.log(res);
     addToast({
       title: `Захиалга амжилттай цуцлагдлаа.`,
     });
@@ -113,7 +113,7 @@ export const PaymentView = ({
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
-    <div className="mx-auto max-w-lg mt-24">
+    <div className="mx-auto max-w-lg mt-24 px-2">
       <AlertDialog
         submit={() => {
           cancel();
@@ -138,7 +138,7 @@ export const PaymentView = ({
           className="mt-1"
           color={progress > 30 ? "primary" : "#FCA5A5"}
         />
-        <div>
+        <div className="">
           <p
             className={`${progress > 30 ? "text-gray-500" : "text-red-300"} text-sm mb-2`}
           >
@@ -156,6 +156,27 @@ export const PaymentView = ({
       <div className="flex flex-col items-center rounded-md bg-white py-4 px-3 border border-gray-300">
         <p className="text-sm">Нийт төлбөр</p>
         <p className="text-xl mb-2">{money(invoice.price.toString())}₮</p>
+        <div className="md:hidden grid grid-cols-12 px-2 gap-4 mt-2 mb-4">
+          {invoice.urls.map((url, i) => {
+            return (
+              <Link
+                href={url.link}
+                key={i}
+                className="col-span-3 flex items-start"
+              >
+                <div className="flex items-center flex-col w-full">
+                  <Image
+                    src={`${url.logo}`}
+                    width={100}
+                    height={100}
+                    alt={url.name}
+                  />
+                  <p className="mt-2 text-center">{url.name}</p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
         <div className="flex items-center justify-center">
           <Image
             className="border border-gray-300 rounded-md"
@@ -165,6 +186,7 @@ export const PaymentView = ({
             alt={invoice.invoice_id}
           />
         </div>
+
         <p className="mt-4 mb-6 text-sm">
           QPay апп-аар QR код уншиж, төлбөрөө хийнэ үү.
         </p>

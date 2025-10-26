@@ -60,7 +60,7 @@ export const ServiceCard = ({
             {data.duplicated && (
               <div className="flex gap-0.5 px-2 py-1 rounded-xl bg-gray-200 ">
                 <Users size={15} />
-                <p className="text-xs">зэрэг хийж болох</p>
+                <p className="text-xs">зэрэг</p>
               </div>
             )}
           </div>
@@ -95,7 +95,7 @@ export const ArtistCard = ({
   if (mini)
     return (
       <div
-        className={`h-[60px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-black bg-[#00000030] opacity-50" : selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
+        className={`h-[60px] col-span-6 xs:col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-black bg-[#00000030] opacity-50" : selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
         onClick={() => onClick(data.id)}
       >
         <div className="flex items-start gap-2">
@@ -122,7 +122,7 @@ export const ArtistCard = ({
     );
   return (
     <div
-      className={`h-[80px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
+      className={`h-[80px] col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
       onClick={() => onClick(data.id)}
     >
       <div className="flex items-start gap-2">
@@ -163,7 +163,7 @@ export const ReviewCard = ({
   return (
     <div className="border-b  border-gray-300 py-3 flex w-full items-start justify-start gap-3">
       <span className="w-[35px] h-[35px] rounded-full flex items-center justify-center bg-gray-200">
-        <Icon size={18}  color="#242526"/>
+        <Icon size={18} color="#242526" />
       </span>
       <div className="w-full">
         <p className={`text-md ${bold && "font-bolder"}`}>{title}</p>

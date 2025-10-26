@@ -15,6 +15,7 @@ import Login from "./Login";
 import { Button } from "@heroui/button";
 import Link from "next/link";
 import { siteData } from "@/lib/constants";
+import { Logout } from "./Logout";
 
 export function NavbarDemo({ token }: { token?: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,7 +27,7 @@ export function NavbarDemo({ token }: { token?: string }) {
         <NavItems items={siteData.navItems} />
         <NavbarLogo />
         <div className="flex items-center gap-4">
-          {!token && <Login />}
+          {!token ? <Login /> : <Logout />}
           {/* <NavbarButton variant="secondary"></NavbarButton> */}
           <Button
             href="/order"
@@ -64,13 +65,7 @@ export function NavbarDemo({ token }: { token?: string }) {
             </Link>
           ))}
           <div className="flex flex-col w-full gap-4">
-            <NavbarButton
-              onClick={() => setIsMobileMenuOpen(false)}
-              variant="primary"
-              className="w-full"
-            >
-              Нэвтрэх
-            </NavbarButton>
+            {token ? <Logout /> : <Login />}
             <NavbarButton
               onClick={() => setIsMobileMenuOpen(false)}
               variant="primary"

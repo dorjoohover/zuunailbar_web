@@ -32,6 +32,7 @@ export default function PasswordInput({ label = "Нууц үг", placeholder, re
           {isVisible ? <EyeOff className="text-default-400" size={20} /> : <Eye className="text-default-400" size={20} />}
         </button>
       }
+      errorMessage={value ? "" : `${label} оруулна уу`}
     />
   );
 }
