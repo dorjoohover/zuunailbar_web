@@ -95,8 +95,9 @@ export default function Step3({
         <p className="font-medium">Захиалга өгөх өдөр болон цаг сонгох</p>
         <div className="flex flex-col sm:flex-row  gap-4">
           <div className="flex-1">
-            <p className="text-gray-500 text-xs mb-1">Өдөр сонгох</p>
+            <p className="text-muted-foreground text-xs mb-1">Өдөр сонгох</p>
             <Calendar
+              color="primary"
               aria-label="Өдөр сонгох"
               value={
                 values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
@@ -113,7 +114,7 @@ export default function Step3({
               errorMessage={"Буруу өдөр сонгосон."}
               isDateUnavailable={(v) => !isDateUnavailable(v)}
               calendarWidth={"100%"}
-              className="w-full border border-gray-300"
+              className="w-full border border-primary"
               // weekdayStyle='long'
             />
             {errors.date && showError && (
@@ -121,11 +122,11 @@ export default function Step3({
             )}
           </div>
           <div className="flex-1 ">
-            <p className="text-gray-500 text-xs mb-1">Цаг сонгох</p>
-            <div className="flex rounded-xl mb-2 justify-between border bg-gray-200 p-2 border border-gray-300">
+            <p className="text-muted-foreground text-xs mb-1">Цаг сонгох</p>
+            <div className="flex rounded-xl mb-2 justify-between border bg-accent/50 p-2 border border-primary">
               <div className="flex items-center gap-1.5 ">
-                <Clock1 size={15} color="gray" />
-                <p className="text-sm">Хугацаа:</p>
+                <Clock1 size={15} className="text-primary" />
+                <p className="text-sm ">Хугацаа:</p>
               </div>
 
               {duration ? <p className="text-sm">{duration} мин</p> : <span />}
@@ -140,7 +141,7 @@ export default function Step3({
                   if (time! + 0)
                     return (
                       <button
-                        className={`text-start text-sm border p-2 border-gray-300 transition-all duration-300 hover:shadow-lg  rounded-md ${values.time == `${time}` ? "bg-gray-400" : ""}`}
+                        className={`text-start text-sm border p-2 transition-all duration-300 hover:shadow-sm  rounded-lg ${values.time == `${time}` ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary/50"}`}
                         key={i}
                         onClick={() => onChange("start_time", `${time}`)}
                       >

@@ -11,7 +11,7 @@ import {
   MobileNavMenu,
 } from "./ui/resizable-navbar";
 import { useEffect, useState } from "react";
-import Login from "./Login";
+import { AuthModal } from "./Login";
 import { Button } from "@heroui/button";
 import Link from "next/link";
 import { siteData } from "@/lib/constants";
@@ -86,6 +86,7 @@ export function NavbarDemo({ token }: { token?: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | undefined>();
   const me = async () => {
+    console.log(token);
     if (token) {
       try {
         const res = await fetch(`${API.user}/me`, {
@@ -109,7 +110,6 @@ export function NavbarDemo({ token }: { token?: string }) {
   useEffect(() => {
     me();
   }, [token]);
-
   return (
     <Navbar>
       {/* Desktop Navigation */}
@@ -126,7 +126,7 @@ export function NavbarDemo({ token }: { token?: string }) {
           >
             Захиалга
           </Button>
-          {!token || user == undefined ? <Login /> : <UserMenu user={user} />}
+          {user ? <UserMenu user={user} /> : <AuthModal />}
         </div>
       </NavBody>
 
@@ -155,7 +155,7 @@ export function NavbarDemo({ token }: { token?: string }) {
             </Link>
           ))}
           <div className="flex flex-col w-full gap-4">
-            {token ? <Logout /> : <Login />}
+            {token ? <Logout /> : <AuthModal />}
             <NavbarButton
               onClick={() => setIsMobileMenuOpen(false)}
               variant="primary"

@@ -19,11 +19,11 @@ export const LocationCard = ({
 }) => {
   return (
     <div
-      className={`h-[80px] flex flex-col w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"}`}
+      className={`h-[80px] flex flex-col w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-primary border-2 bg-accent/50" : "border-border hover:border-primary/50"}`}
       onClick={() => onClick(data.id)}
     >
       <h2 className="text-sm font-medium">{data.name}</h2>
-      <p className="text-gray-500 text-sm">{data.address}</p>
+      <p className="text-muted-foreground text-sm">{data.address}</p>
     </div>
   );
 };
@@ -41,8 +41,8 @@ export const ServiceCard = ({
     <div
       className={`col-span-1 flex justify-between items-start w-full cursor-pointer rounded-md p-4 border transition-all duration-200 ${
         selected
-          ? "border-black bg-black/10"
-          : "border-gray-300 hover:border-gray-500"
+          ? "border-primary border-2 bg-accent/50"
+          : "border-border hover:border-primary/50"
       }`}
       onClick={() => onClick(data.id)}
     >
@@ -57,12 +57,12 @@ export const ServiceCard = ({
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-medium">{data.name}</h2>
 
-          <p className="text-gray-500 min-h-[1.6rem] leading-4 text-xs line-clamp-2">
+          <p className="text-muted-foreground min-h-[1.6rem] leading-4 text-xs line-clamp-2">
             {data.description || "\u00A0"}
           </p>
 
           <div className="flex gap-2 mt-1">
-            <div className="flex items-center gap-1 text-gray-700">
+            <div className="flex items-center gap-1 text-secondary-foreground">
               <Clock size={13} />
               <p className="text-xs">{data.duration} мин</p>
             </div>
@@ -116,7 +116,7 @@ export const ArtistCard = ({
           </div>
           <div>
             <h2 className="text-sm font-medium mb-1">{data.nickname}</h2>
-            <p className="text-gray-500 text-sm line-clamp-2">
+            <p className="text-muted-foreground text-sm line-clamp-2">
               {data.description}
             </p>
             <div className="flex gap-2">
@@ -145,7 +145,7 @@ export const ArtistCard = ({
         </div>
         <div>
           <h2 className="text-sm font-medium mb-1">{data.nickname}</h2>
-          <p className="text-gray-500 text-sm line-clamp-2">
+          <p className="text-muted-foreground text-sm line-clamp-2">
             {data.description}
           </p>
           <div className="flex gap-2">
@@ -212,7 +212,7 @@ export const statusConfig = {
   },
   [OrderStatus.Absent]: {
     bg: "bg-gray-100",
-    text: "text-gray-700",
+    text: "text-secondary-foreground",
     label: "Ирээгүй",
   },
   [OrderStatus.Friend]: {
@@ -251,14 +251,14 @@ export function OrderCard({ data }: { data: Order }) {
 
       {/* Date and Time */}
       <div className="space-y-1.5 mb-3">
-        <div className="flex items-center gap-2 text-gray-500">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Calendar className="w-4 h-4" />
           <span className="text-sm">
             {getDayName(date.getDay() == 0 ? 7 : date.getDay())},{" "}
             {date.getMonth() + 1}-р сарын {date.getDate()}, {date.getFullYear()}
           </span>
         </div>
-        <div className="flex items-center gap-2 text-gray-500">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Clock className="w-4 h-4" />
           <span className="text-sm">
             {start_time.slice(0, 5)} - {end_time.slice(0, 5)}
@@ -268,7 +268,7 @@ export function OrderCard({ data }: { data: Order }) {
 
       {/* Description */}
       {description && (
-        <p className="text-sm text-gray-500 mb-3 pb-3 border-b border-gray-100">
+        <p className="text-sm text-muted-foreground mb-3 pb-3 border-b border-gray-100">
           {description}
         </p>
       )}

@@ -103,32 +103,32 @@ export const HeroParallax = ({
         className="bg-[url(/bg/blue-gradient.png)] bg-cover bg-center"
       >
         <motion.div className="flex flex-row-reverse mb-10 space-x-reverse space-x-15 sm:mb-14">
-          {firstRow.map((product) => (
+          {firstRow.map((product, i) => (
             <ProductCard
               product={product}
               handleDone={handleDone}
               translate={translateX}
-              key={product.name}
+              key={i}
             />
           ))}
         </motion.div>
         <motion.div className="flex flex-row mb-10 space-x-15 sm:mb-14 ">
-          {secondRow.map((product) => (
+          {secondRow.map((product, i) => (
             <ProductCard
               product={product}
               handleDone={handleDone}
               translate={translateXReverse}
-              key={product.name}
+              key={i}
             />
           ))}
         </motion.div>
         <motion.div className="flex flex-row-reverse space-x-reverse space-x-15">
-          {thirdRow.map((product) => (
+          {thirdRow.map((product, i) => (
             <ProductCard
               product={product}
               handleDone={handleDone}
               translate={translateX}
-              key={product.name}
+              key={i}
             />
           ))}
         </motion.div>

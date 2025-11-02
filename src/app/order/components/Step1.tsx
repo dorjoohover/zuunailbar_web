@@ -124,7 +124,7 @@ export default function Step1({
           </div>
         </div>
       ) : (
-        <div className="w-full  bg-gray-100 flex justify-center items-center border border-gray-300 rounded-sm h-[70px]">
+        <div className="w-full  bg-primary/10 flex justify-center items-center border border-primary rounded-sm h-[70px]">
           <p className="text-sm text-gray-500">Салбараа сонгоно уу</p>
         </div>
       )}
@@ -214,7 +214,7 @@ const Price = ({
   const totalDisplay = totalPrice({ services: services, values: values });
 
   return (
-    <div className="border w-full border-gray-500 bg-gray-100 px-2.5 py-2 rounded-md flex justify-between">
+    <div className="border w-full border-primary bg-primary/10 px-2.5 py-2 rounded-md flex justify-between">
       <p className="text-sm">{values.length} Үйлчилгээ</p>
       <p>Нийт: {totalDisplay}₮</p>
     </div>

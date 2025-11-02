@@ -69,7 +69,7 @@ export default function Step2({
         </p>
       </div>
       {Object.keys(values.users).length === 0 ? (
-        <div className="w-full  bg-gray-100 flex justify-center items-center border border-gray-300 rounded-sm h-[60px]">
+        <div className="w-full  border-primary flex justify-center items-center border bg-primary/10 rounded-sm h-[60px]">
           <p className="text-sm text-gray-500 px-2 py-2 text-center">
             Артист сонгогдоогүй байна. Автоматаар хуваарилах эсвэл хүссэн
             артистаа сонгоно уу.

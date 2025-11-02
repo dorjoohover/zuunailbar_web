@@ -16,10 +16,9 @@ import {
 import { Form } from "@heroui/form";
 import { addToast } from "@heroui/toast";
 import { login, register, sendOtp } from "@/app/(api)/auth";
-import { usePathname, useRouter } from "next/navigation";
-import { baseUrl } from "@/utils/api";
+import { usePathname } from "next/navigation";
 
-export default function AuthModal() {
+export function AuthModal() {
   const [tab, setTab] = useState<"login" | "register">("login");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -52,7 +51,7 @@ export default function AuthModal() {
     } else {
       if (data) {
         setOtpSent(true);
-        setTimer(5);
+        setTimer(59);
         addToast({
           title: "Нэг удаагийн нууц үг илгээлээ",
           size: "lg",
@@ -95,9 +94,6 @@ export default function AuthModal() {
       save(data.accessToken, data.merchant_id);
 
       onClose();
-      setTimeout(() => {
-        window.location.replace(window.location.href);
-      }, 300);
     }
   };
   const handleLogin = async () => {
