@@ -1,11 +1,13 @@
-import { money } from "@/lib/functions";
-import { Branch, Service, User } from "@/models";
+import { getDayName, money } from "@/lib/functions";
+import { Branch, Order, Service, User } from "@/models";
 import { Api } from "@/utils/api";
 import { Checkbox } from "@heroui/checkbox";
-import { Clock, LocationEdit, Users } from "lucide-react";
+import { Calendar, Clock, DollarSign, LocationEdit, Users } from "lucide-react";
 import Image from "next/image";
 import CustomImage from "./image";
 import { ReactNode } from "react";
+import { OrderStatus } from "@/lib/constants";
+import { mnDate } from "@/lib/const";
 export const LocationCard = ({
   data,
   selected,
@@ -37,36 +39,46 @@ export const ServiceCard = ({
 }) => {
   return (
     <div
-      className={`h-[90px] col-span-1 flex justify-between w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"}`}
+      className={`col-span-1 flex justify-between items-start w-full cursor-pointer rounded-md p-4 border transition-all duration-200 ${
+        selected
+          ? "border-black bg-black/10"
+          : "border-gray-300 hover:border-gray-500"
+      }`}
       onClick={() => onClick(data.id)}
     >
-      <div className="flex items-start">
+      {/* Left Section */}
+      <div className="flex items-start gap-2">
         <Checkbox
           isSelected={selected}
           onChange={() => onClick(data.id)}
           size="sm"
           color="default"
-        ></Checkbox>
-        <div>
-          <h2 className="text-sm font-medium mb-1 min-h-[2.4em]">
-            {data.name}
-          </h2>
-          <p className="text-gray-500 text-sm">{data.description}</p>
-          <div className="flex gap-2">
-            <div className="flex gap-0.5 py-1">
-              <Clock size={15} />
+        />
+        <div className="flex flex-col gap-1">
+          <h2 className="text-sm font-medium">{data.name}</h2>
+
+          <p className="text-gray-500 min-h-[1.6rem] leading-4 text-xs line-clamp-2">
+            {data.description || "\u00A0"}
+          </p>
+
+          <div className="flex gap-2 mt-1">
+            <div className="flex items-center gap-1 text-gray-700">
+              <Clock size={13} />
               <p className="text-xs">{data.duration} мин</p>
             </div>
+
             {data.duplicated && (
-              <div className="flex gap-0.5 px-2 py-1 rounded-xl bg-gray-200 ">
-                <Users size={15} />
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-200">
+                <Users size={13} />
                 <p className="text-xs">зэрэг</p>
               </div>
             )}
           </div>
         </div>
       </div>
-      <p className="text-md font-bolder whitespace-nowrap">
+
+      {/* Right Section */}
+      <p className="text-sm font-semibold whitespace-nowrap text-right">
         {money(
           data.min_price.toString(),
           "",
@@ -104,7 +116,9 @@ export const ArtistCard = ({
           </div>
           <div>
             <h2 className="text-sm font-medium mb-1">{data.nickname}</h2>
-            <p className="text-gray-500 text-sm">{data.description}</p>
+            <p className="text-gray-500 text-sm line-clamp-2">
+              {data.description}
+            </p>
             <div className="flex gap-2">
               {/* <div className="flex gap-0.5 py-1">
               <Clock size={15} />
@@ -131,7 +145,9 @@ export const ArtistCard = ({
         </div>
         <div>
           <h2 className="text-sm font-medium mb-1">{data.nickname}</h2>
-          <p className="text-gray-500 text-sm">{data.description}</p>
+          <p className="text-gray-500 text-sm line-clamp-2">
+            {data.description}
+          </p>
           <div className="flex gap-2">
             {/* <div className="flex gap-0.5 py-1">
               <Clock size={15} />
@@ -172,3 +188,97 @@ export const ReviewCard = ({
     </div>
   );
 };
+
+export const statusConfig = {
+  [OrderStatus.Pending]: {
+    bg: "bg-amber-100",
+    text: "text-amber-700",
+    label: "Урьдчилгаа төлөөгүй",
+  },
+  [OrderStatus.Active]: {
+    bg: "bg-blue-100",
+    text: "text-blue-700",
+    label: "Урьдчилгаа төлсөн",
+  },
+  [OrderStatus.Finished]: {
+    bg: "bg-emerald-100",
+    text: "text-emerald-700",
+    label: "Дууссан",
+  },
+  [OrderStatus.Cancelled]: {
+    bg: "bg-red-100",
+    text: "text-red-700",
+    label: "Цуцлагдсан",
+  },
+  [OrderStatus.Absent]: {
+    bg: "bg-gray-100",
+    text: "text-gray-700",
+    label: "Ирээгүй",
+  },
+  [OrderStatus.Friend]: {
+    bg: "bg-purple-100",
+    text: "text-purple-700",
+    label: "Танилын будалт",
+  },
+};
+
+export function OrderCard({ data }: { data: Order }) {
+  const {
+    order_date,
+    order_status,
+    artist_name,
+    start_time,
+    end_time,
+    description,
+    total_amount,
+  } = data;
+  const config = statusConfig[order_status as OrderStatus];
+  // Format date
+
+  const artist = artist_name?.split(" ");
+  const date = new Date(order_date);
+  return (
+    <div className="bg-white rounded-2xl  p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+      {/* Artist Name */}
+      <div className="flex items-start justify-between mb-3">
+        <h3 className="text-purple-600">{artist?.[0]}</h3>
+        <div
+          className={`inline-flex items-center px-2.5 py-1 rounded-full ${config.bg}`}
+        >
+          <span className={`text-xs ${config.text}`}>{config.label}</span>
+        </div>
+      </div>
+
+      {/* Date and Time */}
+      <div className="space-y-1.5 mb-3">
+        <div className="flex items-center gap-2 text-gray-500">
+          <Calendar className="w-4 h-4" />
+          <span className="text-sm">
+            {getDayName(date.getDay() == 0 ? 7 : date.getDay())},{" "}
+            {date.getMonth() + 1}-р сарын {date.getDate()}, {date.getFullYear()}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-gray-500">
+          <Clock className="w-4 h-4" />
+          <span className="text-sm">
+            {start_time.slice(0, 5)} - {end_time.slice(0, 5)}
+          </span>
+        </div>
+      </div>
+
+      {/* Description */}
+      {description && (
+        <p className="text-sm text-gray-500 mb-3 pb-3 border-b border-gray-100">
+          {description}
+        </p>
+      )}
+
+      {/* Amount */}
+      <div className="flex items-center gap-1">
+        <span className="text-gray-900">
+          {money((total_amount ?? 0).toString())} ₮
+        </span>
+      </div>
+    </div>
+  );
+}

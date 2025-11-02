@@ -16,8 +16,10 @@ export interface IUser {
   password?: string;
   experience?: number;
   created_at?: Date;
+  level?: number;
 }
 export interface User {
+  level?: number;
   id: string;
   firstname?: string;
   lastname?: string;

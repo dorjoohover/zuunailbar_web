@@ -347,7 +347,7 @@ export default function OrderPage({
       details: formatDetails(),
       order_date: selected.order_date,
       start_time: st,
-      customer_desc: selected.customer_desc,
+      description: selected.description,
       user_id: selected.users?.[0],
 
       duplicated: selected.duplicated,
@@ -468,7 +468,7 @@ export default function OrderPage({
                 date: selected.order_date,
                 time: selected.start_time,
                 details: selected.details ?? [],
-                description: selected.customer_desc,
+                description: selected.description,
               }}
               loading={false}
               slots={availableTimes()}

@@ -3,7 +3,7 @@ import { UserService } from "./user.service.model";
 export interface IOrder {
   user_id?: string;
   customer_id?: string;
-  customer_desc?: string;
+  description?: string;
   branch_id?: string;
   order_date?: Date;
   start_time?: string;
@@ -14,12 +14,16 @@ export interface IOrder {
   details?: IOrderDetail[] | any[];
   duplicated?: boolean;
 }
+
 export interface Order {
   id: string;
+  description?: string;
+  artist_name?: string;
   user_id: string;
   customer_id: string;
+  branch_id?: string;
   duration: number;
-  order_date: Date;
+  order_date: string;
   start_time: string;
   end_time: string;
   order_status: number;
@@ -27,8 +31,6 @@ export interface Order {
   is_pre_amount_paid: boolean;
   total_amount: number;
   paid_amount: number;
-  customer_desc: string;
-  user_desc: string;
   created_at?: Date;
   updated_at?: Date;
 }

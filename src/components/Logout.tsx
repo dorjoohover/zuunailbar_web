@@ -47,7 +47,7 @@ export const Logout = () => {
         onPress={() => {
           onOpen();
         }}
-        className="text-sm font-semibold md:hidden  text-white w-full bg-transparent max-w-auto border border-white  aspect-square"
+        className="text-sm md:hidden   w-full max-w-auto border border-white  aspect-square"
       >
         {/* <UserRound className="size-4" /> */}
         Гарах
@@ -55,9 +55,10 @@ export const Logout = () => {
       <Button
         size="sm"
         onPress={() => {
-          onOpen();
+          // onOpen();
+          handleLogout();
         }}
-        className="text-sm font-semibold hidden md:block text-white bg-transparent size-10 aspect-square"
+        className="text-sm w-full hidden md:block  aspect-square"
       >
         {/* <UserRound className="size-4" /> */}
         Гарах

@@ -164,7 +164,7 @@ export default function Step3({
       <div className="space-y-2">
         <h1 className="font-medium">Захиалгын дэлгэрэнгүй</h1>
         <Textarea
-          onChange={(e) => onChange("customer_desc", e.target.value)}
+          onChange={(e) => onChange("description", e.target.value)}
           minRows={5}
           placeholder="Хумс хүнд гэмтэлтэй гэх мэт..."
           className="placeholder:text-gray-100"

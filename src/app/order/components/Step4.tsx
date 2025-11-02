@@ -49,7 +49,7 @@ export default function Step4({
     services: services.items,
     values: service_ids!,
   });
-  const pre = values.details?.reduce((acc, item) => acc + (item?.pre ?? 0), 0);
+  const pre = values.details?.reduce((acc, item) => acc + +(item?.pre ?? 0), 0);
   const date = values.order_date ?? mnDate();
 
   return (
@@ -117,11 +117,11 @@ export default function Step4({
               })}
             </div>
           </ReviewCard>
-          {values.customer_desc && (
+          {values.description && (
             <ReviewCard Icon={Folder} title="Тайлбар">
               <div>
                 <p className="text-gray-500 text-sm">
-                  {firstLetterUpper(values.customer_desc)}
+                  {firstLetterUpper(values.description)}
                 </p>
               </div>
             </ReviewCard>

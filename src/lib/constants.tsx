@@ -14,6 +14,11 @@ import {
   Sparkles,
 } from "lucide-react";
 
+export enum UserLevel {
+  BRONZE = 0,
+  SILVER = 10,
+  GOLD = 20,
+}
 export const siteData = {
   navItems: [
     {
@@ -179,8 +184,7 @@ export enum OrderStatus {
   Pending = 10,
   // uridchilgaa tolson
   Active = 20,
-  // uilchilgee ehelsen
-  Started = 30,
+
   // duussan
   Finished = 40,
   // tsutsalsan
@@ -192,7 +196,6 @@ export enum OrderStatus {
 export const StatusValue = {
   [OrderStatus.Pending]: "Хүлээгдэж байна.",
   [OrderStatus.Active]: "Төлбөр төлөгдсөн.",
-  [OrderStatus.Started]: "Үйлчилгээ эхэлсэн.",
   [OrderStatus.Finished]: "Үйлчилгээ дууссан.",
   [OrderStatus.Cancelled]: "Үйлчилгээ цуцлагдсан.",
   [OrderStatus.Absent]: "Ирээгүй.",
@@ -201,7 +204,6 @@ export const StatusValue = {
 export const StatusColor = {
   [OrderStatus.Pending]: "bg-yellow-300 text-yellow-800", // Төлбөр хүлээгдэж байна
   [OrderStatus.Active]: "bg-blue-300 text-blue-800", // Төлбөр төлөгдсөн
-  [OrderStatus.Started]: "bg-purple-300 text-purple-800", // Үйлчилгээ эхэлсэн
   [OrderStatus.Finished]: "bg-green-300 text-green-800", // Үйлчилгээ дууссан
   [OrderStatus.Cancelled]: "bg-red-300 text-red-800", // Цуцлагдсан
   [OrderStatus.Absent]: "bg-gray-300 text-gray-800", // Ирээгүй

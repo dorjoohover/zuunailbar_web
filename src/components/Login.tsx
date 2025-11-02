@@ -17,6 +17,7 @@ import { Form } from "@heroui/form";
 import { addToast } from "@heroui/toast";
 import { login, register, sendOtp } from "@/app/(api)/auth";
 import { usePathname, useRouter } from "next/navigation";
+import { baseUrl } from "@/utils/api";
 
 export default function AuthModal() {
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -126,9 +127,6 @@ export default function AuthModal() {
           size: "lg",
           color: "success",
         });
-        setTimeout(() => {
-          window.location.replace(window.location.href);
-        }, 300);
       }
     } catch (error) {
       console.log(error);
@@ -146,6 +144,7 @@ export default function AuthModal() {
         merchant,
       }),
     });
+    window.location.replace(window.location.href);
   };
   const pathname = usePathname();
   useEffect(() => {
@@ -154,7 +153,7 @@ export default function AuthModal() {
   return (
     <>
       <Button
-        size="sm"
+        size="md"
         onPress={() => {
           onOpen();
         }}
@@ -164,7 +163,7 @@ export default function AuthModal() {
         Нэвтрэх
       </Button>
       <Button
-        size="sm"
+        size="md"
         onPress={() => {
           onOpen();
         }}
