@@ -6,6 +6,7 @@ import { Button } from "@heroui/button";
 import { ListDefault, ListType, mnDate } from "@/lib/const";
 import {
   Branch,
+  BranchService,
   DateTime,
   IOrder,
   IOrderDetail,
@@ -27,6 +28,7 @@ import { orderSteps } from "@/lib/constants";
 import Step4 from "./Step4";
 import {
   Modal,
+  ModalBody,
   ModalContent,
   ModalFooter,
   ModalHeader,
@@ -34,15 +36,8 @@ import {
 } from "@heroui/modal";
 import { PaymentView } from "./payment";
 import { Invoice } from "@/types";
-function useStepper(total = 4) {
-  const [step, setStep] = useState(1);
-  const go = (n: number) => setStep(Math.min(Math.max(1, n), total));
+import { formatTime, money, parseDate } from "@/lib/functions";
 
-  const next = () => go(step + 1);
-  const prev = () => go(step - 1);
-
-  return { step, go, next, prev, total };
-}
 function getMergedSlots(slotsArray: DateTime[]): DateTime {
   if (slotsArray == undefined || slotsArray?.length === 0) return {};
 
@@ -127,16 +122,18 @@ export default function OrderPage({
   branches,
   token,
   users,
+  branch_services,
 }: {
   token?: string;
   data: ListType<Service>;
   branches: ListType<Branch>;
+  branch_services: ListType<BranchService>;
   users: ListType<User>;
 }) {
   // selected бүх мэдээллээ энд төвлөрүүлнэ
   const [selected, setSelected] = useState<IOrder>({
     details: [],
-    duplicated: false,
+    parallel: false,
   });
 
   const [limit, setLimit] = useState(7);
@@ -166,8 +163,18 @@ export default function OrderPage({
     }),
     [selected.order_date, selected.start_time]
   );
+  const total = 4;
+  const [step, setStep] = useState(1);
+  const go = async (n: number) => {
+    if (n == 4 && !order) {
+      const result = await onSubmit();
+      if (!result) return;
+    }
+    setStep(Math.min(Math.max(1, n), total));
+  };
 
-  const { step, go, next, prev, total } = useStepper(4);
+  const next = () => go(step + 1);
+  const prev = () => go(step - 1);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const activeErrors =
     step === 1
@@ -180,15 +187,6 @@ export default function OrderPage({
     [activeErrors]
   );
 
-  // индикатор дээр үсрэх зөвшөөрөл
-  function canJump(target: number) {
-    // target хүртэлх өмнөх алхмууд бэлэн байх ёстой
-    if (target <= 1) return true;
-    if (!Object.values(step1Errors).every((v) => !v)) return false;
-    if (target <= 2) return true;
-    if (!Object.values(step3Errors).every((v) => !v)) return false;
-    return true;
-  }
   const handleNext = () => {
     if (!isStepComplete) {
       setShowError(true);
@@ -213,10 +211,11 @@ export default function OrderPage({
         services:
           (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
         branch_id: selected.branch_id,
-        duplicated: selected.duplicated,
+        parallel: selected.parallel,
       },
       "artists"
     ).then((d) => {
+      console.log(d);
       if (d.success) {
         setUserDateTimes(d.data.payload.items);
         setLimit(d.data.payload.limit ?? 7);
@@ -253,8 +252,8 @@ export default function OrderPage({
         return;
       }
 
-      // duplicated тохиолдолд 2 artist байх боломжтой
-      if (selected.duplicated) {
+      // parallel тохиолдолд 2 artist байх боломжтой
+      if (selected.parallel) {
         const selectedUser = selected.users?.[service];
         if (selectedUser) {
           details.push({ ...d, user_id: selectedUser });
@@ -285,7 +284,7 @@ export default function OrderPage({
         return;
       }
 
-      // duplicated биш — 1 artist
+      // parallel биш — 1 artist
       const availableTimes = userDatetimes.filter(
         (u) => u.service_id === service && u.slots?.[day]?.includes(startHour)
       );
@@ -306,7 +305,7 @@ export default function OrderPage({
 
   const availableTimes = (): DateTime => {
     const artists = Object.values(selected.users ?? {}).length;
-    if (selected.duplicated && artists > 1) {
+    if (selected.parallel && artists > 1) {
       const slots = getCommonSlots(
         userDatetimes
           .filter((u) =>
@@ -333,12 +332,13 @@ export default function OrderPage({
             )
             .map((u) => u.slots);
 
-    const slots = selected.duplicated
+    const slots = selected.parallel
       ? getCommonSlots(slotsArray, artists > 0 ? 1 : 2)
       : getMergedSlots(slotsArray);
     return slots;
   };
   const [invoice, setInvoice] = useState<Invoice | null>(null);
+  const [checked, setChecked] = useState(false);
   const [order, setOrder] = useState<string | null>(null);
   const onSubmit = async () => {
     const st = selected.start_time?.slice(0, 2);
@@ -350,7 +350,7 @@ export default function OrderPage({
       description: selected.description,
       user_id: selected.users?.[0],
 
-      duplicated: selected.duplicated,
+      parallel: selected.parallel,
     };
     const res = await create<IOrder>(Api.order, payload);
     if (!res.success) {
@@ -365,15 +365,58 @@ export default function OrderPage({
       setOrder(res.data.payload.id);
     } else {
       addToast({ title: "Амжилттай.", color: "success" });
-      reset();
+      // reset();
     }
+    return res.success;
   };
-  if (invoice != null && order != null)
+  if (invoice != null && order != null && step == 5)
     return (
       <div>
         <PaymentView invoice={invoice} id={order} />
       </div>
     );
+  const stepValue = (index: number) => {
+    const selected_services = selected.details;
+    if (index == 0) {
+      if (!selected_services) return undefined;
+      let value =
+        selected_services?.length > 1
+          ? "2 Үйлчилгээ"
+          : selected_services?.length > 0
+            ? selected_services?.[0]?.service_name
+            : undefined;
+      return value;
+    }
+    if (index == 1) {
+      const selected_users = selected.users
+        ? Object.values(selected.users).filter((a) => a != undefined)
+        : [];
+
+      if (selected_users.length === 0) {
+        return selected_services && selected_services?.length > 0
+          ? "Артистыг автоматаар оноох"
+          : undefined;
+      }
+      const matchedUsers = users.items.filter((u) =>
+        selected_users.includes(u.id)
+      );
+
+      const uniqueUserIds = Array.from(new Set(matchedUsers.map((u) => u.id)));
+
+      if (uniqueUserIds.length > 1) {
+        return "2 Артист";
+      }
+
+      return matchedUsers[0]?.nickname;
+    }
+    if (index == 2) {
+      const date = selected.order_date;
+      const time = selected.start_time;
+      if (!date || !time) return undefined;
+      return `${parseDate(date, false)} ${formatTime(time)}`;
+    }
+    return undefined;
+  };
 
   return (
     <div className="relative py-10">
@@ -386,19 +429,33 @@ export default function OrderPage({
             size="sm"
             value={(step / 4) * 100}
           />
-          <div className="relative flex justify-between w-full ">
-            <div className="absolute top-[50%] -translate-y-[50%]  left-[50%] -translate-x-[50%] w-3/4 border-[0.5px] border-gray-400 h-[1px] border-dashed"></div>
-            {orderSteps.map((s, i) => (
-              <div
-                key={i}
-                className={`space-x-2 z-10 cursor-pointer relative px-2 bg-white flex-center font-semibold text-xs `}
-                onClick={() => {
-                  // if (canJump(s)) go(s);
-                }}
-              >
-                <span>{s.name}</span>
-              </div>
-            ))}
+          <div className="relative flex justify-between w-full mt-2">
+            {/* <div className="absolute top-[50%] -translate-y-[50%]  left-[50%] -translate-x-[50%] w-3/4 border-[0.5px] border-gray-400 h-[1px] border-dashed"></div> */}
+            {orderSteps.map((s, i) => {
+              const value = stepValue(i);
+              const current = i == step - 1;
+              return (
+                <div key={i} className="flex flex-col">
+                  <div
+                    className={`space-x-2 z-10 flex flex-col cursor-pointer relative px-2 bg-white flex-center `}
+                    onClick={() => {
+                      // if (canJump(s)) go(s);
+                    }}
+                  >
+                    <span
+                      className={`font-bolder pb-1 mb-1 text-sm ${current ? "text-primary" : ""} ${!value && current ? "border-b-2 border-primary" : ""}`}
+                    >
+                      {s.name}
+                    </span>
+                    <span
+                      className={`pb-1 text-xs  ${current ? "text-primary border-b  border-primary" : ""} font-light`}
+                    >
+                      {value}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
         <div className="block sm:hidden mb-4">
@@ -431,6 +488,7 @@ export default function OrderPage({
         >
           {step === 1 && (
             <Step1
+              branch_services={branch_services}
               values={{
                 branch: selected.branch_id,
                 services:
@@ -454,7 +512,7 @@ export default function OrderPage({
               values={{
                 details: selected.details ?? [],
                 users: selected.users ?? {},
-                duplicated: selected.duplicated ?? false,
+                parallel: selected.parallel ?? false,
               }}
               users={users}
               onChange={setField}
@@ -529,8 +587,32 @@ export default function OrderPage({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Та итгэлтэй байна уу
+                Та захиалгаа баталгаажуулахдаа итгэлтэй байна уу?
               </ModalHeader>
+
+              <ModalBody className="space-y-3">
+                {invoice?.price && (
+                  <p className="text-sm text-muted-foreground">
+                    Та захиалгаа баталгаажуулахын тулд{" "}
+                    <span className="font-semibold text-primary">
+                      {money(invoice.price)}₮
+                    </span>{" "}
+                    урьдчилгаа төлбөр төлөх шаардлагатай. Энэ төлбөр буцаан
+                    олгогдохгүйг анхаарна уу.
+                  </p>
+                )}
+
+                {/* ✅ Checkbox хэсэг */}
+                <label className="flex items-start gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => setChecked(e.target.checked)}
+                    className="mt-1"
+                  />
+                  <span>Би үйлчилгээний нөхцөлийг уншиж, зөвшөөрч байна.</span>
+                </label>
+              </ModalBody>
 
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
@@ -538,12 +620,13 @@ export default function OrderPage({
                 </Button>
                 <Button
                   color="primary"
+                  isDisabled={!checked} // 👈 checkbox шалгаагүй бол disable
                   onPress={() => {
                     onClose();
-                    onSubmit();
+                    setStep(5);
                   }}
                 >
-                  Баталгаажсан
+                  Үргэлжлүүлэх
                 </Button>
               </ModalFooter>
             </>

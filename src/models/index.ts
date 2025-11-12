@@ -14,6 +14,8 @@ export * from "./user.service.model";
 export * from "./product.log.model";
 export * from "./voucher.model";
 export * from "./service.model";
+export * from "./branch.service.model";
+export * from "./service.category.model";
 
 export interface RegisterDto {
   mobile: string;

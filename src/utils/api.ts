@@ -9,9 +9,9 @@ const BASE = process.env.API
   ? process.env.API?.endsWith("/")
     ? process.env.API
     : process.env.API + "/"
-  // : "http://localhost:5000/api/v1/";
-// :  "http://192.168.1.104:4000/api/v1/";
-:  "https://api.zunailbar.mn/api/v1/";
+  : // : "http://localhost:5000/api/v1/";
+    // :  "http://192.168.1.104:4000/api/v1/";
+    "https://api.zunailbar.mn/api/v1/";
 
 export enum Api {
   login = "login",
@@ -25,6 +25,7 @@ export enum Api {
   send_otp = "send_otp",
   category = "category",
   service = "service",
+  branch_service = "branch_service",
   order = "order",
   schedule = "schedule",
   booking = "booking",
@@ -54,6 +55,7 @@ export const API = {
   [Api.service]: BASE + "service",
   [Api.file]: BASE + "file",
   [Api.schedule]: BASE + "schedule",
+  [Api.branch_service]: BASE + "branch_service",
   [Api.user_service]: BASE + "user_service",
   [Api.brand]: BASE + "brand",
   [Api.user_product]: BASE + "user_product",

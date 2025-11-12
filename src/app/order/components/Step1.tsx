@@ -3,7 +3,7 @@
 import { LocationCard, ServiceCard } from "@/components/card";
 import { ListType } from "@/lib/const";
 import { money } from "@/lib/functions";
-import { Branch, IOrder, Service } from "@/models";
+import { Branch, BranchService, IOrder, Service } from "@/models";
 import { Button } from "@heroui/button";
 import {
   Modal,
@@ -24,6 +24,7 @@ interface Step1Props {
   errors: { branch?: string; service?: string };
   values: { branch?: string; services?: string[] };
   showError: boolean;
+  branch_services: ListType<BranchService>;
 }
 
 export default function Step1({
@@ -31,19 +32,20 @@ export default function Step1({
   onChange,
   services,
   values,
+  branch_services,
   errors,
   showError,
 }: Step1Props) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [chosen, setChosen] = useState<
     {
-      service_id: string;
-      service_name: string;
-      duration: number;
-      max_price: number;
-      min_price: number;
-      duplicated: boolean;
-      pre: number;
+      service_id?: string;
+      service_name?: string;
+      duration?: number;
+      max_price?: number;
+      min_price?: number;
+      parallel?: boolean;
+      pre?: number;
     }[]
   >([]);
   return (
@@ -68,11 +70,11 @@ export default function Step1({
         <div className="pt-6 w-full">
           <p className="font-medium mb-2">Үйлчилгээ сонгох</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
-            {services.items
+            {branch_services.items
               .filter((service) => service.branch_id == values.branch)
               .map((service, i) => {
                 const details = values.services as string[];
-                const selected = details?.includes(service.id) ?? false;
+                const selected = details?.includes(service.service_id) ?? false;
                 return (
                   <ServiceCard
                     key={i}
@@ -87,7 +89,7 @@ export default function Step1({
                           (s) => s.id == v
                         )[0];
                         if (
-                          value.duplicated &&
+                          value.parallel &&
                           details.length > 0 &&
                           id == value.id
                         )
@@ -98,11 +100,21 @@ export default function Step1({
                           duration: value.duration,
                           max_price: value.max_price,
                           min_price: value.min_price,
-                          duplicated: value.duplicated,
+                          parallel: value.parallel,
                           pre: value.pre,
-                          category: value.category,
+                          category_id: value.category_id,
                         };
                       });
+                      const categoryIds = updatedDetail.map(
+                        (a) => a.category_id
+                      );
+                      const allSame = new Set(categoryIds).size === 1;
+                      if (updatedDetail.length > 1 && allSame) {
+                        addToast({
+                          title: "Ижил төрлийн үйлчилгээ зэрэг авах боломжгүй",
+                        });
+                        return;
+                      }
                       if (updatedDetail.length > 2) {
                         addToast({
                           title: "Хамгийн ихдээ 2 үйлчилгээ сонгоно уу.",
@@ -153,7 +165,7 @@ export default function Step1({
                   color="default"
                   variant="bordered"
                   onPress={() => {
-                    onChange("duplicated", false);
+                    onChange("parallel", false);
                     onChange("details", chosen);
                     onClose();
                   }}
@@ -163,7 +175,7 @@ export default function Step1({
                 <Button
                   color="primary"
                   onPress={() => {
-                    onChange("duplicated", true);
+                    onChange("parallel", true);
                     onClose();
                     onChange("details", chosen);
                   }}

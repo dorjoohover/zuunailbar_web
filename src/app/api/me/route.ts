@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const store = await cookies();
   let merchant = store.get("merchant_id")?.value;
-  console.log(merchant);
 
   const res = NextResponse.json(
     { ok: true, merchant: merchant ?? process.env.MERCHANT },

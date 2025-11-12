@@ -1,5 +1,5 @@
 import { getDayName, money } from "@/lib/functions";
-import { Branch, Order, Service, User } from "@/models";
+import { Branch, BranchService, Order, Service, User } from "@/models";
 import { Api } from "@/utils/api";
 import { Checkbox } from "@heroui/checkbox";
 import { Calendar, Clock, DollarSign, LocationEdit, Users } from "lucide-react";
@@ -33,7 +33,7 @@ export const ServiceCard = ({
   selected,
   data,
 }: {
-  data: Service;
+  data: BranchService;
   onClick: (id: string) => void;
   selected: boolean;
 }) => {
@@ -44,21 +44,21 @@ export const ServiceCard = ({
           ? "border-primary border-2 bg-accent/50"
           : "border-border hover:border-primary/50"
       }`}
-      onClick={() => onClick(data.id)}
+      onClick={() => onClick(data.service_id)}
     >
       {/* Left Section */}
       <div className="flex items-start gap-2">
         <Checkbox
           isSelected={selected}
-          onChange={() => onClick(data.id)}
+          onChange={() => onClick(data.service_id)}
           size="sm"
           color="default"
         />
         <div className="flex flex-col gap-1">
-          <h2 className="text-sm font-medium">{data.name}</h2>
+          <h2 className="text-sm font-medium">{data.meta?.serviceName}</h2>
 
           <p className="text-muted-foreground min-h-[1.6rem] leading-4 text-xs line-clamp-2">
-            {data.description || "\u00A0"}
+            {data.meta?.description || "\u00A0"}
           </p>
 
           <div className="flex gap-2 mt-1">
@@ -67,7 +67,7 @@ export const ServiceCard = ({
               <p className="text-xs">{data.duration} мин</p>
             </div>
 
-            {data.duplicated && (
+            {data.meta?.parallel && (
               <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-200">
                 <Users size={13} />
                 <p className="text-xs">зэрэг</p>

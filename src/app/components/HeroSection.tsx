@@ -34,7 +34,7 @@ export default function HeroSection({ data }: { data: ListType<Home> }) {
 
   return (
     <div className="bg-no-repeat bg-cover">
-      {!done && (
+      {/* {!done && (
         <div className="fixed inset-0 z-10 flex items-center justify-center bg-white/70 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-10">
             <div className="pulse"></div>
@@ -43,7 +43,7 @@ export default function HeroSection({ data }: { data: ListType<Home> }) {
             </div>
           </div>
         </div>
-      )}
+      )} */}
       <HeroParallax data={data?.items ?? []} handleDone={handleDone} />
     </div>
   );

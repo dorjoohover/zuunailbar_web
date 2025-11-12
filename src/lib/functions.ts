@@ -127,12 +127,12 @@ export const usernameFormatter = (user: User) => {
   );
 };
 export const money = (
-  value: string,
+  value: string | number,
   currency = "",
   round = 1,
   slice?: number
 ) => {
-  let v = Math.round(+value / round) * round;
+  let v = Math.round(+`${value}` / round) * round;
   const result = `${currency}${v
     .toString()
     .replaceAll(",", "")

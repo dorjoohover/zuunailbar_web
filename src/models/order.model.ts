@@ -7,12 +7,13 @@ export interface IOrder {
   branch_id?: string;
   order_date?: Date;
   start_time?: string;
+  category_id?: string;
   end_time?: string;
   // pre_amount: number;
   users?: Record<string, string>;
   user_desc?: string;
   details?: IOrderDetail[] | any[];
-  duplicated?: boolean;
+  parallel?: boolean;
 }
 
 export interface Order {
@@ -44,7 +45,7 @@ export interface IOrderDetail {
   service_name?: string;
   user_id?: string;
   duration?: number;
-  duplicated?: boolean;
+  parallel?: boolean;
   category?: number | null;
   created_at?: Date;
   pre?: number;

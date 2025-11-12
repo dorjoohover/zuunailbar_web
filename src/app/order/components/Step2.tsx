@@ -34,7 +34,7 @@ interface Step2Props {
   values: {
     details: IOrderDetail[];
     users: Record<string, string>;
-    duplicated: boolean;
+    parallel: boolean;
   };
   userDateTimes: UserDateTime[];
   // eniig hiine
@@ -92,9 +92,9 @@ export default function Step2({
         </div>
       )}
 
-      {values.duplicated
+      {values.parallel
         ? values.details
-            .filter((v) => v.duplicated)
+            .filter((v) => v.parallel)
             .map((v, i) => {
               const key = v.service_id ?? "";
               const selectedUser =
@@ -147,13 +147,13 @@ export default function Step2({
                           const prevArtistId = prevKey
                             ? values.users[prevKey]
                             : null;
-                          let duplicated = true;
+                          let parallel = true;
                           if (prevArtistId) {
                             const prevArtist = userDateTimes.find(
                               (u) => u.user?.id == prevArtistId
                             );
                             if (prevArtist)
-                              duplicated = hasOverlap(
+                              parallel = hasOverlap(
                                 prevArtist.slots,
                                 user.slots
                               );
@@ -163,7 +163,7 @@ export default function Step2({
                           const disabled =
                             Object.entries(values.users).some(
                               ([k, v]) => k != key && v == user.user?.id
-                            ) || !duplicated;
+                            ) || !parallel;
                           return (
                             <ArtistCard
                               mini={true}

@@ -86,7 +86,6 @@ export function NavbarDemo({ token }: { token?: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | undefined>();
   const me = async () => {
-    console.log(token);
     if (token) {
       try {
         const res = await fetch(`${API.user}/me`, {

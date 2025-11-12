@@ -21,6 +21,11 @@ export enum UserStatus {
   FIRED = 40,
   BANNED = 50,
 }
+export enum STATUS {
+  Active = 10,
+  Pending = 20,
+  Hidden = 30,
+}
 
 // export enum EmployeeStatus {
 //   ACTIVE = 10,

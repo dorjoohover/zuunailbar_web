@@ -1,11 +1,16 @@
 import { Api } from "@/utils/api";
 import { find } from "../(api)";
 import OrderPage from "./components";
-import { Branch, Service, User } from "@/models";
+import { Branch, BranchService, Service, User } from "@/models";
 import { cookies } from "next/headers";
 
 export default async function Page() {
-  const { data, error } = await find<Service>(Api.service, {limit: -1});
+  const { data, error } = await find<Service>(Api.service, { limit: -1 });
+  const branchService = await find<BranchService>(Api.branch_service, {
+    limit: -1,
+    order_by: "index",
+    sort: true
+  });
   const branch = await find<Branch>(Api.branch);
   const user = await find<User>(Api.user, { limit: -1 }, "client");
   const store = await cookies();
@@ -15,6 +20,7 @@ export default async function Page() {
       <OrderPage
         data={data}
         token={token}
+        branch_services={branchService.data}
         branches={branch.data}
         users={user.data}
       />

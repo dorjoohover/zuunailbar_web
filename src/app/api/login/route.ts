@@ -7,7 +7,6 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const store = await cookies();
-    console.log(body);
     store.set("token", body.token);
     store.set("merchant_id", body.merchant);
 

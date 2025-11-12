@@ -23,7 +23,6 @@ export const find = async <T>(
     };
 
     const url = paginationToQuery(uri, merged, route);
-    console.log(url);
     const res = await fetch(url, {
       cache: "no-store",
 
@@ -103,7 +102,6 @@ export const deleteOne = async (
     // }
     const data = await res.json();
     if (!res.ok) {
-      console.log(data);
       return { error: (data as Error).message, success: false };
     }
 
@@ -143,7 +141,6 @@ export const updateOne = async <T>(
     });
     const data = await res.json();
     if (!res.ok) {
-      console.log(data);
       return { error: (data as Error).message, success: false };
     }
 
@@ -184,7 +181,6 @@ export const create = async <T>(
 
     const data = await res.json();
     if (!res.ok) {
-      console.log(data);
       return { error: (data as Error).message, success: false };
     }
 

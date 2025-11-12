@@ -95,7 +95,6 @@ export const updatePassword = async (dto: RegisterDto) => {
       },
       body: JSON.stringify(dto),
     });
-    console.log(res);
     const data = await res.json();
     if (!res.ok)
       return {
@@ -121,7 +120,6 @@ export const forgetPassword = async (mobile: string) => {
         "merchant-id": merchant ?? "",
       },
     });
-    console.log(res);
     const data = await res.json();
     if (!res.ok)
       return {

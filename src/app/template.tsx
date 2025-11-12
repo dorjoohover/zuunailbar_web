@@ -34,7 +34,6 @@ export default function Template({
           cache: "no-store",
         });
         const data = await res.json();
-        console.log(data);
         if (!res.ok) {
           // deleteCookie();
         } else {
