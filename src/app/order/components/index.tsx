@@ -288,8 +288,9 @@ export default function OrderPage({
       const availableTimes = userDatetimes.filter(
         (u) => u.service_id === service && u.slots?.[day]?.includes(startHour)
       );
-
-      const selectedUser = selected.users?.[service];
+      console.log(selected);
+      const selectedUser = selected.users?.[service] ?? selected.users?.[0];
+      console.log(selectedUser);
       if (selectedUser && selectedUser !== "0" && selectedUser !== "") {
         user_id = selectedUser;
       } else if (availableTimes.length > 0) {
@@ -348,7 +349,6 @@ export default function OrderPage({
       order_date: selected.order_date,
       start_time: st,
       description: selected.description,
-      user_id: selected.users?.[0],
 
       parallel: selected.parallel,
     };
