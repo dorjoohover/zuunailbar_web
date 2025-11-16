@@ -45,7 +45,6 @@ export interface IOrderDetail {
   service_name?: string;
   user_id?: string;
   duration?: number;
-  parallel?: boolean;
   category?: number | null;
   created_at?: Date;
   pre?: number;

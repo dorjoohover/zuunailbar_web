@@ -48,6 +48,9 @@ export default function Step1({
       pre?: number;
     }[]
   >([]);
+  const filteredServices = branch_services.items.filter(
+    (service) => service.branch_id == values.branch
+  );
   return (
     <div className="flex flex-col items-center justify-center w-full space-y-4 ">
       <div className="flex flex-col xs:flex-row justify-between w-full gap-4">
@@ -70,69 +73,59 @@ export default function Step1({
         <div className="pt-6 w-full">
           <p className="font-medium mb-2">Үйлчилгээ сонгох</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
-            {branch_services.items
-              .filter((service) => service.branch_id == values.branch)
-              .map((service, i) => {
-                const details = values.services as string[];
-                const selected = details?.includes(service.service_id) ?? false;
-                return (
-                  <ServiceCard
-                    key={i}
-                    data={service}
-                    onClick={(id: string) => {
-                      let updatedDetails = selected
-                        ? details.filter((u) => u != id)
-                        : [...details, id];
-                      let prev = false;
-                      const updatedDetail = updatedDetails?.map((v) => {
-                        const value = services.items.filter(
-                          (s) => s.id == v
-                        )[0];
-                        if (
-                          value.parallel &&
-                          details.length > 0 &&
-                          id == value.id
-                        )
-                          prev = true;
-                        return {
-                          service_id: v,
-                          service_name: value.name ?? "",
-                          duration: value.duration,
-                          max_price: value.max_price,
-                          min_price: value.min_price,
-                          parallel: value.parallel,
-                          pre: value.pre,
-                          category_id: value.category_id,
-                        };
+            {filteredServices.map((service, i) => {
+              const details = values.services as string[];
+              const selected = details?.includes(service.service_id) ?? false;
+              return (
+                <ServiceCard
+                  key={i}
+                  data={service}
+                  onClick={(id: string) => {
+                    let updatedDetails = selected
+                      ? details.filter((u) => u != id)
+                      : [...details, id];
+                    let prev = false;
+                    const updatedDetail = updatedDetails?.map((v) => {
+                      const value = services.items.filter((s) => s.id == v)[0];
+                      return {
+                        service_id: v,
+                        service_name: value.name ?? "",
+                        duration: value.duration,
+                        max_price: value.max_price,
+                        min_price: value.min_price,
+                        pre: value.pre,
+                        category_id: value.category_id,
+                      };
+                    });
+                    const categoryIds = updatedDetail.map((a) => a.category_id);
+                    const allSame = new Set(categoryIds).size === 1;
+                    if (updatedDetail.length > 1 && allSame) {
+                      addToast({
+                        title: "Ижил төрлийн үйлчилгээ зэрэг авах боломжгүй",
                       });
-                      const categoryIds = updatedDetail.map(
-                        (a) => a.category_id
-                      );
-                      const allSame = new Set(categoryIds).size === 1;
-                      if (updatedDetail.length > 1 && allSame) {
-                        addToast({
-                          title: "Ижил төрлийн үйлчилгээ зэрэг авах боломжгүй",
-                        });
-                        return;
-                      }
-                      if (updatedDetail.length > 2) {
-                        addToast({
-                          title: "Хамгийн ихдээ 2 үйлчилгээ сонгоно уу.",
-                        });
-                        return;
-                      }
-                      if (prev) {
-                        onOpen();
-                        setChosen(updatedDetail);
-                      } else {
-                        setChosen(updatedDetail);
-                        onChange("details", updatedDetail);
-                      }
-                    }}
-                    selected={selected}
-                  />
-                );
-              })}
+                      return;
+                    }
+                    if (updatedDetail.length > 1) {
+                      prev = true;
+                    }
+                    if (updatedDetail.length > 2) {
+                      addToast({
+                        title: "Хамгийн ихдээ 2 үйлчилгээ сонгоно уу.",
+                      });
+                      return;
+                    }
+                    if (prev) {
+                      onOpen();
+                      setChosen(updatedDetail);
+                    } else {
+                      setChosen(updatedDetail);
+                      onChange("details", updatedDetail);
+                    }
+                  }}
+                  selected={selected}
+                />
+              );
+            })}
           </div>
         </div>
       ) : (

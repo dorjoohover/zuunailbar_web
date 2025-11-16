@@ -1,5 +1,4 @@
 export interface BranchServiceMeta {
-  parallel?: boolean;
   serviceName?: string;
   branchName?: string;
   description?: string;
