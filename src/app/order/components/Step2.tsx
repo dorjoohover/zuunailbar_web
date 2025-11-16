@@ -93,100 +93,94 @@ export default function Step2({
       )}
 
       {values.parallel
-        ? values.details
-            .filter((v) => v.parallel)
-            .map((v, i) => {
-              const key = v.service_id ?? "";
-              const selectedUser =
-                users.items.filter(
-                  (user) => user.id == values.users[key]
-                )?.[0] ?? null;
-              return (
-                <div className="flex w-full gap-3" key={i}>
-                  <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
-                    <span>{i + 1}</span>
-                  </div>
-                  <div className="w-full">
-                    <div className="flex w-full mb-2 justify-between items-center">
-                      <div>
-                        <p className="text-sm">{v.service_name}</p>
-                        <p className="text-xs text-gray-300">
-                          {v.duration && `${v.duration} мин • `}
-                          {money(
-                            (v?.min_price ?? 0).toString(),
-                            "",
-                            1,
-                            v.max_price ? 2 : undefined
-                          )}
-                          {v.max_price &&
-                            ` - ${money(v.max_price.toString(), "", 1, 2)}`}
-                        </p>
+        ? values.details.map((v, i) => {
+            const key = v.service_id ?? "";
+            const selectedUser =
+              users.items.filter((user) => user.id == values.users[key])?.[0] ??
+              null;
+            return (
+              <div className="flex w-full gap-3" key={i}>
+                <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
+                  <span>{i + 1}</span>
+                </div>
+                <div className="w-full">
+                  <div className="flex w-full mb-2 justify-between items-center">
+                    <div>
+                      <p className="text-sm">{v.service_name}</p>
+                      <p className="text-xs text-gray-300">
+                        {v.duration && `${v.duration} мин • `}
+                        {money(
+                          (v?.min_price ?? 0).toString(),
+                          "",
+                          1,
+                          v.max_price ? 2 : undefined
+                        )}
+                        {v.max_price &&
+                          ` - ${money(v.max_price.toString(), "", 1, 2)}`}
+                      </p>
+                    </div>
+                    {selectedUser && (
+                      <div className="flex gap-3 items-center">
+                        <span>
+                          <ArrowRight size={14} />
+                        </span>
+                        <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
+                          <User2 size={14} color="gray" />
+                          {firstLetterUpper(selectedUser.nickname ?? "")}
+                        </span>
                       </div>
-                      {selectedUser && (
-                        <div className="flex gap-3 items-center">
-                          <span>
-                            <ArrowRight size={14} />
-                          </span>
-                          <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
-                            <User2 size={14} color="gray" />
-                            {firstLetterUpper(selectedUser.nickname ?? "")}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-6 gap-3">
-                      {userDateTimes
-                        .filter((u) => u.service_id == v.service_id)
-                        .map((user, index) => {
-                          const selected =
-                            values.users[key] == user?.user?.id &&
-                            key == v.service_id;
-                          const prevKey = Object.keys(values.users).find(
-                            (k) => k != key
+                    )}
+                  </div>
+                  <div className="grid grid-cols-6 gap-3">
+                    {userDateTimes
+                      .filter((u) => u.service_id == v.service_id)
+                      .map((user, index) => {
+                        const selected =
+                          values.users[key] == user?.user?.id &&
+                          key == v.service_id;
+                        const prevKey = Object.keys(values.users).find(
+                          (k) => k != key
+                        );
+                        const prevArtistId = prevKey
+                          ? values.users[prevKey]
+                          : null;
+                        let parallel = true;
+                        if (prevArtistId) {
+                          const prevArtist = userDateTimes.find(
+                            (u) => u.user?.id == prevArtistId
                           );
-                          const prevArtistId = prevKey
-                            ? values.users[prevKey]
-                            : null;
-                          let parallel = true;
-                          if (prevArtistId) {
-                            const prevArtist = userDateTimes.find(
-                              (u) => u.user?.id == prevArtistId
-                            );
-                            if (prevArtist)
-                              parallel = hasOverlap(
-                                prevArtist.slots,
-                                user.slots
-                              );
-                          }
+                          if (prevArtist)
+                            parallel = hasOverlap(prevArtist.slots, user.slots);
+                        }
 
-                          // өөр service-д давхцахгүй эсэхийг шалгана
-                          const disabled =
-                            Object.entries(values.users).some(
-                              ([k, v]) => k != key && v == user.user?.id
-                            ) || !parallel;
-                          return (
-                            <ArtistCard
-                              mini={true}
-                              data={user.user!}
-                              onClick={(id: string) => {
-                                if (!selected && !disabled) {
-                                  onChange("users", {
-                                    ...values.users,
-                                    [key]: id,
-                                  });
-                                }
-                              }}
-                              selected={selected}
-                              disabled={disabled}
-                              key={index}
-                            />
-                          );
-                        })}
-                    </div>
+                        // өөр service-д давхцахгүй эсэхийг шалгана
+                        const disabled =
+                          Object.entries(values.users).some(
+                            ([k, v]) => k != key && v == user.user?.id
+                          ) || !parallel;
+                        return (
+                          <ArtistCard
+                            mini={true}
+                            data={user.user!}
+                            onClick={(id: string) => {
+                              if (!selected && !disabled) {
+                                onChange("users", {
+                                  ...values.users,
+                                  [key]: id,
+                                });
+                              }
+                            }}
+                            selected={selected}
+                            disabled={disabled}
+                            key={index}
+                          />
+                        );
+                      })}
                   </div>
                 </div>
-              );
-            })
+              </div>
+            );
+          })
         : [""].map((v, i) => {
             console.log(userDateTimes);
             return (
