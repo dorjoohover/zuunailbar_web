@@ -55,7 +55,10 @@ export const ServiceCard = ({
           color="default"
         />
         <div className="flex flex-col gap-1">
-          <h2 className="text-sm font-medium">{data.meta?.serviceName}</h2>
+          <h2 className="text-sm font-medium">
+            {data.meta?.serviceName}{' '}
+            {data.index}
+          </h2>
 
           <p className="text-muted-foreground min-h-[1.6rem] leading-4 text-xs line-clamp-2">
             {data.meta?.description || "\u00A0"}
