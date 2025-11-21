@@ -5,13 +5,14 @@ export enum METHOD {
   patch = "PATCH",
   delete = "DELETE",
 }
-const BASE = process.env.API;
-// ? process.env.API?.endsWith("/")
-//   ? process.env.API
-//   : process.env.API + "/"
-// :
-// :  "http://192.168.1.104:4000/api/v1/";
-// "https://api.zunailbar.mn/api/v1/";
+const BASE = process.env.API
+  ? process.env.API
+  : // ? process.env.API?.endsWith("/")
+    //   ? process.env.API
+    //   : process.env.API + "/"
+    // :
+    // :  "http://192.168.1.104:4000/api/v1/";
+    "https://api.zunailbar.mn/api/v1/";
 
 export enum Api {
   login = "login",
