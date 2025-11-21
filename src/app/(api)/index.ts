@@ -126,7 +126,7 @@ export const updateOne = async <T>(
     const token = store.get("token")?.value;
     const branch = store.get("branch_id")?.value;
     const merchant = store.get("merchant_id")?.value;
-    const url = `${API[uri]}${route ? `/${route}` : ""}/${id}`;
+    const url = `${API[uri]}${route ? `/${route}` : ""}/update/${id}`;
 
     const res = await fetch(url, {
       cache: "no-store",

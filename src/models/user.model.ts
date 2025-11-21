@@ -16,6 +16,7 @@ export interface IUser {
   password?: string;
   experience?: number;
   created_at?: Date;
+  mail?: string;
   level?: number;
 }
 export interface User {
@@ -28,6 +29,7 @@ export interface User {
   mobile?: string;
   birthday?: Date;
   added_by: string;
+  mail: string;
   branch_id: string;
   branch_name?: string;
   user_status: number;

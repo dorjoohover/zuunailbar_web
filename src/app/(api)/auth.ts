@@ -31,9 +31,37 @@ export const sendOtp = async (mobile: string) => {
     };
   }
 };
+export const sendOtpForget = async (mobile: string) => {
+  try {
+    const res = await fetch(`${API.send_otp_forget}`, {
+      cache: "no-store",
+      method: METHOD.post,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mobile,
+      }),
+    });
+    const data = await res.json();
+
+    if (!res.ok)
+      return {
+        error: data.message,
+      };
+
+    return { data: data.payload };
+  } catch (error) {
+    console.log(error);
+    return {
+      error: (error as Error).message,
+    };
+  }
+};
 export const register = async (dto: RegisterDto) => {
   try {
-    const merchant = (await cookies()).get("merchant_id")?.value ?? process.env.MERCHANT;
+    const merchant =
+      (await cookies()).get("merchant_id")?.value ?? process.env.MERCHANT;
     const res = await fetch(`${API.register}`, {
       cache: "no-store",
       method: METHOD.post,

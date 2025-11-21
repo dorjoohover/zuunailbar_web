@@ -118,6 +118,20 @@ export function EditProfileModal({
               required
             />
           </div>
+          <div>
+            <label className="block text-sm text-gray-700 mb-2">
+              Майл хаяг
+            </label>
+            <input
+              type="email"
+              value={formData.mail}
+              onChange={(e) =>
+                setFormData({ ...formData, mail: e.target.value })
+              }
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              required
+            />
+          </div>
 
           {/* Mobile */}
           <div>

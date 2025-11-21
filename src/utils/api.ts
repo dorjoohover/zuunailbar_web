@@ -5,13 +5,13 @@ export enum METHOD {
   patch = "PATCH",
   delete = "DELETE",
 }
-const BASE = process.env.API
-  ? process.env.API?.endsWith("/")
-    ? process.env.API
-    : process.env.API + "/"
-  : // : "http://localhost:5000/api/v1/";
-    // :  "http://192.168.1.104:4000/api/v1/";
-    "https://api.zunailbar.mn/api/v1/";
+const BASE = process.env.API;
+// ? process.env.API?.endsWith("/")
+//   ? process.env.API
+//   : process.env.API + "/"
+// :
+// :  "http://192.168.1.104:4000/api/v1/";
+// "https://api.zunailbar.mn/api/v1/";
 
 export enum Api {
   login = "login",
@@ -23,6 +23,7 @@ export enum Api {
   otp = "otp",
   file = "file",
   send_otp = "send_otp",
+  send_otp_forget = "send_otp_forget",
   category = "category",
   service = "service",
   branch_service = "branch_service",
@@ -45,6 +46,7 @@ export const API = {
   [Api.register]: BASE + "register",
   [Api.otp]: BASE + "otp",
   [Api.send_otp]: BASE + "send/otp",
+  [Api.send_otp_forget]: BASE + "forget/otp",
   [Api.forget]: BASE + "forget",
   [Api.home]: BASE + "home",
   [Api.user]: BASE + "user",

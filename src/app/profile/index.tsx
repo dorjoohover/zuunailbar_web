@@ -4,7 +4,7 @@ import { UserLevel } from "@/lib/constants";
 import { firstLetterUpper, mobileFormatter } from "@/lib/functions";
 import { User } from "@/models";
 import { Api, API } from "@/utils/api";
-import { Edit, Phone } from "lucide-react";
+import { Edit, IdCard, Mail, Phone, UserPen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EditProfileModal } from "./edit";
 import { updateOne } from "../(api)";
@@ -45,6 +45,7 @@ export const ProfilePage = ({
     }
     const res = await updateOne(Api.user, data.id, payload);
     const success = res.success;
+    console.log(res);
     addToast({
       title: `${success ? "Амжилттай солигдлоо." : "Дахин оролдоно уу."}`,
     });
@@ -53,6 +54,7 @@ export const ProfilePage = ({
   const me = async () => {
     if (token) {
       try {
+        console.log(token);
         const res = await fetch(`${API.user}/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -61,6 +63,7 @@ export const ProfilePage = ({
           cache: "no-store",
         });
         const data = await res.json();
+        console.log(data);
         if (data?.payload && data?.payload?.user) {
           setUser(data.payload.user);
         }
@@ -108,7 +111,31 @@ export const ProfilePage = ({
           <h3 className="text-gray-900">Мэдээлэл</h3>
         </div>
 
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3  grid grid-cols-2">
+          <div className="flex items-center gap-3">
+            <div className="bg-purple-50 rounded-lg p-2.5">
+              <IdCard className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Овог нэр</p>
+              <p className="text-sm text-gray-900">
+                {(user.lastname ?? "")?.slice(0, 1)?.toUpperCase()}
+                {user.lastname && "."}
+                {firstLetterUpper(user.firstname ?? "")}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="bg-purple-50 rounded-lg p-2.5">
+              <UserPen className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Хоч</p>
+              <p className="text-sm text-gray-900">
+                {user.nickname ?? "Хоосон"}
+              </p>
+            </div>
+          </div>
           <div className="flex items-center gap-3">
             <div className="bg-purple-50 rounded-lg p-2.5">
               <Phone className="w-5 h-5 text-purple-600" />
@@ -116,6 +143,15 @@ export const ProfilePage = ({
             <div>
               <p className="text-xs text-gray-500">Утасны дугаар</p>
               <p className="text-sm text-gray-900">{phone}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="bg-purple-50 rounded-lg p-2.5">
+              <Mail className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">Майл хаяг</p>
+              <p className="text-sm text-gray-900">{user.mail ?? "Хоосон"}</p>
             </div>
           </div>
         </div>
@@ -146,7 +182,10 @@ export const ProfilePage = ({
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        userData={user}
+        userData={{
+          ...user,
+          mobile: mobileFormatter(user.mobile ?? ''),
+        }}
         onSave={handleSaveProfile}
       />
     </div>
