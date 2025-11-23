@@ -54,7 +54,7 @@ const UserMenu = ({ user }: { user: User }) => {
           <span className="sr-only">User menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56" >
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{name}</p>
@@ -66,10 +66,10 @@ const UserMenu = ({ user }: { user: User }) => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href={"/profile"}>Профайл</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href={"/my"}>Миний захиалгын түүх</Link>
         </DropdownMenuItem>
 

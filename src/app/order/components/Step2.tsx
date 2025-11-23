@@ -133,7 +133,7 @@ export default function Step2({
                   </div>
                   <div className="grid grid-cols-6 gap-3">
                     {userDateTimes
-                      .filter((u) => u.service_id == v.service_id)
+                      .filter((u) => u.services.includes(v.service_id))
                       .map((user, index) => {
                         const selected =
                           values.users[key] == user?.user?.id &&

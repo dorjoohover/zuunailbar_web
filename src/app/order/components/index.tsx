@@ -37,6 +37,7 @@ import {
 import { PaymentView } from "./payment";
 import { Invoice } from "@/types";
 import { formatTime, money, parseDate } from "@/lib/functions";
+import { Check } from "lucide-react";
 
 function getMergedSlots(slotsArray: DateTime[]): DateTime {
   if (slotsArray == undefined || slotsArray?.length === 0) return {};
@@ -97,17 +98,19 @@ export function getCommonSlots(
       if (!slotCount[day]) slotCount[day] = {};
 
       for (const t of times) {
-        const value = (slotCount[day][t] ?? 0) + 1;
-        if (value != 0) slotCount[day][t] = value;
+        slotCount[day][t] = (slotCount[day][t] ?? 0) + 1;
       }
     }
   }
 
-  const common: DateTime = {};
+  const common: Record<number, number[]> = {};
+
   for (const [dayStr, timesMap] of Object.entries(slotCount)) {
     const day = Number(dayStr);
+
+    // Бүх schedule-д нийтлэг цаг
     const availableTimes = Object.entries(timesMap)
-      .filter(([_, count]) => count > 2)
+      .filter(([_, count]) => count === slotsArray.length)
       .map(([t]) => Number(t));
 
     if (availableTimes.length > 0) {
@@ -215,14 +218,33 @@ export default function OrderPage({
       },
       "artists"
     ).then((d) => {
-      console.log(d);
       if (d.success) {
+        console.log(d.data);
+        const length = d.data?.payload?.items?.length ?? 0;
+        if (length == 0) {
+          setStep(step - 1);
+          addToast({
+            title: "Үйлчилгээ үзүүлэх артист олдсонгүй.",
+          });
+          return;
+        }
+        if (length == 1 && selected.parallel) {
+          setStep(step - 1);
+          addToast({
+            title:
+              "Тухайн 2 үйлчилгээг зэрэг үзүүлэх боломжтой артистууд одоогоор байхгүй байна.",
+          });
+          setSelected((prev) => ({
+            ...prev,
+            details: [selected.details?.[0]],
+          }));
+          return;
+        }
         setUserDateTimes(d.data.payload.items);
         setLimit(d.data.payload.limit ?? 7);
       }
     });
   };
-
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     fetcher();
@@ -288,9 +310,8 @@ export default function OrderPage({
       const availableTimes = userDatetimes.filter(
         (u) => u.service_id === service && u.slots?.[day]?.includes(startHour)
       );
-      console.log(selected);
+
       const selectedUser = selected.users?.[service] ?? selected.users?.[0];
-      console.log(selectedUser);
       if (selectedUser && selectedUser !== "0" && selectedUser !== "") {
         user_id = selectedUser;
       } else if (availableTimes.length > 0) {
@@ -315,6 +336,7 @@ export default function OrderPage({
           .map((u) => u.slots),
         1
       );
+      console.log(slots);
       return slots;
     }
 
@@ -603,13 +625,30 @@ export default function OrderPage({
                 )}
 
                 {/* ✅ Checkbox хэсэг */}
-                <label className="flex items-start gap-2 text-sm">
+                <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     checked={checked}
                     onChange={(e) => setChecked(e.target.checked)}
-                    className="mt-1"
+                    className="
+    mt-1 h-4 w-4
+    appearance-none
+    rounded
+    border border-gray-400
+    checked:bg-primary    
+    checked:border-primary
+    checked:text-white
+    flex items-center justify-center
+  "
                   />
+                  {checked && (
+                    <Check
+                      className="absolute font-bold text-white pointer-events-none"
+                      size={12}
+                      strokeWidth={6}
+                      style={{ marginTop: 3, marginLeft: 2 }}
+                    />
+                  )}
                   <span>Би үйлчилгээний нөхцөлийг уншиж, зөвшөөрч байна.</span>
                 </label>
               </ModalBody>

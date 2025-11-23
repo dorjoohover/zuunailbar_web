@@ -244,11 +244,15 @@ export function AuthModal() {
         placement="top"
         isOpen={pathname.includes("/order") ? true : isOpen}
         onOpenChange={onOpenChange}
+        onClose={() => {
+          setForget(false);
+          setTab("login");
+        }}
       >
         <ModalContent className="p-4">
           {(onClose) => (
             <>
-              <ModalHeader className={forget ? "text-dark" : "text-white"}>
+              <ModalHeader className={"text-dark"}>
                 {forget
                   ? "Нууц үг сэргээх"
                   : tab === "login"
@@ -434,9 +438,21 @@ export function AuthModal() {
                 {/* Modal footer */}
                 <ModalFooter className="flex justify-center w-full">
                   {forget ? (
-                    <Button onClick={() => forgetPassword()} className="px-10">
-                      Илгээх
-                    </Button>
+                    otpSent ? (
+                      <Button
+                        onClick={() => forgetPassword()}
+                        className="px-10"
+                      >
+                        Илгээх
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => setForget(false)}
+                        className="px-10"
+                      >
+                        Буцах
+                      </Button>
+                    )
                   ) : (
                     tab === "login" && (
                       <Button type="submit" className="px-10">
