@@ -71,6 +71,7 @@ export default function Step3({
   const today = mnDate(date);
   date.setDate(date.getDate() + limit);
   const days = Object.keys(slots).map(Number);
+  console.log(slots, values);
   let selectedDay = values.date ? mnDate(values.date).getDay() - 1 : undefined;
   if (selectedDay && selectedDay == -1) selectedDay = 6;
   const times = selectedDay != undefined ? slots[selectedDay] : null;

@@ -155,13 +155,13 @@ export function NavbarDemo({ token }: { token?: string }) {
           ))}
           <div className="flex flex-col w-full gap-4">
             {token ? <Logout /> : <AuthModal />}
-            <NavbarButton
+            <Link
+            href={'/order'}
               onClick={() => setIsMobileMenuOpen(false)}
-              variant="primary"
-              className="w-full"
+              className="w-full bg-white border text-dark text-center text-sm flex items-center justify-center rounded-md font-semibold size-10"
             >
               Захиалга өгөх
-            </NavbarButton>
+            </Link>
           </div>
         </MobileNavMenu>
       </MobileNav>

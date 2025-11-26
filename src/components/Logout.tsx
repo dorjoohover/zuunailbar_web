@@ -47,7 +47,7 @@ export const Logout = () => {
         onPress={() => {
           onOpen();
         }}
-        className="text-sm md:hidden   w-full max-w-auto border border-white  aspect-square"
+        className="text-sm md:hidden font-semibold text-white bg-transparent border border-white aspect-square"
       >
         {/* <UserRound className="size-4" /> */}
         Гарах
@@ -58,7 +58,7 @@ export const Logout = () => {
           // onOpen();
           handleLogout();
         }}
-        className="text-sm w-full hidden md:block  aspect-square"
+        className="text-sm hidden md:block font-semibold text-white bg-transparent size-10 aspect-square"
       >
         {/* <UserRound className="size-4" /> */}
         Гарах

@@ -38,6 +38,7 @@ import { PaymentView } from "./payment";
 import { Invoice } from "@/types";
 import { formatTime, money, parseDate } from "@/lib/functions";
 import { Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 function getMergedSlots(slotsArray: DateTime[]): DateTime {
   if (slotsArray == undefined || slotsArray?.length === 0) return {};
@@ -55,12 +56,10 @@ function getMergedSlots(slotsArray: DateTime[]): DateTime {
           merged[day].push(t);
         }
       }
-
       // хүсвэл цагуудыг эрэмбэлж болно
       merged[day].sort((a, b) => a - b);
     }
   }
-
   return merged;
 }
 
@@ -341,7 +340,11 @@ export default function OrderPage({
     }
 
     const selectedServiceIds = selected.details?.map((d) => d.service_id) ?? [];
-
+    console.log(
+      userDatetimes.filter((u) =>
+        Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
+      )
+    );
     const slotsArray =
       artists > 0
         ? userDatetimes
@@ -354,7 +357,7 @@ export default function OrderPage({
               u.services.every((s) => selectedServiceIds.includes(s))
             )
             .map((u) => u.slots);
-
+    console.log(slotsArray);
     const slots = selected.parallel
       ? getCommonSlots(slotsArray, artists > 0 ? 1 : 2)
       : getMergedSlots(slotsArray);
@@ -382,6 +385,7 @@ export default function OrderPage({
       });
       return;
     }
+    console.log(res.data.payload);
     if (res.data?.payload?.invoice) {
       setInvoice(res.data.payload.invoice);
       setOrder(res.data.payload.id);
@@ -391,12 +395,19 @@ export default function OrderPage({
     }
     return res.success;
   };
-  if (invoice != null && order != null && step == 5)
-    return (
-      <div>
-        <PaymentView invoice={invoice} id={order} />
-      </div>
-    );
+  const router = useRouter();
+  if (invoice != null && order != null && step == 5) {
+    if (invoice.price)
+      return (
+        <div>
+          <PaymentView invoice={invoice} id={order} />
+        </div>
+      );
+    else {
+      addToast({ title: "Амжилттай.", color: "success" });
+      router.refresh();
+    }
+  }
   const stepValue = (index: number) => {
     const selected_services = selected.details;
     if (index == 0) {
@@ -565,6 +576,7 @@ export default function OrderPage({
               branches={branches}
               services={data}
               users={users}
+              invoice={invoice}
             />
           )}
 
@@ -613,6 +625,12 @@ export default function OrderPage({
               </ModalHeader>
 
               <ModalBody className="space-y-3">
+                {!invoice?.price && (
+                  <p className="text-sm text-muted-foreground">
+                    Энэхүү захиалга урьдчилгаа төлбөргүйгээр баталгаажна.
+                  </p>
+                )}
+
                 {invoice?.price && (
                   <p className="text-sm text-muted-foreground">
                     Та захиалгаа баталгаажуулахын тулд{" "}
@@ -620,7 +638,8 @@ export default function OrderPage({
                       {money(invoice.price)}₮
                     </span>{" "}
                     урьдчилгаа төлбөр төлөх шаардлагатай. Энэ төлбөр буцаан
-                    олгогдохгүйг анхаарна уу.
+                    олгогдохгүйг анхаарна уу. Мөн энэхүү урьдчилгаа нь таны нийт
+                    төлбөрөөс хасагдан тооцогдох болно.
                   </p>
                 )}
 

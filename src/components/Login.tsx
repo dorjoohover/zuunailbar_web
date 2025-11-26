@@ -23,6 +23,7 @@ import {
   updatePassword,
 } from "@/app/(api)/auth";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export function AuthModal() {
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -455,9 +456,18 @@ export function AuthModal() {
                     )
                   ) : (
                     tab === "login" && (
-                      <Button type="submit" className="px-10">
-                        Нэвтрэх
-                      </Button>
+                      <div className="flex gap-2">
+                        <Link
+                          onClick={() => onClose()}
+                          href={"/"}
+                          className="items-center flex justify-center px-10 bg-cover border rounded-2xl text-sm"
+                        >
+                          Буцах
+                        </Link>
+                        <Button type="submit" className="px-10">
+                          Нэвтрэх
+                        </Button>
+                      </div>
                     )
                   )}
                   {/* Register footer */}

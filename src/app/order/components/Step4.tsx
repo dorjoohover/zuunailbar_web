@@ -22,6 +22,7 @@ import {
   Clock,
   Wallet,
 } from "lucide-react";
+import { Invoice } from "@/types";
 
 interface Step4Props {
   values: Partial<IOrder> & {
@@ -30,6 +31,7 @@ interface Step4Props {
   branches: ListType<Branch>;
   users: ListType<User>;
   services: ListType<Service>;
+  invoice: Invoice | null;
 }
 
 export default function Step4({
@@ -37,6 +39,7 @@ export default function Step4({
   branches,
   services,
   users,
+  invoice,
 }: Step4Props) {
   const branch = branches.items.filter((a) => a.id == values.branch_id)[0];
 
@@ -49,7 +52,7 @@ export default function Step4({
     services: services.items,
     values: service_ids!,
   });
-  const pre = values.details?.reduce((acc, item) => acc + +(item?.pre ?? 0), 0);
+  const pre = invoice?.price ?? 0;
   const date = values.order_date ?? mnDate();
 
   return (

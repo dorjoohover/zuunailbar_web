@@ -182,7 +182,6 @@ export default function Step2({
             );
           })
         : [""].map((v, i) => {
-            console.log(userDateTimes);
             return (
               <div className="grid grid-cols-6 gap-4" key={i}>
                 {userDateTimes.map((user, index) => {

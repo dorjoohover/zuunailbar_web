@@ -67,12 +67,12 @@ export const ServiceCard = ({
               <p className="text-xs">{data.duration} мин</p>
             </div>
 
-            {data.meta?.categoryName && (
+            {/* {data.meta?.categoryName && (
               <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-gray-200">
                 <Users size={13} />
                 <p className="text-xs">{data.meta?.categoryName}</p>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>

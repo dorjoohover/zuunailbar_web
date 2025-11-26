@@ -21,12 +21,11 @@ export default function ServicesPage({ services }: { services: Service[] }) {
   }, [activeQuery]);
 
   const activeService = siteData.detailService[activeIndex];
-
   return (
     <div className="relative py-20">
       <div className="absolute top-0 left-0 size-full bg-cover bg-no-repeat bg-[url(/bg/blue-gradient.png)] bg-center opacity-20" />
 
-      <div className="container relative z-10 grid items-center w-full grid-cols-2 gap-8 pt-10 mx-auto">
+      <div className="container relative z-10 grid items-center w-full grid-cols-1 md:grid-cols-2 gap-8 pt-10 mx-auto">
         {/* Left image */}
         <div className="relative flex-center">
           <div className="relative w-full overflow-hidden bg-gray-100 border aspect-square rounded-xl">
