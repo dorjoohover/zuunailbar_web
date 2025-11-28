@@ -226,7 +226,8 @@ export function AuthModal() {
         onPress={() => {
           onOpen();
         }}
-        className="text-sm md:hidden font-semibold text-white bg-transparent border border-white aspect-square"
+        variant="ghost"
+        className="text-sm md:hidden w-full text-center font-semibold text-white border border-white aspect-square"
       >
         {/* <UserRound className="size-4" /> */}
         Нэвтрэх

@@ -11,13 +11,7 @@ import { Button } from "@heroui/button";
 import { Home } from "@/models/home.model";
 import Link from "next/link";
 
-export const HeroParallax = ({
-  data,
-  handleDone,
-}: {
-  data: Home[];
-  handleDone: () => void;
-}) => {
+export const HeroParallax = ({ data }: { data: Home[] }) => {
   const interval = Math.ceil(data.length / 3);
   const firstRow = data.slice(0, interval);
   const secondRow = data.slice(interval, interval * 2);
@@ -104,19 +98,13 @@ export const HeroParallax = ({
       >
         <motion.div className="flex flex-row-reverse mb-10 space-x-reverse space-x-15 sm:mb-14">
           {firstRow.map((product, i) => (
-            <ProductCard
-              product={product}
-              handleDone={handleDone}
-              translate={translateX}
-              key={i}
-            />
+            <ProductCard product={product} translate={translateX} key={i} />
           ))}
         </motion.div>
         <motion.div className="flex flex-row mb-10 space-x-15 sm:mb-14 ">
           {secondRow.map((product, i) => (
             <ProductCard
               product={product}
-              handleDone={handleDone}
               translate={translateXReverse}
               key={i}
             />
@@ -124,12 +112,7 @@ export const HeroParallax = ({
         </motion.div>
         <motion.div className="flex flex-row-reverse space-x-reverse space-x-15">
           {thirdRow.map((product, i) => (
-            <ProductCard
-              product={product}
-              handleDone={handleDone}
-              translate={translateX}
-              key={i}
-            />
+            <ProductCard product={product} translate={translateX} key={i} />
           ))}
         </motion.div>
       </motion.div>
@@ -163,10 +146,8 @@ export const Header = () => {
 
 export const ProductCard = ({
   product,
-  handleDone,
   translate,
 }: {
-  handleDone: () => void;
   product: Home;
   translate: MotionValue<number>;
 }) => {
@@ -190,8 +171,6 @@ export const ProductCard = ({
           height="600"
           width="600"
           className="inset-0 object-cover object-left-top size-full"
-          onLoad={handleDone}
-          onError={handleDone}
           alt={product.name}
         />
         <div className="absolute flex flex-col items-center justify-end text-white pb-7 size-full bg-gradient-to-t from-black/90 to-transparent">

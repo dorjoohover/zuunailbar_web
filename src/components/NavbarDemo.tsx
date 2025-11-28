@@ -112,7 +112,7 @@ export function NavbarDemo({ token }: { token?: string }) {
   return (
     <Navbar>
       {/* Desktop Navigation */}
-      <NavBody className="min-w-[630px]">
+      <NavBody className="min-w-[630px] md:flex">
         <NavItems items={siteData.navItems} />
         <NavbarLogo />
 
@@ -130,7 +130,7 @@ export function NavbarDemo({ token }: { token?: string }) {
       </NavBody>
 
       {/* Mobile Navigation */}
-      <MobileNav>
+      <MobileNav className="md:hidden">
         <MobileNavHeader>
           <NavbarLogo />
           <MobileNavToggle
