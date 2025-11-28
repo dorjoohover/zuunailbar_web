@@ -39,7 +39,7 @@ const UserMenu = ({ user }: { user: User }) => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="light"
-          className="h-9 py-0 hover:bg-accent hover:text-accent-foreground"
+          className="py-2 hover:bg-dark hover:text-accent-foreground"
         >
           <Avatar className="h-7 w-7">
             <AvatarImage src={`/api/file/${user.profile_img}`} alt={name} />
@@ -54,7 +54,7 @@ const UserMenu = ({ user }: { user: User }) => {
           <span className="sr-only">User menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56" >
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{name}</p>
@@ -74,9 +74,9 @@ const UserMenu = ({ user }: { user: User }) => {
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <div className="px-2 py-1.5">
           <Logout />
-        </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -153,15 +153,33 @@ export function NavbarDemo({ token }: { token?: string }) {
               <span className="block">{item.name}</span>
             </Link>
           ))}
+          {user && (
+            <>
+              <Link
+                href={"/profile"}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="relative text-white"
+              >
+                Профайл
+              </Link>
+              <Link
+                href={"/my"}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="relative text-white"
+              >
+                Миний захиалгын түүх
+              </Link>
+            </>
+          )}
           <div className="flex flex-col w-full gap-4">
-            {token ? <Logout /> : <AuthModal />}
             <Link
-            href={'/order'}
+              href={"/order"}
               onClick={() => setIsMobileMenuOpen(false)}
               className="w-full bg-white border text-dark text-center text-sm flex items-center justify-center rounded-md font-semibold size-10"
             >
               Захиалга өгөх
             </Link>
+            {token ? <Logout /> : <AuthModal />}
           </div>
         </MobileNavMenu>
       </MobileNav>

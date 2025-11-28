@@ -45,7 +45,6 @@ export const ProfilePage = ({
     }
     const res = await updateOne(Api.user, data.id, payload);
     const success = res.success;
-    console.log(res);
     addToast({
       title: `${success ? "Амжилттай солигдлоо." : "Дахин оролдоно уу."}`,
     });
@@ -63,7 +62,6 @@ export const ProfilePage = ({
           cache: "no-store",
         });
         const data = await res.json();
-        console.log(data);
         if (data?.payload && data?.payload?.user) {
           setUser(data.payload.user);
         }
@@ -100,11 +98,11 @@ export const ProfilePage = ({
           </p>
         )}
         <p className="text-center text-sm text-gray-500 mb-4">{phone}</p>
-        <div
+        {/* <div
           className={`inline-flex items-center px-5 py-2 rounded-full ${config.gradient} shadow-sm`}
         >
           <span className="text-sm text-white">{config.text} Member</span>
-        </div>
+        </div> */}
       </div>
       <div className="bg-white rounded-2xl p-6 shadow-sm">
         <div className="flex items-center justify-between mb-5">
@@ -165,7 +163,7 @@ export const ProfilePage = ({
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm my-8">
+      {/* <div className="bg-white rounded-2xl p-6 shadow-sm my-8">
         <h3 className="text-gray-900 mb-5">Товч мэдээлэл </h3>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 text-center">
@@ -177,7 +175,7 @@ export const ProfilePage = ({
             <p className="text-xs text-gray-600">Member Level</p>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <EditProfileModal
         isOpen={isEditModalOpen}

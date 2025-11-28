@@ -210,7 +210,7 @@ export const statusConfig = {
     text: "text-red-700",
     label: "Цуцлагдсан",
   },
-  [OrderStatus.Absent]: {
+  [OrderStatus.ABSENT]: {
     bg: "bg-gray-100",
     text: "text-secondary-foreground",
     label: "Ирээгүй",
@@ -238,7 +238,7 @@ export function OrderCard({ data }: { data: Order }) {
   const artist = artist_name?.split(" ");
   const date = new Date(order_date);
   return (
-    <div className="bg-white rounded-2xl  p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+    <div className="bg-white rounded-2xl h-full p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       {/* Artist Name */}
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-purple-600">{artist?.[0]}</h3>

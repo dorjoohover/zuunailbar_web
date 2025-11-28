@@ -1,3 +1,4 @@
+import { User } from "./user.model";
 import { UserService } from "./user.service.model";
 
 export interface IOrder {
@@ -34,6 +35,7 @@ export interface Order {
   paid_amount: number;
   created_at?: Date;
   updated_at?: Date;
+  details?: IOrderDetail[];
 }
 
 export interface IOrderDetail {
@@ -47,6 +49,9 @@ export interface IOrderDetail {
   duration?: number;
   category?: number | null;
   created_at?: Date;
+  user?: User;
+  start_time?: string;
+  end_time?: string;
   pre?: number;
 }
 

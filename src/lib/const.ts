@@ -22,6 +22,7 @@ import {
   UserStatus,
 } from "./enum";
 import { DateValue } from "@heroui/calendar";
+import { OrderStatus } from "./constants";
 
 export const roleIconMap = {
   [ROLE.SYSTEM]: { icon: Crown, color: "yellow" },
@@ -178,3 +179,13 @@ export enum ServiceView {
   DEFAULT = 0,
   FEATURED = 20,
 }
+
+export const OrderStatusValues = {
+  [OrderStatus.Active]: "Бэлэн",
+  // [OrderStatus.Started]: "Эхэлсэн",
+  [OrderStatus.Cancelled]: "Баталгаажуулаагүй",
+  [OrderStatus.Finished]: "Дууссан",
+  [OrderStatus.Pending]: "Хүлээгдэж буй",
+  [OrderStatus.ABSENT]: "Цуцалсан",
+  [OrderStatus.Friend]: "Танил",
+};

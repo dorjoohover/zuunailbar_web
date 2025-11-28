@@ -218,7 +218,6 @@ export default function OrderPage({
       "artists"
     ).then((d) => {
       if (d.success) {
-        console.log(d.data);
         const length = d.data?.payload?.items?.length ?? 0;
         if (length == 0) {
           setStep(step - 1);

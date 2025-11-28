@@ -184,21 +184,22 @@ export enum OrderStatus {
   Pending = 10,
   // uridchilgaa tolson
   Active = 20,
-
+  // uilchilgee ehelsen
+  // Started = 30,
   // duussan
   Finished = 40,
   // tsutsalsan
   Cancelled = 50,
-  // tsutsalsan
-  Absent = 60,
+  // ireegui
+  ABSENT = 60,
   Friend = 70,
 }
 export const StatusValue = {
   [OrderStatus.Pending]: "Хүлээгдэж байна.",
   [OrderStatus.Active]: "Төлбөр төлөгдсөн.",
   [OrderStatus.Finished]: "Үйлчилгээ дууссан.",
-  [OrderStatus.Cancelled]: "Үйлчилгээ цуцлагдсан.",
-  [OrderStatus.Absent]: "Ирээгүй.",
+  [OrderStatus.Cancelled]: "Баталгаажуулаагүй.",
+  [OrderStatus.ABSENT]: "Цуцалсан.",
   [OrderStatus.Friend]: "Танил.",
 };
 export const StatusColor = {
@@ -206,6 +207,6 @@ export const StatusColor = {
   [OrderStatus.Active]: "bg-blue-300 text-blue-800", // Төлбөр төлөгдсөн
   [OrderStatus.Finished]: "bg-green-300 text-green-800", // Үйлчилгээ дууссан
   [OrderStatus.Cancelled]: "bg-red-300 text-red-800", // Цуцлагдсан
-  [OrderStatus.Absent]: "bg-gray-300 text-gray-800", // Ирээгүй
+  [OrderStatus.ABSENT]: "bg-gray-300 text-gray-800", // Ирээгүй
   [OrderStatus.Friend]: "bg-pink-300 text-pink-800", // Танил
 };

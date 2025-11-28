@@ -42,12 +42,12 @@ export const Logout = () => {
     }
   };
   return (
-    <>
+    <div className="w-full">
       <Button
         onPress={() => {
           onOpen();
         }}
-        className="text-sm md:hidden font-semibold text-white bg-transparent border border-white aspect-square"
+        className="text-sm md:hidden w-full flex justify-center font-semibold text-white bg-transparent border border-white aspect-square"
       >
         {/* <UserRound className="size-4" /> */}
         Гарах
@@ -58,7 +58,7 @@ export const Logout = () => {
           // onOpen();
           handleLogout();
         }}
-        className="text-sm hidden md:block font-semibold text-white bg-transparent size-10 aspect-square"
+        className="text-sm hidden md:w-full md:flex font-semibold text-white bg-dark size-10 aspect-square"
       >
         {/* <UserRound className="size-4" /> */}
         Гарах
@@ -98,6 +98,6 @@ export const Logout = () => {
           )}
         </ModalContent>
       </Modal>
-    </>
+    </div>
   );
 };

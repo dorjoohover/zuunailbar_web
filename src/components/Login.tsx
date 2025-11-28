@@ -22,7 +22,7 @@ import {
   sendOtpForget,
   updatePassword,
 } from "@/app/(api)/auth";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 
 export function AuthModal() {
@@ -206,7 +206,6 @@ export function AuthModal() {
       return;
     }
     if (data) {
-      console.log(data);
       addToast({
         title: "Амжилттай нууц үг шинэчиллээ.",
         size: "lg",
@@ -219,6 +218,7 @@ export function AuthModal() {
     }
   };
   const [forget, setForget] = useState(false);
+  const router = useRouter();
   return (
     <>
       <Button
@@ -248,6 +248,8 @@ export function AuthModal() {
         onClose={() => {
           setForget(false);
           setTab("login");
+          onClose();
+          router.push("/");
         }}
       >
         <ModalContent className="p-4">
@@ -456,18 +458,9 @@ export function AuthModal() {
                     )
                   ) : (
                     tab === "login" && (
-                      <div className="flex gap-2">
-                        <Link
-                          onClick={() => onClose()}
-                          href={"/"}
-                          className="items-center flex justify-center px-10 bg-cover border rounded-2xl text-sm"
-                        >
-                          Буцах
-                        </Link>
-                        <Button type="submit" className="px-10">
-                          Нэвтрэх
-                        </Button>
-                      </div>
+                      <Button type="submit" className="px-10">
+                        Нэвтрэх
+                      </Button>
                     )
                   )}
                   {/* Register footer */}

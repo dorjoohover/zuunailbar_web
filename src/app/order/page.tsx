@@ -9,7 +9,7 @@ export default async function Page() {
   const branchService = await find<BranchService>(Api.branch_service, {
     limit: -1,
     order_by: "index",
-    sort: false
+    sort: false,
   });
   const branch = await find<Branch>(Api.branch);
   const user = await find<User>(Api.user, { limit: -1 }, "client");
