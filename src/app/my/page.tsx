@@ -7,7 +7,7 @@ import { OrderStatus } from "@/lib/constants";
 const Page = async ({
   searchParams,
 }: {
-  searchParams: { status?: string };
+  searchParams: Promise<{ status?: string }>;
 }) => {
   const params = await searchParams;
 
