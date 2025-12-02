@@ -17,8 +17,8 @@ export default function ContactSection() {
         <div className="col-span-1"></div>
         <div className="col-span-2 space-y-5 col-center sm:block">
           <h1 className="mb-3 text-dark-100">Lorem ipsum dolor sit amet.</h1>
-          <h1 className="text-3xl font-medium text-primary-pink">(976) 9999 9999</h1>
-          <Link href={"tel:+97699999999"} className="glass-button">
+          <h1 className="text-3xl font-medium text-primary-pink">(976) 8608 0708</h1>
+          <Link href={"tel:+97686080708"} className="glass-button">
             Холбогдох
             <ChevronRight className="text-white size-3" />
           </Link>

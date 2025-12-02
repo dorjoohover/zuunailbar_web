@@ -2,6 +2,7 @@ import {
   Brush,
   BrushCleaning,
   Bubbles,
+  Code,
   Component,
   Eraser,
   Facebook,
@@ -10,8 +11,10 @@ import {
   Instagram,
   Mail,
   Scissors,
+  Shield,
   Smartphone,
   Sparkles,
+  Star,
 } from "lucide-react";
 
 export enum UserLevel {
@@ -162,6 +165,28 @@ export const siteData = {
     //   url: "https://www.facebook.com/zunailbar",
     // },
   ],
+  about: [
+    {
+      Icon: Star,
+      title: "Чанарт баталгаа",
+      text: "Солонгос улсын Yogurt брендийн аюулгүй, эрүүл хумсны будгийг ашиглан танд хамгийн сайн үр дүнг бүтээнэ",
+    },
+    {
+      Icon: Code,
+      title: "Орчин үеийн технологи",
+      text: "Орос болон Солонгосын хамгийн сүүлийн үеийн техник, тоног төхөөрөмжийг ашигладаг",
+    },
+    {
+      Icon: Shield,
+      title: "Эрүүл ахуйн стандарт",
+      text: "Олон улсын эрүүл ахуй, ариун цэврийн өндөр стандартийг баримталж, бүх хэрэгслийг ариутгаж ажилладаг",
+    },
+    {
+      Icon: Brush,
+      title: "Орчин үеийн тренд будалт",
+      text: "Дээд зэргийн өнгөний зохицол, минимал ба модерн дизайнтай хослуулсан будалт",
+    },
+  ],
 };
 
 export const orderSteps = [
@@ -181,16 +206,14 @@ export const orderSteps = [
 
 export enum OrderStatus {
   // uridchilgaa toloogui
-  Pending = 10,
   // uridchilgaa tolson
   Active = 20,
-  // uilchilgee ehelsen
-  // Started = 30,
   // duussan
   Finished = 40,
-  // tsutsalsan
+  Pending = 10,
+  // batalgaajaagui
   Cancelled = 50,
-  // ireegui
+  // tsutsalsan
   ABSENT = 60,
   Friend = 70,
 }

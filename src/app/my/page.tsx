@@ -13,7 +13,7 @@ const Page = async ({
 
   const res = await find<Order>(Api.order, {
     limit: 20,
-    order_status: params.status ?? OrderStatus.Pending,
+    order_status: params.status ?? OrderStatus.Active,
   });
   return <MyOrderPage data={res.data} params={params.status} />;
 };

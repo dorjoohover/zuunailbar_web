@@ -33,7 +33,7 @@ export const MyOrderPage = ({
   params?: string;
 }) => {
   const pathname = usePathname();
-  const invisibleStatus = [OrderStatus.Finished, OrderStatus.Friend];
+  const invisibleStatus = [OrderStatus.Cancelled, OrderStatus.Friend];
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const view = async (id: string) => {
@@ -54,7 +54,9 @@ export const MyOrderPage = ({
               href={`${pathname}?status=${status}`}
               className={cn(
                 "px-4 py-2 text-center  text-sm rounded-md hover:bg-primary/50 transition-all duration-300 bg-secondary",
-                params?.includes(status.toString()) ? "bg-primary" : ""
+                (params ?? `${OrderStatus.Active}`)?.includes(status.toString())
+                  ? "bg-primary"
+                  : ""
               )}
             >
               {OrderStatusValues[status]}

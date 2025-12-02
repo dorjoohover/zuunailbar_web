@@ -113,8 +113,7 @@ html {
   @apply bg-white border border-gray-400;
 }
 @utility order-button-solid {
-  @apply text-white bg-dark-200;
-  /* bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)] */
+  @apply text-white bg-rose-400;
 }
 
 @config "../tailwind.config.js";
@@ -190,38 +189,35 @@ html {
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
-  
 
-
-
-    /* --background: #FAF8F6; */
-  --foreground: #2D2D3A;
+  /* --background: #FAF8F6; */
+  --foreground: #2d2d3a;
   --card: #ffffff;
-  --card-foreground: #2D2D3A;
+  --card-foreground: #2d2d3a;
   --popover: #ffffff;
-  --popover-foreground: #2D2D3A;
-  --primary: #C9A7D5;
-  --primary-foreground: #2D2D3A;
-  --secondary: #F8E8EE;
-  --secondary-foreground: #2D2D3A;
-  --muted: #F3EEF1;
-  --muted-foreground: #8B8A95;
-  --accent: #E5D9F2;
-  --accent-foreground: #2D2D3A;
-  --destructive: #E38B9E;
+  --popover-foreground: #2d2d3a;
+  --primary: #c9a7d5;
+  --primary-foreground: #2d2d3a;
+  --secondary: #f8e8ee;
+  --secondary-foreground: #2d2d3a;
+  --muted: #f3eef1;
+  --muted-foreground: #8b8a95;
+  --accent: #e5d9f2;
+  --accent-foreground: #2d2d3a;
+  --destructive: #e38b9e;
   --destructive-foreground: #ffffff;
-  --border: #E8D9E5;
+  --border: #e8d9e5;
   --input: transparent;
-  --input-background: #F8F3F5;
-  --switch-background: #D9C9D6;
+  --input-background: #f8f3f5;
+  --switch-background: #d9c9d6;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #C9A7D5;
-  --chart-1: #C9A7D5;
-  --chart-2: #A7D5C9;
-  --chart-3: #F8C9D5;
-  --chart-4: #D5C9A7;
-  --chart-5: #A7C9D5;
+  --ring: #c9a7d5;
+  --chart-1: #c9a7d5;
+  --chart-2: #a7d5c9;
+  --chart-3: #f8c9d5;
+  --chart-4: #d5c9a7;
+  --chart-5: #a7c9d5;
   --radius: 0.75rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
