@@ -10,6 +10,7 @@ import {
 import { Button } from "@heroui/button";
 import { Home } from "@/models/home.model";
 import Link from "next/link";
+import Image from "next/image";
 
 export const HeroParallax = ({ data }: { data: Home[] }) => {
   const interval = Math.ceil(data.length / 3);
@@ -166,12 +167,13 @@ export const ProductCard = ({
         // href={product.link}
         className="relative flex items-end justify-center overflow-hidden size-full group-hover/product:shadow-2xl"
       >
-        <img
+        <Image
           src={`/api/file/${product.image}`}
           height="600"
           width="600"
           className="inset-0 object-cover object-left-top size-full"
           alt={product.name}
+          priority
         />
         <div className="absolute flex flex-col items-center justify-end text-white pb-7 size-full bg-gradient-to-t from-black/90 to-transparent">
           <h1 className="text-xl font-bold uppercase">{product.name}</h1>

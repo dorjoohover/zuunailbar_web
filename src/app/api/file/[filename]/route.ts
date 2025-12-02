@@ -24,15 +24,15 @@ export async function GET(
       }
     }
 
-    const contentType =
-      res.headers.get("Content-Type") || "application/octet-stream";
-    const arrayBuffer = await res.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer) as any;
+    // const contentType =
+    //   res.headers.get("Content-Type") || "application/octet-stream";
+    // const arrayBuffer = await res.arrayBuffer();
+    // const buffer = Buffer.from(arrayBuffer) as any;
 
-    return new NextResponse(buffer, {
-      status: 200,
+    return new NextResponse(res.body, {
       headers: {
-        "Content-Type": contentType,
+        "Content-Type":
+          res.headers.get("Content-Type") || "application/octet-stream",
         "Content-Disposition": `inline; filename="${filename}"`,
       },
     });
