@@ -19,7 +19,7 @@ export const LocationCard = ({
 }) => {
   return (
     <div
-      className={`h-[80px] flex flex-col w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-primary border-2 bg-accent/50" : "border-border hover:border-primary/50"}`}
+      className={`h-[80px] flex flex-col w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-rose-600/50 border-2 bg-rose-100/50" : "border-border hover:border-rose-400/50"}`}
       onClick={() => onClick(data.id)}
     >
       <h2 className="text-sm font-medium">{data.name}</h2>
@@ -41,8 +41,8 @@ export const ServiceCard = ({
     <div
       className={`col-span-1 flex justify-between items-start w-full cursor-pointer rounded-md p-4 border transition-all duration-200 ${
         selected
-          ? "border-primary border-2 bg-accent/50"
-          : "border-border hover:border-primary/50"
+          ? "border-rose-600/50 border-2 bg-rose-100/50"
+          : "border-border hover:border-rose-400/50"
       }`}
       onClick={() => onClick(data.service_id)}
     >
@@ -107,7 +107,7 @@ export const ArtistCard = ({
   if (mini)
     return (
       <div
-        className={`h-[60px] col-span-6 xs:col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-black bg-[#00000030] opacity-50" : selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
+        className={`h-[60px] col-span-6 xs:col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-rose-400/50 bg-rose-100/50 opacity-50" : selected ? "border-rose-600/50 bg-rose-100/50" : "border-rose-50"} duration-300 ease-out hover:shadow-lg transition-shadow`}
         onClick={() => onClick(data.id)}
       >
         <div className="flex items-start gap-2">
@@ -125,7 +125,7 @@ export const ArtistCard = ({
               <p className="text-xs">{data.duration} мин</p>
             </div> */}
               {data.experience && (
-                <div className="flex gap-0.5 px-2 py-0.5 rounded-xl bg-gray-200 ">
+                <div className="flex gap-0.5 px-2 py-0.5 rounded-xl bg-rose-200/50 ">
                   <p className="text-xs">{data.experience} жил</p>
                 </div>
               )}
@@ -136,7 +136,7 @@ export const ArtistCard = ({
     );
   return (
     <div
-      className={`h-[80px] col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-4 border ${selected ? "border-black bg-[#00000030]" : "border-gray-500"} duration-300 ease-out hover:shadow-lg transition-shadow`}
+      className={`h-[60px] col-span-6 xs:col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-rose-400/50 bg-rose-100/50" : selected ? "border-rose-600/50 bg-rose-100/50" : "border-rose-100"} duration-300 ease-out hover:shadow-lg transition-shadow`}
       onClick={() => onClick(data.id)}
     >
       <div className="flex items-start gap-2">
@@ -154,7 +154,7 @@ export const ArtistCard = ({
               <p className="text-xs">{data.duration} мин</p>
             </div> */}
             {data.experience && (
-              <div className="flex gap-0.5 px-2 py-1 rounded-xl bg-gray-200 ">
+              <div className="flex gap-0.5 px-2 py-1 rounded-xl bg-rose-200 ">
                 <p className="text-xs">{data.experience} жил</p>
               </div>
             )}
@@ -241,7 +241,7 @@ export function OrderCard({ data }: { data: Order }) {
     <div className="bg-white rounded-2xl h-full p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
       {/* Artist Name */}
       <div className="flex items-start justify-between mb-3">
-        <h3 className="text-purple-600">{artist?.[0]}</h3>
+        <h3 className="text-rose-600">{artist?.[0]}</h3>
         <div
           className={`inline-flex items-center px-2.5 py-1 rounded-full ${config.bg}`}
         >

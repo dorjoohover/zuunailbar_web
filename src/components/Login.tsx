@@ -24,6 +24,7 @@ import {
   updatePassword,
 } from "@/app/(api)/auth";
 import { usePathname, useRouter } from "next/navigation";
+import { button, text } from "@/lib/const";
 
 function useAutoFocus(condition: boolean, ref: any) {
   useEffect(() => {
@@ -193,14 +194,14 @@ export function AuthModal() {
         size="md"
         onPress={onOpen}
         variant="ghost"
-        className="text-sm md:hidden w-full text-center font-semibold text-white border border-white aspect-square"
+        className="text-sm md:hidden w-full text-center font-semibold text-white border text-rose-400 bg-transparent border border-rose-400/50 aspect-square"
       >
         Нэвтрэх
       </Button>
       <Button
         size="md"
         onPress={onOpen}
-        className="text-sm hidden md:block font-semibold text-white bg-transparent size-10 aspect-square"
+        className="text-sm hidden md:block font-semibold text-rose-400 bg-transparent border border-rose-400/50 rounded-full px-6"
       >
         Нэвтрэх
       </Button>
@@ -219,7 +220,7 @@ export function AuthModal() {
         <ModalContent className="p-4">
           {(onClose) => (
             <>
-              <ModalHeader className="text-dark">
+              <ModalHeader className={cn(text, "text-xl font-semibold")}>
                 {forget
                   ? "Нууц үг сэргээх"
                   : tab === "login"
@@ -247,7 +248,7 @@ export function AuthModal() {
                         />
                         <Button
                           type="button"
-                          className="text-white px-2 bg-dark bg-[url(/bg/banner-gradient.png)] bg-no-repeat bg-cover absolute right-2 top-[50%] -translate-y-[50%]"
+                          className="text-white px-2 bg-rose-500/90 absolute right-2 top-[50%] -translate-y-[50%]"
                           onPress={forgetPasswordSendOtp}
                           isDisabled={timer > 0}
                         >
@@ -311,7 +312,7 @@ export function AuthModal() {
                             className={cn(
                               "flex-1 bg-cover bg-no-repeat",
                               tab === t
-                                ? "bg-dark text-white bg-[url(/bg/banner-gradient.png)]"
+                                ? "bg-rose-500/90 text-white"
                                 : "bg-transparent text-black",
                               t === "login"
                                 ? "rounded-l-full"
@@ -344,7 +345,7 @@ export function AuthModal() {
                           />
                           <div className="flex justify-end">
                             <div
-                              className="text-sm text-dark cursor-pointer hover:text-primary"
+                              className="text-sm  cursor-pointer hover:text-rose-400 translation-all duration-300"
                               onClick={() => setForget(true)}
                             >
                               Нууц үг сэргээх
@@ -365,7 +366,7 @@ export function AuthModal() {
                             />
                             <Button
                               type="button"
-                              className="text-white px-2 bg-dark bg-[url(/bg/banner-gradient.png)] bg-no-repeat bg-cover absolute right-2 top-[50%] -translate-y-[50%]"
+                              className="text-white px-2 bg-rose-500/90 absolute right-2 top-[50%] -translate-y-[50%]"
                               onPress={handleSendOtp}
                               isDisabled={timer > 0}
                             >
@@ -433,24 +434,30 @@ export function AuthModal() {
                       <Button
                         onClick={forgetPassword}
                         type="submit"
-                        className="px-10"
+                        className={cn(button, "px-10 rounded-xl")}
                       >
                         Илгээх
                       </Button>
                     ) : (
                       <Button
                         onClick={() => setForget(false)}
-                        className="px-10"
+                        className={cn(button, "px-10 rounded-xl")}
                       >
                         Буцах
                       </Button>
                     )
                   ) : tab === "login" ? (
-                    <Button type="submit" className="px-10">
+                    <Button
+                      type="submit"
+                      className={cn(button, "px-10 rounded-xl")}
+                    >
                       Нэвтрэх
                     </Button>
                   ) : tab === "register" && otpSent ? (
-                    <Button type="submit" className="px-10">
+                    <Button
+                      type="submit"
+                      className={cn(button, "px-10 rounded-xl")}
+                    >
                       Баталгаажуулах
                     </Button>
                   ) : null}

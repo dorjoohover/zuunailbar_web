@@ -189,3 +189,12 @@ export const OrderStatusValues = {
   [OrderStatus.ABSENT]: "Цуцалсан",
   [OrderStatus.Friend]: "Танил",
 };
+
+export const button =
+  " whitespace-nowrap text-sm transition-all h-auto py-2  rounded-full bg-rose-500/90 hover:bg-pink-600 text-white hover:scale-105 font-medium shadow-lg shadow-rose-200/50 px-5 duration-300";
+
+export const text =
+  "text-3xl font-bold bg-gradient-to-r from-rose-600 via-pink-600 to-rose-500 bg-clip-text text-transparent";
+
+export const icon =
+  "flex items-center size-18 rounded-full transition-transform duration-300 bg-gradient-to-br from-rose-400 via-pink-400 to-rose-500 justify-center";

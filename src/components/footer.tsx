@@ -37,10 +37,10 @@ export default function Footer() {
               <Link
                 href={item.url}
                 target="_blank"
-                className="flex items-center duration-150 bg-gray-100 size-11 flex-center rounded-xl gap-x-2 hover:bg-dark hover:text-white"
+                className="flex items-center duration-150 border border-rose-200 bg-white-100 hover:scale-105 hover:border-rose-500 hover:bg-pink-50 hover:shadow-lg transition-all duration-300 size-11 flex-center rounded-xl gap-x-2 "
                 key={index}
               >
-                <item.icon className="size-4" />
+                <item.icon className="size-4 text-rose-500" />
               </Link>
             ))}
           </div>
@@ -49,7 +49,6 @@ export default function Footer() {
             
         </div> */}
         <div className="space-y-6 col-span-6 sm:col-span-2">
-          <h1>Main</h1>
           <ul className="space-y-3 text-dark-100">
             {siteData.navItems.map((item, index) => (
               <li key={index}>

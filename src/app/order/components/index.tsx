@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@heroui/button";
-import { ListDefault, ListType, mnDate } from "@/lib/const";
+import { button, ListDefault, ListType, mnDate } from "@/lib/const";
 import {
   Branch,
   BranchService,
@@ -457,7 +457,13 @@ export default function OrderPage({
         <div className="hidden sm:block">
           <Progress
             aria-label="Loading..."
-            className="w-full pb-3 px-2"
+            className="w-full pb-3 px-2 "
+            classNames={{
+              track: "drop-shadow-md border border-default",
+              indicator: "bg-linear-to-r from-rose-600 to-rose-500",
+              label: "tracking-wider font-medium text-default-600",
+              value: "text-foreground/60",
+            }}
             size="sm"
             value={(step / 4) * 100}
           />
@@ -475,12 +481,12 @@ export default function OrderPage({
                     }}
                   >
                     <span
-                      className={`font-bolder pb-1 mb-1 text-sm ${current ? "text-primary" : ""} ${!value && current ? "border-b-2 border-primary" : ""}`}
+                      className={`font-bolder pb-1 mb-1 text-sm ${current ? "bg-gradient-to-r from-rose-600 via-pink-600 to-rose-500 bg-clip-text text-transparent " : ""} ${!value && current ? "border-b-2 border-rose-600" : ""}`}
                     >
                       {s.name}
                     </span>
                     <span
-                      className={`pb-1 text-xs  ${current ? "text-primary border-b  border-primary" : ""} font-light`}
+                      className={`pb-1 text-xs  ${current ? "bg-gradient-to-r from-rose-600 via-pink-600 to-rose-500 bg-clip-text text-transparent border-b  border-rose-600" : ""} font-light`}
                     >
                       {value}
                     </span>
@@ -585,7 +591,7 @@ export default function OrderPage({
               onPress={prev}
               disabled={step === 1}
               variant="bordered"
-              className="h-12 w-28"
+              className={"h-12 w-28 border-rose-400 text-rose-500 hover:scale-105 transition-all duration-150"}
             >
               Буцах
             </Button>
@@ -593,8 +599,8 @@ export default function OrderPage({
               <Button
                 className={cn(
                   isStepComplete ? "" : "",
-                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
-                  "bg-dark bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)]"
+                  button,
+                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center"
                 )}
                 onPress={handleNext}
               >

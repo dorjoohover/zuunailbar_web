@@ -13,7 +13,6 @@ import Link from "next/link";
 
 import React, { useRef, useState } from "react";
 
-
 interface NavbarProps {
   children: React.ReactNode;
   className?: string;
@@ -78,9 +77,9 @@ export const Navbar = ({ children, className }: NavbarProps) => {
         React.isValidElement(child)
           ? React.cloneElement(
               child as React.ReactElement<{ visible?: boolean }>,
-              { visible },
+              { visible }
             )
-          : child,
+          : child
       )}
     </motion.div>
   );
@@ -106,9 +105,9 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
       //   minWidth: "800px",
       // }}
       className={cn(
-        "relative z-[60] mx-auto hidden w-full max-w-6xl flex-row items-center justify-between self-start rounded-full px-4 h-16 lg:flex bg-dark/90 bg-[url(/bg/navbar-bg.png)] bg-center bg-cover",
-        visible && "bg-dark/90 bg-[url(/bg/navbar-bg.png)] bg-center bg-cover",
-        className,
+        "relative z-[60] mx-auto hidden w-full max-w-6xl flex-row items-center justify-between self-start rounded-full px-4 h-16 lg:flex bg-gradient-to-b from-rose-50/30 to-rose-50  ",
+        visible && "bg-gradient-to-b from-rose-50/30 to-rose-50/70",
+        className
       )}
     >
       {children}
@@ -123,22 +122,22 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-zinc-600 transition duration-200 hover:text-zinc-800 lg:flex lg:space-x-2",
-        className,
+        "absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-rose-600 transition duration-200 hover:text-rose-800 lg:flex lg:space-x-2",
+        className
       )}
     >
       {items.map((item, idx) => (
         <a
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
-          className="relative px-4 py-2 font-medium text-neutral-100"
+          className="relative px-4 py-2 font-medium text-rose-600"
           key={`link-${idx}`}
           href={item.link}
         >
           {hovered === idx && (
             <motion.div
               layoutId="hovered"
-              className="absolute inset-0 w-full h-full rounded-full bg-white/20"
+              className="absolute inset-0 w-full h-full rounded-full bg"
             />
           )}
           <span className="relative z-20">{item.name}</span>
@@ -168,9 +167,9 @@ export const MobileNav = ({ children, className, visible }: MobileNavProps) => {
         damping: 50,
       }}
       className={cn(
-        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-10 py-2 lg:hidden bg-dark/90",
-        visible && "bg-dark/90",
-        className,
+        "relative z-50 mx-auto flex w-full max-w-[calc(100vw-2rem)] flex-col items-center justify-between px-10 py-2 lg:hidden bg-gradient-to-b from-rose-50/30 to-rose-50",
+        visible && "bg-gradient-to-b from-rose-50/30 to-rose-50/70",
+        className
       )}
     >
       {children}
@@ -186,7 +185,7 @@ export const MobileNavHeader = ({
     <div
       className={cn(
         "flex w-full flex-row items-center justify-between",
-        className,
+        className
       )}
     >
       {children}
@@ -208,8 +207,8 @@ export const MobileNavMenu = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className={cn(
-            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-dark text-white px-4 py-8 shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
-            className,
+            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-gradient-to-b from-rose-50/30 to-rose-50   px-4 py-8 shadow-[0_0_24px_rgba(34,_42,_53,_0.06),_0_1px_1px_rgba(0,_0,_0,_0.05),_0_0_0_1px_rgba(34,_42,_53,_0.04),_0_0_4px_rgba(34,_42,_53,_0.08),_0_16px_68px_rgba(47,_48,_55,_0.05),_0_1px_0_rgba(255,_255,_255,_0.1)_inset]",
+            className
           )}
         >
           {children}
@@ -227,9 +226,9 @@ export const MobileNavToggle = ({
   onClick: () => void;
 }) => {
   return isOpen ? (
-    <IconX className="text-white" onClick={onClick} />
+    <IconX className="text-rose-500/50" onClick={onClick} />
   ) : (
-    <IconMenu2 className="text-white" onClick={onClick} />
+    <IconMenu2 className="text-rose-500/50" onClick={onClick} />
   );
 };
 
@@ -239,12 +238,7 @@ export const NavbarLogo = () => {
       href="/"
       className="relative z-20 flex items-center px-2 py-1 mr-4 space-x-2 text-sm font-normal text-black"
     >
-      <Image
-        src="/logo/zu-white.png"
-        alt="logo"
-        width={50}
-        height={50}
-      />
+      <Image src="/logo/zu-black.png" alt="logo" width={50} height={50} />
       {/* <span className="font-medium text-white">Zu Nailbar</span> */}
     </Link>
   );

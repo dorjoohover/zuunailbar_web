@@ -111,8 +111,8 @@ export const ProfilePage = ({
 
         <div className="space-y-3  grid grid-cols-2">
           <div className="flex items-center gap-3">
-            <div className="bg-purple-50 rounded-lg p-2.5">
-              <IdCard className="w-5 h-5 text-purple-600" />
+            <div className="bg-rose-50 rounded-lg p-2.5">
+              <IdCard className="w-5 h-5 text-rose-600" />
             </div>
             <div>
               <p className="text-xs text-gray-500">Овог нэр</p>
@@ -124,8 +124,8 @@ export const ProfilePage = ({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="bg-purple-50 rounded-lg p-2.5">
-              <UserPen className="w-5 h-5 text-purple-600" />
+            <div className="bg-rose-50 rounded-lg p-2.5">
+              <UserPen className="w-5 h-5 text-rose-600" />
             </div>
             <div>
               <p className="text-xs text-gray-500">Хоч</p>
@@ -135,8 +135,8 @@ export const ProfilePage = ({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="bg-purple-50 rounded-lg p-2.5">
-              <Phone className="w-5 h-5 text-purple-600" />
+            <div className="bg-rose-50 rounded-lg p-2.5">
+              <Phone className="w-5 h-5 text-rose-600" />
             </div>
             <div>
               <p className="text-xs text-gray-500">Утасны дугаар</p>
@@ -144,8 +144,8 @@ export const ProfilePage = ({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <div className="bg-purple-50 rounded-lg p-2.5">
-              <Mail className="w-5 h-5 text-purple-600" />
+            <div className="bg-rose-50 rounded-lg p-2.5">
+              <Mail className="w-5 h-5 text-rose-600" />
             </div>
             <div>
               <p className="text-xs text-gray-500">Майл хаяг</p>
@@ -156,7 +156,7 @@ export const ProfilePage = ({
 
         <button
           onClick={() => setIsEditModalOpen(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-sm"
+          className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-xl hover:from-rose-700 hover:to-pink-700 transition-all duration-200 shadow-sm mt-4"
         >
           <Edit className="w-4 h-4" />
           <span className="text-sm">Засах</span>
@@ -166,7 +166,7 @@ export const ProfilePage = ({
       {/* <div className="bg-white rounded-2xl p-6 shadow-sm my-8">
         <h3 className="text-gray-900 mb-5">Товч мэдээлэл </h3>
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-5 text-center">
+          <div className="bg-gradient-to-br from-rose-50 to-rose-100 rounded-xl p-5 text-center">
             <p className="text-3xl text-gray-900 mb-1">{orders}</p>
             <p className="text-xs text-gray-600">Нийт захиалга</p>
           </div>
@@ -182,7 +182,7 @@ export const ProfilePage = ({
         onClose={() => setIsEditModalOpen(false)}
         userData={{
           ...user,
-          mobile: mobileFormatter(user.mobile ?? ''),
+          mobile: mobileFormatter(user.mobile ?? ""),
         }}
         onSave={handleSaveProfile}
       />

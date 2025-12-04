@@ -45,6 +45,9 @@ export default async function RootLayout({
           "min-h-screen text-foreground bg-background font-sans antialiased scroll-smooth ",
           fontSans.variable
         )}
+        style={{
+          margin: "0 !important",
+        }}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "light" }}>
           <main className="">

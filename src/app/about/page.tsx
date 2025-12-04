@@ -1,6 +1,8 @@
 "use client";
 
+import { text } from "@/lib/const";
 import { siteData } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -61,28 +63,35 @@ export default function Page() {
             );
           })}
         </section>
-        <section className="rounded-[50px] relative z-10 bg-no-repeat bg-cover bg-black bg-[url(/bg/banner-gradient.png)]">
+        <section className="rounded-[50px] relative z-10 ">
           <div className="container grid grid-cols-1 gap-5 p-10 divide-gray-700 lg:grid-cols-2 sm:grid-cols-2 ">
             {siteData.address.map((item, index) => (
               <Link
                 href={item.link}
                 target="_blank"
                 key={index}
-                className="flex flex-col justify-center gap-6 p-10 duration-150 border shadow-md border-white/5 bg-gray-500/30 backdrop-blur-3xl rounded-3xl hover:bg-gray-500/50"
+                className="flex flex-col justify-center gap-6 p-10 duration-150 border-3 shadow-md border-rose-300/50 hover:shadow-md border-rose-400 bg-gradient-to-br from-rose-50 to-pink-50 group hover:border-rose-500 rounded-3xl "
               >
                 {/* bg-[url('/images/glass-frame.png')] */}
                 <>
                   <div className="flex items-center justify-start gap-4 text-white">
-                    <div className="border shadow-xl border-white/5 bg-gray-500/20 rounded-xl size-14 aspect-square flex-center">
+                    <div className="border shadow-xl bg-rose-500 rounded-xl size-14 aspect-square flex-center group-hover:bg-rose-600 transition-all duration-150">
                       {/*  */}
                       <MapPin className="text-white" strokeWidth={"1.5px"} />
                     </div>
-                    <h1 className="text-lg font-semibold">Салбар {item.id}</h1>
+                    <h1
+                      className={cn(
+                        text,
+                        "text-lg group-hover:to-rose-600 transition-all duration-150"
+                      )}
+                    >
+                      Салбар {item.id}
+                    </h1>
                   </div>
 
                   <div className="space-y-4">
-                    <h1 className="text-white text-md">{item.name}</h1>
-                    <p className="text-sm text-gray-400">{item.city}</p>
+                    <h1 className="text-md font-medium">{item.name}</h1>
+                    <p className="text-sm text-gray-500">{item.city}</p>
                   </div>
                 </>
               </Link>

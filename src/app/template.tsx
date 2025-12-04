@@ -4,6 +4,7 @@ import { ROLE } from "@/lib/enum";
 import { API, baseUrl } from "@/utils/api";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { DisableScrollLock } from "./scroll";
 
 export default function Template({
   children,
@@ -50,5 +51,10 @@ export default function Template({
     me();
   }, []);
 
-  return <div className="w-full ">{children}</div>;
+  return (
+    <div className="w-full ">
+      <DisableScrollLock />
+      {children}
+    </div>
+  );
 }

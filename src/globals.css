@@ -240,5 +240,6 @@ html {
 body[data-scroll-locked] {
   margin-right: 0 !important;
   padding-right: 0 !important;
-  overflow-y: scroll;
+  overflow-y: auto !important;
+  margin-right: 0 !important;
 }

@@ -71,16 +71,20 @@ function ServiceCard({
       onClick={() => router.push(`/service?active=${item.id}`)}
       key={index}
       className={cn(
-        "justify-start gap-6 px-8 py-10 text-center border shadow-md bg-white/40 border-gray-200/50 backdrop-blur-3xl rounded-3xl col-center cursor-pointer hover:scale-105 duration-300",
+        "justify-start gap-6 px-8 py-10 text-center border shadow-md bg-white/40 border-gray-200/50 backdrop-blur-3xl rounded-3xl col-center cursor-pointer hover:scale-105 duration-300 group shadow-rose-200/50",
         index === 7 && "z-20"
       )}
     >
-      <div className="border shadow-xl bg-no-repeat border-gray-200/50 bg-[#101318]/80 bg-cover bg-[url(/bg/blue-gradient.png)] rounded-3xl size-18 aspect-square flex-center">
-        {Icon && <Icon className="text-white" strokeWidth={"1.5px"} />}
+      <div className="border shadow-xl bg-no-repeat border-gray-200/50 bg-rose-100/80 bg-cover bg-[url(/bg/blue-gradient.png)] rounded-3xl size-18 aspect-square  flex-center">
+        {Icon && <Icon className="text-rose-500" strokeWidth={"1.5px"} />}
       </div>
-      <div className="space-y-2">
-        <h1 className="text-xl">{item?.name}</h1>
-        <p className="text-xl font-bold text-dark-200">{money(item.min_price.toString())}₮</p>
+      <div className="flex flex-col justify-between h-full gap-2 items-center">
+        <h1 className="text-xl font-medium bg-gradient-to-r from-rose-600 via-pink-600 to-rose-500 bg-clip-text text-transparent">
+          {item?.name}
+        </h1>
+        <p className="text-xl font-bold group-hover:text-pink-500 transition-color duration-300 text-gray-500">
+          {money(item.min_price.toString())}₮
+        </p>
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
 "use client";
 
 import { LocationCard, ServiceCard } from "@/components/card";
-import { ListType } from "@/lib/const";
+import { button, ListType } from "@/lib/const";
 import { money } from "@/lib/functions";
+import { cn } from "@/lib/utils";
 import { Branch, BranchService, IOrder, Service } from "@/models";
 import { Button } from "@heroui/button";
 import {
@@ -129,7 +130,7 @@ export default function Step1({
           </div>
         </div>
       ) : (
-        <div className="w-full  bg-primary/10 flex justify-center items-center border border-primary rounded-sm h-[70px]">
+        <div className="w-full  bg-rose-100/50 flex justify-center items-center border border-rose-400/50 rounded-sm h-[70px]">
           <p className="text-sm text-gray-500">Салбараа сонгоно уу</p>
         </div>
       )}
@@ -157,6 +158,7 @@ export default function Step1({
                 <Button
                   color="default"
                   variant="bordered"
+                  className="border border-rose-600 rounded-md text-rose-500"
                   onPress={() => {
                     onChange("parallel", false);
                     onChange("details", chosen);
@@ -167,6 +169,7 @@ export default function Step1({
                 </Button>
                 <Button
                   color="primary"
+                  className={cn(button, 'rounded-md')}
                   onPress={() => {
                     onChange("parallel", true);
                     onClose();
@@ -219,7 +222,7 @@ const Price = ({
   const totalDisplay = totalPrice({ services: services, values: values });
 
   return (
-    <div className="border w-full border-primary bg-primary/10 px-2.5 py-2 rounded-md flex justify-between">
+    <div className="border w-full border-rose-400/50 bg-rose-100/50 px-2.5 py-2 rounded-md flex justify-between">
       <p className="text-sm">{values.length} Үйлчилгээ</p>
       <p>Нийт: {totalDisplay}₮</p>
     </div>

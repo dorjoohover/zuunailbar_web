@@ -6,6 +6,8 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Service } from "@/models";
 import { firstLetterUpper, money } from "@/lib/functions";
+import { cn } from "@/lib/utils";
+import { text } from "@/lib/const";
 
 export default function ServicesPage({ services }: { services: Service[] }) {
   const searchParams = useSearchParams();
@@ -30,8 +32,11 @@ export default function ServicesPage({ services }: { services: Service[] }) {
         <div className="relative flex-center">
           <div className="relative w-full overflow-hidden bg-gray-100 border aspect-square rounded-xl">
             <Image
-              src="/images/nail/1.png"
-              // siteData.detailService[activeIndex].image || '/images/nail/1.png'
+              src={
+                services[activeIndex]?.image
+                  ? `/api/file/${services[activeIndex]?.image}`
+                  : "/images/nail/1.png"
+              }
               alt={activeService.title}
               fill
               className="object-cover"
@@ -52,12 +57,14 @@ export default function ServicesPage({ services }: { services: Service[] }) {
               className={`flex justify-between items-center py-6 border-b border-dark transition-all duration-300 ${idx === activeIndex ? "opacity-100 translate-x-2" : "opacity-30 translate-x-0"}`}
             >
               <div className="flex items-center gap-2">
-                <span className="font-bold">00{idx + 1}</span>
-                <h2 className="text-lg font-medium">
+                <span className={cn(text, "text-lg font-semibold")}>
+                  00{idx + 1}
+                </span>
+                <h2 className={cn(text, "text-lg font-medium")}>
                   {firstLetterUpper(service.name ?? "")}
                 </h2>
               </div>
-              <h2 className="text-lg font-bold">
+              <h2 className={cn(text, "text-lg font-bold")}>
                 {money(service.min_price.toString())}₮
               </h2>
             </div>

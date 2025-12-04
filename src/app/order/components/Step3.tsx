@@ -104,10 +104,8 @@ export default function Step3({
                 values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
               }
               onChange={(val) => {
-                // if (!isDateUnavailable(val)) return;
                 onChange("order_date", selectDate(val));
                 onChange("start_time", undefined);
-                // if (errors.date) clearError("date");
               }}
               defaultValue={
                 values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
@@ -115,8 +113,11 @@ export default function Step3({
               errorMessage={"Буруу өдөр сонгосон."}
               isDateUnavailable={(v) => !isDateUnavailable(v)}
               calendarWidth={"100%"}
-              className="w-full border border-primary"
-              // weekdayStyle='long'
+              className="w-full border border-rose-200/50"
+              classNames={{
+
+                pickerHighlight: "bg-rose-400",
+              }}
             />
             {errors.date && showError && (
               <p className="mt-1 text-sm text-red-600">{errors.date}</p>
@@ -124,7 +125,7 @@ export default function Step3({
           </div>
           <div className="flex-1 ">
             <p className="text-muted-foreground text-xs mb-1">Цаг сонгох</p>
-            <div className="flex rounded-xl mb-2 justify-between border bg-accent/50 p-2 border border-primary">
+            <div className="flex rounded-xl mb-2 justify-between border bg-rose-100/50 p-2 border border-rose-400/50">
               <div className="flex items-center gap-1.5 ">
                 <Clock1 size={15} className="text-primary" />
                 <p className="text-sm ">Хугацаа:</p>
@@ -142,7 +143,7 @@ export default function Step3({
                   if (time! + 0)
                     return (
                       <button
-                        className={`text-start text-sm border p-2 transition-all duration-300 hover:shadow-sm  rounded-lg ${values.time == `${time}` ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary/50"}`}
+                        className={`text-start text-sm border p-2 transition-all duration-300 hover:shadow-sm  rounded-lg ${values.time == `${time}` ? "border-rose-400 bg-rose-200 text-primary-foreground" : "border-rose-400/50 bg-rose-100/50 hover:border-rose-600/50"}`}
                         key={i}
                         onClick={() => onChange("start_time", `${time}`)}
                       >

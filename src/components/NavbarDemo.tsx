@@ -36,25 +36,12 @@ const UserMenu = ({ user }: { user: User }) => {
   const phone = mobileFormatter(user.mobile ?? "");
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="light"
-          className="py-2 hover:bg-dark hover:text-accent-foreground"
-        >
-          <Avatar className="h-7 w-7">
-            <AvatarImage src={`/api/file/${user.profile_img}`} alt={name} />
-            <AvatarFallback className="text-xs">
-              {name
-                ?.split(" ")
-                .map((n) => n[0])
-                .join("")}
-            </AvatarFallback>
-          </Avatar>
-          <ChevronDownIcon color="white" className="h-3  w-3 ml-1" />
-          <span className="sr-only">User menu</span>
-        </Button>
+      <DropdownMenuTrigger>
+        <Avatar className="h-9 w-9 shadow-xl">
+          <AvatarImage src={`/api/file/${user.profile_img}`} alt={name} />
+        </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-50">
         <DropdownMenuLabel>
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{name}</p>
@@ -67,10 +54,20 @@ const UserMenu = ({ user }: { user: User }) => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href={"/profile"}>Профайл</Link>
+          <Link
+            href={"/profile"}
+            className="bg-gradient-to-br hover:from-rose-100/80 hover:to-pink-100/80 cursor-pointer w-full py-2 my-1 text-gray-700 transition-all duration-300"
+          >
+            Профайл
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href={"/my"}>Миний захиалгын түүх</Link>
+          <Link
+            href={"/my"}
+            className="bg-gradient-to-br hover:from-rose-100/80 hover:to-pink-100/80 cursor-pointer w-full py-2 my-1 text-gray-700 transition-all duration-300"
+          >
+            Миний захиалгын түүх
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
@@ -121,7 +118,7 @@ export function NavbarDemo({ token }: { token?: string }) {
           <Button
             href="/order"
             as={Link}
-            className="px-4 text-black bg-white rounded-full"
+            className=" whitespace-nowrap text-sm transition-all h-auto py-2  rounded-full bg-rose-500/90 hover:bg-pink-600 text-white hover:scale-105 font-medium shadow-lg shadow-rose-200/50 px-5 duration-300"
           >
             Захиалга
           </Button>
@@ -148,7 +145,7 @@ export function NavbarDemo({ token }: { token?: string }) {
               key={`mobile-link-${idx}`}
               href={item.link}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="relative text-white"
+              className="relative "
             >
               <span className="block">{item.name}</span>
             </Link>
@@ -158,14 +155,14 @@ export function NavbarDemo({ token }: { token?: string }) {
               <Link
                 href={"/profile"}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-white"
+                className="relative "
               >
                 Профайл
               </Link>
               <Link
                 href={"/my"}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-white"
+                className="relative "
               >
                 Миний захиалгын түүх
               </Link>

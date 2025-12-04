@@ -69,7 +69,7 @@ export default function Step2({
         </p>
       </div>
       {Object.keys(values.users).length === 0 ? (
-        <div className="w-full  border-primary flex justify-center items-center border bg-primary/10 rounded-sm h-[60px]">
+        <div className="w-full  border-rose-400/50 flex justify-center items-center border bg-rose-100/50 rounded-sm h-[60px]">
           <p className="text-sm text-gray-500 px-2 py-2 text-center">
             Артист сонгогдоогүй байна. Автоматаар хуваарилах эсвэл хүссэн
             артистаа сонгоно уу.
@@ -86,6 +86,7 @@ export default function Step2({
             color="primary"
             size="sm"
             variant="light"
+            className="text-rose-500"
           >
             Цэвэрлэх
           </Button>

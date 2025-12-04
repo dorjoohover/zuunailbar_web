@@ -47,7 +47,8 @@ export const Logout = () => {
         onPress={() => {
           onOpen();
         }}
-        className="text-sm md:hidden w-full flex justify-center font-semibold text-white bg-transparent border border-white aspect-square"
+        variant="bordered"
+        className="text-sm md:hidden flex font-semibold text-rose-600  rounded-xl border-2 border-rose-200 transition-all duration-300 hover:bg-rose-50  size-2 py-2 h-auto hover:text-accent-foreground w-full"
       >
         {/* <UserRound className="size-4" /> */}
         Гарах
@@ -58,7 +59,8 @@ export const Logout = () => {
           // onOpen();
           handleLogout();
         }}
-        className="text-sm hidden md:w-full md:flex font-semibold text-white bg-dark size-10 aspect-square"
+        variant="bordered"
+        className="text-sm hidden md:w-full md:flex font-semibold text-rose-600  rounded-xl border-2 border-rose-200 transition-all duration-300 hover:bg-rose-50  size-2 py-2 h-auto hover:text-accent-foreground"
       >
         {/* <UserRound className="size-4" /> */}
         Гарах

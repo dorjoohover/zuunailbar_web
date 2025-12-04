@@ -53,9 +53,9 @@ export const MyOrderPage = ({
               key={i}
               href={`${pathname}?status=${status}`}
               className={cn(
-                "px-4 py-2 text-center  text-sm rounded-md hover:bg-primary/50 transition-all duration-300 bg-secondary",
+                "px-4 py-2 text-center  text-sm rounded-md hover:bg-500/50 transition-all duration-300 bg-rose-300 text-white",
                 (params ?? `${OrderStatus.Active}`)?.includes(status.toString())
-                  ? "bg-primary"
+                  ? "bg-rose-500"
                   : ""
               )}
             >

@@ -11,8 +11,14 @@ interface ActionButtonProps {
   onClick?: () => void;
 }
 
-export function ActionButton({ href, children, className, onClick }: ActionButtonProps) {
-  const baseClasses = "text-white border shadow-xl  min-h-10 border-white/5 rounded-xl flex-center bg-[#101318] bg-cover bg-[url(/bg/banner-gradient.png)]";
+export function ActionButton({
+  href,
+  children,
+  className,
+  onClick,
+}: ActionButtonProps) {
+  const baseClasses =
+    " whitespace-nowrap text-sm transition-all h-auto py-2  rounded-full bg-rose-500/90 hover:bg-pink-600 text-white hover:scale-105 font-medium shadow-lg shadow-rose-200/50 px-5 duration-300";
 
   if (href) {
     return (

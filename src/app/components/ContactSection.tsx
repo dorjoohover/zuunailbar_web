@@ -1,26 +1,30 @@
+import { button, icon, text } from "@/lib/const";
+import { cn } from "@/lib/utils";
 import { ChevronRight, PhoneCall } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
 export default function ContactSection() {
   return (
-    <section className="py-20 bg-dark bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)]">
+    <section className="py-20 bg-card bg-gradient-to-b from-white to-rose-50/30 border-rose-100/50 shadow-2xl relative overflow-hidden border  rounded-3xl h-full">
       <div className="container grid items-center gap-4 py-10 sm:grid-cols-5 sm:gap-0">
         <div className="flex items-center justify-center col-span-2 space-x-5 sm:justify-start">
-          <div className="border shadow-xl border-white/5 bg-gray-500/20 rounded-3xl size-17 aspect-square flex-center">
+          <div className={icon}>
             <PhoneCall className="text-white" strokeWidth={"1.5px"} />
           </div>
           <div className="text-3xl text-white">
-            <h1 className="">Танд асуулт байна уу?</h1>
+            <h1 className={text}>Танд асуулт байна уу?</h1>
           </div>
         </div>
         <div className="col-span-1"></div>
-        <div className="col-span-2 space-y-5 col-center sm:block">
-          <h1 className="mb-3 text-dark-100">Lorem ipsum dolor sit amet.</h1>
-          <h1 className="text-3xl font-medium text-primary-pink">(976) 8608 0708</h1>
-          <Link href={"tel:+97686080708"} className="glass-button">
+        <div className="col-span-2  space-y-5 col-center sm:block">
+          <h1 className="mb-3 text-gray-500">Lorem ipsum dolor sit amet.</h1>
+          <h1 className={cn(text, 'font-semibold')}>
+            (976) 8608 0708
+          </h1>
+          <Link href={"tel:+97686080708"} className={cn(button, 'flex w-auto max-w-[150px] rounded-md justify-between items-center text-lg gap-1')}>
             Холбогдох
-            <ChevronRight className="text-white size-3" />
+            <ChevronRight className="text-white " size={20} />
           </Link>
         </div>
       </div>
