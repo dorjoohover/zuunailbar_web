@@ -13,11 +13,12 @@ import {
   IOrder,
   IOrderDetail,
   IUserService,
+  Service,
   User,
   UserDateTime,
   UserService,
 } from "@/models";
-import { ListType } from "@/lib/const";
+import { ListType, MapType } from "@/lib/const";
 import {
   firstLetterUpper,
   formatTime,
@@ -28,6 +29,7 @@ import {
 import { useCallback, useMemo } from "react";
 import { Textarea } from "@heroui/input";
 import { ArtistCard } from "@/components/card";
+import { OrderSlot, ParallelOrderSlot } from "@/models/slot.model";
 
 interface Step2Props {
   showError: boolean;
@@ -36,9 +38,10 @@ interface Step2Props {
     users: Record<string, string>;
     parallel: boolean;
   };
-  userDateTimes: UserDateTime[];
+  slots: OrderSlot | ParallelOrderSlot;
   // eniig hiine
-  users: ListType<User>;
+  users: MapType<User>;
+  services: MapType<Service>;
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
   // clearError: (field: string) => void;
 }
@@ -55,8 +58,9 @@ export default function Step2({
   // date,
   onChange,
   users,
-  userDateTimes,
+  slots,
   showError,
+  services,
   values,
   // clearError,
 }: Step2Props) {
@@ -92,8 +96,114 @@ export default function Step2({
           </Button>
         </div>
       )}
+      {!values.parallel && (
+        <div className="grid grid-cols-6 gap-4">
+          {Object.entries(slots as OrderSlot).map(([artistId], index) => {
+            const key = "0";
+            const artist = users[artistId];
+            const selected = values.users[key] == artistId;
+            return (
+              <ArtistCard
+                data={artist}
+                onClick={(id: string) => {
+                  if (!selected) {
+                    onChange("users", { ...values.users, [key]: id });
+                  }
+                }}
+                selected={selected}
+                key={index}
+              />
+            );
+          })}{" "}
+        </div>
+      )}
+      {values.parallel &&
+        Object.entries(slots as ParallelOrderSlot).map(
+          ([serviceId, slot], i) => {
+            const service = services[serviceId];
+            const key = serviceId ?? "";
+            const selectedUserId = values.users[key];
+            const selectedUser = selectedUserId ? users[selectedUserId] : null;
 
-      {values.parallel
+            return (
+              <div className="flex w-full gap-3" key={i}>
+                <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
+                  <span>{i + 1}</span>
+                </div>
+                <div className="w-full">
+                  <div className="flex w-full mb-2 justify-between items-center">
+                    <div>
+                      <p className="text-sm">{service.name}</p>
+                      <p className="text-xs text-gray-300">
+                        {service.duration && `${service.duration} мин • `}
+                        {money(
+                          (service?.min_price ?? 0).toString(),
+                          "",
+                          1,
+                          service.max_price ? 2 : undefined
+                        )}
+                        {service.max_price &&
+                          ` - ${money(service.max_price.toString(), "", 1, 2)}`}
+                      </p>
+                    </div>
+                    {selectedUser && (
+                      <div className="flex gap-3 items-center">
+                        <span>
+                          <ArrowRight size={14} />
+                        </span>
+                        <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
+                          <User2 size={14} color="gray" />
+                          {firstLetterUpper(selectedUser.nickname ?? "")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-6 gap-3">
+                    {Object.entries(slot).map(
+                      ([artistId, artistSlot], index) => {
+                        const prevKey = Object.keys(values.users).find(
+                          (k) => k != artistId
+                        );
+                        const user = users[artistId];
+                        const prevArtistId = prevKey
+                          ? values.users[prevKey]
+                          : null;
+
+                        const selected = values.users[serviceId] == artistId;
+
+                        return (
+                          <ArtistCard
+                            mini={true}
+                            data={user}
+                            onClick={(id: string) => {
+                              if (!selected) {
+                                const current = Object.entries(
+                                  values.users
+                                ).some(([k, v]) => k != key && v == id);
+                                current
+                                  ? onChange("users", {
+                                      [key]: id,
+                                    })
+                                  : onChange("users", {
+                                      ...values.users,
+                                      [key]: id,
+                                    });
+                              }
+                            }}
+                            selected={selected}
+                            disabled={false}
+                            key={index}
+                          />
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+        )}
+      {/* {values.parallel
         ? values.details.map((v, i) => {
             const key = v.service_id ?? "";
             const selectedUser =
@@ -133,8 +243,11 @@ export default function Step2({
                     )}
                   </div>
                   <div className="grid grid-cols-6 gap-3">
-                    {userDateTimes
-                      .filter((u) => u.services.includes(v.service_id))
+                    {slots.map((slot) => {
+                      const selected = (values.users[key] = slot.artists);
+                    })}
+                    {userServices
+                      .filter((u) => u.service_id == v.service_id)
                       .map((user, index) => {
                         const selected =
                           values.users[key] == user?.user?.id &&
@@ -147,11 +260,11 @@ export default function Step2({
                           : null;
                         let parallel = true;
                         if (prevArtistId) {
-                          const prevArtist = userDateTimes.find(
+                          const prevArtist = userServices.find(
                             (u) => u.user?.id == prevArtistId
                           );
-                          if (prevArtist)
-                            parallel = hasOverlap(prevArtist.slots, user.slots);
+                          // if (prevArtist)
+                          //   parallel = hasOverlap(prevArtist.slots, user.slots);
                         }
 
                         // өөр service-д давхцахгүй эсэхийг шалгана
@@ -185,7 +298,7 @@ export default function Step2({
         : [""].map((v, i) => {
             return (
               <div className="grid grid-cols-6 gap-4" key={i}>
-                {userDateTimes.map((user, index) => {
+                {userServices.map((user, index) => {
                   const key = "0";
                   const selected = values.users[key] == user.user?.id;
                   if (user.user)
@@ -204,7 +317,7 @@ export default function Step2({
                 })}
               </div>
             );
-          })}
+          })} */}
     </div>
   );
 }

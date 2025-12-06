@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@heroui/button";
-import { button, ListDefault, ListType, mnDate } from "@/lib/const";
+import { arrayToMap, button, ListDefault, ListType, mnDate } from "@/lib/const";
 import {
   Branch,
   BranchService,
@@ -14,6 +14,7 @@ import {
   Service,
   User,
   UserDateTime,
+  UserService,
 } from "@/models";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
@@ -39,6 +40,7 @@ import { Invoice } from "@/types";
 import { formatTime, money, parseDate } from "@/lib/functions";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { OrderSlot, ParallelOrderSlot, Slot } from "@/models/slot.model";
 
 function getMergedSlots(slotsArray: DateTime[]): DateTime {
   if (slotsArray == undefined || slotsArray?.length === 0) return {};
@@ -63,62 +65,6 @@ function getMergedSlots(slotsArray: DateTime[]): DateTime {
   return merged;
 }
 
-export function getCommonSlots(
-  slotsArray: DateTime[],
-  artists: number
-): DateTime {
-  if (slotsArray.length === 0) return {};
-
-  // 1 artist байвал давхцах шаардлагагүй — бүгдийг нэгтгээд буцаана
-  if (artists === 1) {
-    const merged: Record<number, Set<number>> = {};
-    for (const slots of slotsArray) {
-      for (const [dayStr, times] of Object.entries(slots)) {
-        const day = Number(dayStr);
-        if (!merged[day]) merged[day] = new Set();
-        times.forEach((t: number) => merged[day].add(t));
-      }
-    }
-
-    const result: DateTime = {};
-    for (const [day, timeSet] of Object.entries(merged)) {
-      result[Number(day)] = Array.from(timeSet).sort((a, b) => a - b);
-    }
-    return result;
-  }
-
-  // artists >= 2 → дор хаяж 2 artist-д давхцсан цагуудыг гаргана
-  const slotCount: Record<number, Record<number, number>> = {};
-
-  for (const slots of slotsArray) {
-    for (const [dayStr, times] of Object.entries(slots)) {
-      const day = Number(dayStr);
-
-      if (!slotCount[day]) slotCount[day] = {};
-
-      for (const t of times) {
-        slotCount[day][t] = (slotCount[day][t] ?? 0) + 1;
-      }
-    }
-  }
-
-  const common: Record<number, number[]> = {};
-
-  for (const [dayStr, timesMap] of Object.entries(slotCount)) {
-    const day = Number(dayStr);
-
-    // Бүх schedule-д нийтлэг цаг
-    const availableTimes = Object.entries(timesMap)
-      .filter(([_, count]) => count === slotsArray.length)
-      .map(([t]) => Number(t));
-
-    if (availableTimes.length > 0) {
-      common[day] = availableTimes.sort((a, b) => a - b);
-    }
-  }
-  return common;
-}
-
 export default function OrderPage({
   data,
   branches,
@@ -138,6 +84,25 @@ export default function OrderPage({
     parallel: false,
   });
 
+  const userMap = arrayToMap<User>(users.items);
+  const serviceMap = arrayToMap<Service>(data.items);
+  const [slots, setSlots] = useState<OrderSlot | ParallelOrderSlot | null>(
+    null
+  );
+  const getUserService = async () => {
+    const artistService = await create(
+      Api.user_service,
+      {
+        branch_id: selected.branch_id,
+        services:
+          (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
+        parallel: selected.parallel,
+      },
+      "client"
+    );
+    console.log(artistService.data.payload);
+    setSlots(artistService.data.payload);
+  };
   const [limit, setLimit] = useState(7);
   const [showError, setShowError] = useState(false);
   function setField<K extends keyof IOrder>(key: K, value: IOrder[K]) {
@@ -175,8 +140,9 @@ export default function OrderPage({
     setStep(Math.min(Math.max(1, n), total));
   };
 
-  const next = () => go(step + 1);
-  const prev = () => go(step - 1);
+  const prev = () => {
+    fetcher(step - 1);
+  };
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const activeErrors =
     step === 1
@@ -195,57 +161,22 @@ export default function OrderPage({
       return;
     }
     setShowError(false);
-    next();
+    fetcher(step + 1);
   };
-  const fetcher = async () => {
-    if (step == 1) setField("users", undefined);
-    if (step == 2) {
-      await getAvailableArtists();
+
+  const fetcher = async (currentStep: number) => {
+    if (currentStep == 1) setField("users", undefined);
+    if (currentStep == 2) {
+      await getUserService();
       setField("order_date", undefined);
       setField("start_time", undefined);
     }
+    // onSubmit();
+    go(currentStep);
   };
 
-  const getAvailableArtists = async () => {
-    await create(
-      Api.order,
-      {
-        services:
-          (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
-        branch_id: selected.branch_id,
-        parallel: selected.parallel,
-      },
-      "artists"
-    ).then((d) => {
-      if (d.success) {
-        const length = d.data?.payload?.items?.length ?? 0;
-        if (length == 0) {
-          setStep(step - 1);
-          addToast({
-            title: "Үйлчилгээ үзүүлэх артист олдсонгүй.",
-          });
-          return;
-        }
-        if (length == 1 && selected.parallel) {
-          setStep(step - 1);
-          addToast({
-            title:
-              "Тухайн 2 үйлчилгээг зэрэг үзүүлэх боломжтой артистууд одоогоор байхгүй байна.",
-          });
-          setSelected((prev) => ({
-            ...prev,
-            details: [selected.details?.[0]],
-          }));
-          return;
-        }
-        setUserDateTimes(d.data.payload.items);
-        setLimit(d.data.payload.limit ?? 7);
-      }
-    });
-  };
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-    fetcher();
   }, [step]);
 
   const reset = () => {
@@ -323,45 +254,45 @@ export default function OrderPage({
     return details;
   };
 
-  const availableTimes = (): DateTime => {
-    const artists = Object.values(selected.users ?? {}).length;
-    if (selected.parallel && artists > 1) {
-      const slots = getCommonSlots(
-        userDatetimes
-          .filter((u) =>
-            Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
-          )
-          .map((u) => u.slots),
-        1
-      );
-      console.log(slots);
-      return slots;
-    }
+  // const availableTimes = (): DateTime => {
+  //   const artists = Object.values(selected.users ?? {}).length;
+  //   if (selected.parallel && artists > 1) {
+  //     const slots = getCommonSlots(
+  //       userDatetimes
+  //         .filter((u) =>
+  //           Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
+  //         )
+  //         .map((u) => u.slots),
+  //       1
+  //     );
+  //     console.log(slots);
+  //     return slots;
+  //   }
 
-    const selectedServiceIds = selected.details?.map((d) => d.service_id) ?? [];
-    console.log(
-      userDatetimes.filter((u) =>
-        Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
-      )
-    );
-    const slotsArray =
-      artists > 0
-        ? userDatetimes
-            .filter((u) =>
-              Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
-            )
-            .map((u) => u.slots)
-        : userDatetimes
-            .filter((u) =>
-              u.services.every((s) => selectedServiceIds.includes(s))
-            )
-            .map((u) => u.slots);
-    console.log(slotsArray);
-    const slots = selected.parallel
-      ? getCommonSlots(slotsArray, artists > 0 ? 1 : 2)
-      : getMergedSlots(slotsArray);
-    return slots;
-  };
+  //   const selectedServiceIds = selected.details?.map((d) => d.service_id) ?? [];
+  //   console.log(
+  //     userDatetimes.filter((u) =>
+  //       Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
+  //     )
+  //   );
+  //   const slotsArray =
+  //     artists > 0
+  //       ? userDatetimes
+  //           .filter((u) =>
+  //             Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
+  //           )
+  //           .map((u) => u.slots)
+  //       : userDatetimes
+  //           .filter((u) =>
+  //             u.services.every((s) => selectedServiceIds.includes(s))
+  //           )
+  //           .map((u) => u.slots);
+  //   console.log(slotsArray);
+  //   const slots = selected.parallel
+  //     ? getCommonSlots(slotsArray, artists > 0 ? 1 : 2)
+  //     : getMergedSlots(slotsArray);
+  //   return slots;
+  // };
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [checked, setChecked] = useState(false);
   const [order, setOrder] = useState<string | null>(null);
@@ -544,7 +475,7 @@ export default function OrderPage({
 
           {/* Step Components */}
 
-          {step === 2 && (
+          {step === 2 && slots != null && (
             <Step2
               showError={showError}
               values={{
@@ -552,27 +483,29 @@ export default function OrderPage({
                 users: selected.users ?? {},
                 parallel: selected.parallel ?? false,
               }}
-              users={users}
+              users={userMap}
+              services={serviceMap}
               onChange={setField}
-              userDateTimes={userDatetimes}
+              slots={slots}
             />
           )}
 
-          {step === 3 && (
+          {step === 3 && slots != null && (
             <Step3
               values={{
                 date: selected.order_date,
                 time: selected.start_time,
                 details: selected.details ?? [],
                 description: selected.description,
+                parallel: selected.parallel,
+                users: selected.users,
               }}
               loading={false}
-              slots={availableTimes()}
+              slots={slots}
               limit={limit}
               errors={step3Errors}
               onChange={setField}
               showError={showError}
-              users={users}
             />
           )}
           {step === 4 && (
@@ -591,7 +524,9 @@ export default function OrderPage({
               onPress={prev}
               disabled={step === 1}
               variant="bordered"
-              className={"h-12 w-28 border-rose-400 text-rose-500 hover:scale-105 transition-all duration-150"}
+              className={
+                "h-12 w-28 border-rose-400 text-rose-500 hover:scale-105 transition-all duration-150"
+              }
             >
               Буцах
             </Button>

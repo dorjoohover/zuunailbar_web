@@ -68,6 +68,14 @@ export interface ListType<T> {
   count: number;
   items: T[];
 }
+export interface MapType<T> {
+  [id: string]: T;
+}
+export function arrayToMap<T extends { id: string }>(arr: T[]): MapType<T> {
+  const map: MapType<T> = {};
+  arr.forEach((item) => (map[item.id] = item));
+  return map;
+}
 export interface SearchType<T> {
   id: string;
   value: string;

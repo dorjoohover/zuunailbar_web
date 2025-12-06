@@ -7,6 +7,12 @@ import { Dispatch, SetStateAction } from "react";
 const formatDate = (value: string, limit = 10) => {
   return parseInt(value) < limit ? `0${value}` : `${value}`;
 };
+export function toYMD(d: Date) {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 export const parseDate = (date = new Date(), isHour = true) => {
   const year = date.getFullYear();
   let month = (date.getMonth() + 1).toString();

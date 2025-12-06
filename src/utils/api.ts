@@ -5,10 +5,10 @@ export enum METHOD {
   patch = "PATCH",
   delete = "DELETE",
 }
-const BASE = process.env.API
-  // ? process.env.API
-  // : "https://api.zunailbar.mn/api/v1/";
-  // : "https://api.zunailbar.mn/api/v1/";
+const BASE = process.env.API;
+// ? process.env.API
+// : "https://api.zunailbar.mn/api/v1/";
+// : "https://api.zunailbar.mn/api/v1/";
 
 export enum Api {
   login = "login",
@@ -34,6 +34,7 @@ export enum Api {
   product_transaction_admin = "product_transaction_admin",
   product_log = "product_log",
   brand = "brand",
+  slots = "slots",
   upload = "upload",
   forget = "forget",
 }
@@ -63,6 +64,7 @@ export const API = {
   [Api.product_log]: BASE + "product_log",
   [Api.branch]: BASE + "branch",
   [Api.upload]: BASE + "upload",
+  [Api.slots]: BASE + "slots",
   [Api.category]: BASE + "category",
 };
 
