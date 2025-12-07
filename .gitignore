@@ -11,6 +11,7 @@ next.config.js
 
 # next.js
 /.next/
+.package-lock.json
 /out/
 
 # production
