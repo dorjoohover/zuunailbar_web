@@ -69,4 +69,4 @@ export const API = {
 };
 
 export const baseUrl =
-  process.env.NEXT_PUBLIC_BASE_URL || "https://zuunailbar-web.vercel.app";
+  process.env.NEXT_PUBLIC_BASE_URL || "https://zunailbar.mn";
