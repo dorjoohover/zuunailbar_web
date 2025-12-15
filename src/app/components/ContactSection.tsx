@@ -18,7 +18,7 @@ export default function ContactSection() {
         </div>
         <div className="col-span-1"></div>
         <div className="col-span-2  space-y-5 col-center sm:block">
-          <h1 className="mb-3 text-gray-500">Lorem ipsum dolor sit amet.</h1>
+          <h1 className="mb-3 text-gray-500">Холбоо барих</h1>
           <h1 className={cn(text, 'font-semibold')}>
             (976) 8608 0708
           </h1>

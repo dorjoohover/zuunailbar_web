@@ -6,10 +6,11 @@ import { ServiceView } from "@/lib/const";
 
 const Page = async () => {
   const data = await find<Service>(Api.service, {
-    limit: 8,
+    limit: 10,
     view: ServiceView.FEATURED,
-    sort: false,
+    sort: true,
   });
+  console.log(data)
   return <ServicesPage services={data.data.items} />;
 };
 

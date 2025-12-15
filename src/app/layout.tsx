@@ -59,13 +59,12 @@ export default async function RootLayout({
             <div className="flex items-center justify-center w-full py-10">
               <Link
                 isExternal
-                className="flex items-center gap-1 text-current"
-                href="https://heroui.com?utm_source=next-app-template"
-                title="heroui.com homepage"
+                className="flex items-center gap-1 text-current text-dark-100"
+                href="/"
+                title="Zu nailbar"
               >
-                <span className="text-dark-100">© 2025 Zu Nailbar by</span>
-                <p className="">Lorem</p>
-                <span className="text-dark-100">| All Rigth Reserved</span>
+                <span>© {new Date().getFullYear()} Zu Nailbar.</span>
+                <span>All rights reserved.</span>
               </Link>
             </div>
           </main>

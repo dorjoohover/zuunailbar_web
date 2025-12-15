@@ -41,7 +41,7 @@ export default function ServicesSection({
             <ServiceCard key={index} item={item} index={index} />
           ))} */}
           <div className="my-5 col-span-full flex-center">
-            <ActionButton href="#" onClick={() => {}} className="px-10 h-14">
+            <ActionButton href="/order" className="px-10 h-14">
               Үйлчилгээ авах
             </ActionButton>
           </div>

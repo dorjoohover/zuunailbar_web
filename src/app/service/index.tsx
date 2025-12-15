@@ -37,7 +37,7 @@ export default function ServicesPage({ services }: { services: Service[] }) {
                   ? `/api/file/${services[activeIndex]?.image}`
                   : "/images/nail/1.png"
               }
-              alt={activeService.title}
+              alt={activeService?.title ?? ''}
               fill
               className="object-cover"
             />
