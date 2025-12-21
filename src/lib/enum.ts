@@ -27,6 +27,13 @@ export enum STATUS {
   Hidden = 30,
 }
 
+export enum PaymentMethod {
+  P2P = 1,
+  CASH = 2,
+  BANK = 3,
+  CARD = 4,
+}
+
 // export enum EmployeeStatus {
 //   ACTIVE = 10,
 //   DEKIRIT = 20,

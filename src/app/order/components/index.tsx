@@ -41,6 +41,7 @@ import { formatTime, money, parseDate } from "@/lib/functions";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { OrderSlot, ParallelOrderSlot, Slot } from "@/models/slot.model";
+import { PaymentMethod } from "@/lib/enum";
 
 function getMergedSlots(slotsArray: DateTime[]): DateTime {
   if (slotsArray == undefined || slotsArray?.length === 0) return {};
@@ -304,7 +305,7 @@ export default function OrderPage({
       order_date: selected.order_date,
       start_time: st,
       description: selected.description,
-
+      method: PaymentMethod.P2P,
       parallel: selected.parallel,
     };
     const res = await create<IOrder>(Api.order, payload);

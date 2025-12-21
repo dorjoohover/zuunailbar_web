@@ -16,7 +16,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="w-full">
+    <div className="w-full h-screen">
       <h2 className="text-center">Алдаа гарлаа</h2>
       <button
         onClick={
