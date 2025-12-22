@@ -17,6 +17,7 @@ export interface ISlot {
 
 export interface OrderSlot {
   [artist: string]: {
+    artists?: string[];
     slots: Record<string, string[]>;
   };
 }

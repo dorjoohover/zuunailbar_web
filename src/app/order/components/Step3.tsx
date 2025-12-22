@@ -2,7 +2,7 @@
 
 import { Calendar } from "@heroui/calendar";
 import { Button } from "@heroui/button";
-import { Clock, Clock1 } from "lucide-react";
+import { ArrowRight, Clock, User2, XIcon } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -12,148 +12,304 @@ import {
   DateTime,
   IOrder,
   IOrderDetail,
+  IUserService,
+  Service,
   User,
+  UserDateTime,
+  UserService,
 } from "@/models";
-import { ListType, mnDate } from "@/lib/const";
+import { ListType, MapType } from "@/lib/const";
 import {
+  firstLetterUpper,
   formatTime,
+  money,
   selectDate,
-  toYMD,
   usernameFormatter,
 } from "@/lib/functions";
 import { useCallback, useMemo } from "react";
 import { Textarea } from "@heroui/input";
-import { motion } from "motion/react";
-import LoadingScreen from "./loading";
-import { I18nProvider } from "@react-aria/i18n";
-import { OrderSlot, ParallelOrderSlot, Slot } from "@/models/slot.model";
-import { isSameDay } from "date-fns";
+import { ArtistCard } from "@/components/card";
+import { OrderSlot, ParallelOrderSlot } from "@/models/slot.model";
+
 interface Step3Props {
-  errors: {
-    date?: string;
-    time?: string;
-    user?: string;
-  };
   showError: boolean;
   values: {
-    date?: Date;
-    time?: string;
-    details: IOrderDetail[] | undefined;
-    description: string | undefined;
-    parallel?: boolean;
-    users?: Record<string, string>;
+    details: IOrderDetail[];
+    users: Record<string, string>;
+    parallel: boolean;
+    order_date?: Date | string;
+    start_time?: string;
   };
-  limit: number;
-  loading: boolean;
   slots: OrderSlot | ParallelOrderSlot;
+
+  // eniig hiine
+  users: MapType<User>;
+  services: MapType<Service>;
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
+  // clearError: (field: string) => void;
 }
 
 export default function Step3({
+  // date,
   onChange,
+  users,
   slots,
-  loading,
-
-  errors,
   showError,
-
+  services,
   values,
+  // clearError,
 }: Step3Props) {
-  const [service, user] = Object.entries(values.users!)[0];
-  const slot = values.parallel
-    ? (slots as ParallelOrderSlot)[service][user]
-    : (slots as OrderSlot)[user];
-  const isDateUnavailable = (value: DateValue) => {
-    const date = toYMD(new Date(value.year, value.month - 1, value.day));
-
-    return slot.slots[date] != undefined;
-  };
-  const duration = values.details?.reduce(
-    (acc, item) => acc + (item?.duration ?? 0),
-    0 // reduce-ийн анхны утга
-  );
-
   return (
     <div className="w-full space-y-6">
       <div className="space-y-2">
-        <p className="font-medium">Захиалга өгөх өдөр болон цаг сонгох</p>
-        <div className="flex flex-col sm:flex-row  gap-4">
-          <div className="flex-1">
-            <p className="text-muted-foreground text-xs mb-1">Өдөр сонгох</p>
-            <Calendar
-              aria-label="Өдөр сонгох"
-              value={
-                values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
-              }
-              onChange={(val) => {
-                onChange("order_date", selectDate(val));
-                onChange("start_time", undefined);
-              }}
-              defaultValue={
-                values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
-              }
-              errorMessage={"Буруу өдөр сонгосон."}
-              isDateUnavailable={(v) => !isDateUnavailable(v)}
-              calendarWidth={"100%"}
-              className="w-full border border-rose-200/50"
-              classNames={{
-                pickerHighlight: "bg-rose-400",
-              }}
-            />
-            {errors.date && showError && (
-              <p className="mt-1 text-sm text-red-600">{errors.date}</p>
-            )}
-          </div>
-          <div className="flex-1 ">
-            <p className="text-muted-foreground text-xs mb-1">Цаг сонгох</p>
-            <div className="flex rounded-xl mb-2 justify-between border bg-rose-100/50 p-2 border border-rose-400/50">
-              <div className="flex items-center gap-1.5 ">
-                <Clock1 size={15} className="text-primary" />
-                <p className="text-sm ">Хугацаа:</p>
-              </div>
-
-              {duration ? <p className="text-sm">{duration} мин</p> : <span />}
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {loading ? (
-                <motion.div exit={{ opacity: 0 }} className="w-full col-span-3">
-                  <LoadingScreen />
-                </motion.div>
-              ) : values.date ? (
-                slot.slots[toYMD(values.date)]?.map((time, i) => {
-                  if (time! + 0)
-                    return (
-                      <button
-                        className={`text-start text-sm border p-2 transition-all duration-300 hover:shadow-sm  rounded-lg ${values.time == `${time}` ? "border-rose-400 bg-rose-200 text-primary-foreground" : "border-rose-400/50 bg-rose-100/50 hover:border-rose-600/50"}`}
-                        key={i}
-                        onClick={() => onChange("start_time", `${time}`)}
-                      >
-                        {formatTime(time)}
-                      </button>
-                    );
-                })
-              ) : (
-                <div className="w-full mt-4 col-span-3">
-                  <p className="text-lg text-center">Цаг олдсонгүй.</p>
-                </div>
-              )}
-            </div>
-            {errors.time && showError && (
-              <p className="mt-1 text-sm text-red-600">{errors.time}</p>
-            )}
-          </div>
+        <p className="font-medium ">Артист сонгох </p>
+        {/* <p className="text-gray-500 text-xs">
+          Артистаа сонгох эсвэл автоматаар хуваарилах боломжтой.
+        </p> */}
+      </div>
+      {Object.keys(values.users).length === 0 ? (
+        <div className="w-full  border-rose-400/50 flex justify-center items-center border bg-rose-100/50 rounded-sm h-[60px]">
+          <p className="text-sm text-gray-500 px-2 py-2 text-center">
+            Артист сонгогдоогүй байна.
+          </p>
         </div>
-      </div>
+      ) : (
+        <div className="flex justify-between">
+          <p className="text-sm text-gray-500">
+            Бүх үйлчилгээнд нэг артист сонгогдсон
+          </p>
+          <Button
+            onClick={() => onChange("users", {})}
+            startContent={<XIcon size={14} />}
+            color="primary"
+            size="sm"
+            variant="light"
+            className="text-rose-500"
+          >
+            Цэвэрлэх
+          </Button>
+        </div>
+      )}
+      {!values.parallel && (
+        <div className="grid grid-cols-6 gap-4">
+          {Object.entries(slots as OrderSlot).map(([artistId], index) => {
+            const key = "0";
+            const artist = users[artistId];
+            const selected = values.users[key] == artistId;
+            return (
+              <ArtistCard
+                data={artist}
+                onClick={(id: string) => {
+                  if (!selected) {
+                    onChange("users", { ...values.users, [key]: id });
+                  }
+                }}
+                selected={selected}
+                key={index}
+              />
+            );
+          })}{" "}
+        </div>
+      )}
+      {values.parallel &&
+        Object.entries(slots as ParallelOrderSlot).map(
+          ([serviceId, slot], i) => {
+            const service = services[serviceId];
+            const key = serviceId ?? "";
+            const selectedUserId = values.users[key];
+            const selectedUser = selectedUserId ? users[selectedUserId] : null;
 
-      <div className="space-y-2">
-        <h1 className="font-medium">Захиалгын дэлгэрэнгүй</h1>
-        <Textarea
-          onChange={(e) => onChange("description", e.target.value)}
-          minRows={5}
-          placeholder="Хумс хүнд гэмтэлтэй гэх мэт..."
-          className="placeholder:text-gray-100"
-        />
-      </div>
+            return (
+              <div className="flex w-full gap-3" key={i}>
+                <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
+                  <span>{i + 1}</span>
+                </div>
+                <div className="w-full">
+                  <div className="flex w-full mb-2 justify-between items-center">
+                    <div>
+                      <p className="text-sm">{service.name}</p>
+                      <p className="text-xs text-gray-300">
+                        {service.duration && `${service.duration} мин • `}
+                        {money(
+                          (service?.min_price ?? 0).toString(),
+                          "",
+                          1,
+                          service.max_price ? 2 : undefined
+                        )}
+                        {service.max_price &&
+                          ` - ${money(service.max_price.toString(), "", 1, 2)}`}
+                      </p>
+                    </div>
+                    {selectedUser && (
+                      <div className="flex gap-3 items-center">
+                        <span>
+                          <ArrowRight size={14} />
+                        </span>
+                        <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
+                          <User2 size={14} color="gray" />
+                          {firstLetterUpper(selectedUser.nickname ?? "")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-6 gap-3">
+                    {Object.entries(slot).map(([artistId], index) => {
+                      const prevKey = Object.keys(values.users).find(
+                        (k) => k != artistId
+                      );
+                      const user = users[artistId];
+                      const prevArtistId = prevKey
+                        ? values.users[prevKey]
+                        : null;
+
+                      const selected = values.users[serviceId] == artistId;
+
+                      return (
+                        <ArtistCard
+                          mini={true}
+                          data={user}
+                          onClick={(id: string) => {
+                            if (!selected) {
+                              const current = Object.entries(values.users).some(
+                                ([k, v]) => k != key && v == id
+                              );
+                              current
+                                ? onChange("users", {
+                                    [key]: id,
+                                  })
+                                : onChange("users", {
+                                    ...values.users,
+                                    [key]: id,
+                                  });
+                            }
+                          }}
+                          selected={selected}
+                          disabled={false}
+                          key={index}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+        )}
+      {/* {values.parallel
+        ? values.details.map((v, i) => {
+            const key = v.service_id ?? "";
+            const selectedUser =
+              users.items.filter((user) => user.id == values.users[key])?.[0] ??
+              null;
+            return (
+              <div className="flex w-full gap-3" key={i}>
+                <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
+                  <span>{i + 1}</span>
+                </div>
+                <div className="w-full">
+                  <div className="flex w-full mb-2 justify-between items-center">
+                    <div>
+                      <p className="text-sm">{v.service_name}</p>
+                      <p className="text-xs text-gray-300">
+                        {v.duration && `${v.duration} мин • `}
+                        {money(
+                          (v?.min_price ?? 0).toString(),
+                          "",
+                          1,
+                          v.max_price ? 2 : undefined
+                        )}
+                        {v.max_price &&
+                          ` - ${money(v.max_price.toString(), "", 1, 2)}`}
+                      </p>
+                    </div>
+                    {selectedUser && (
+                      <div className="flex gap-3 items-center">
+                        <span>
+                          <ArrowRight size={14} />
+                        </span>
+                        <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
+                          <User2 size={14} color="gray" />
+                          {firstLetterUpper(selectedUser.nickname ?? "")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-6 gap-3">
+                    {slots.map((slot) => {
+                      const selected = (values.users[key] = slot.artists);
+                    })}
+                    {userServices
+                      .filter((u) => u.service_id == v.service_id)
+                      .map((user, index) => {
+                        const selected =
+                          values.users[key] == user?.user?.id &&
+                          key == v.service_id;
+                        const prevKey = Object.keys(values.users).find(
+                          (k) => k != key
+                        );
+                        const prevArtistId = prevKey
+                          ? values.users[prevKey]
+                          : null;
+                        let parallel = true;
+                        if (prevArtistId) {
+                          const prevArtist = userServices.find(
+                            (u) => u.user?.id == prevArtistId
+                          );
+                          // if (prevArtist)
+                          //   parallel = hasOverlap(prevArtist.slots, user.slots);
+                        }
+
+                        // өөр service-д давхцахгүй эсэхийг шалгана
+                        const disabled =
+                          Object.entries(values.users).some(
+                            ([k, v]) => k != key && v == user.user?.id
+                          ) || !parallel;
+                        return (
+                          <ArtistCard
+                            mini={true}
+                            data={user.user!}
+                            onClick={(id: string) => {
+                              if (!selected && !disabled) {
+                                onChange("users", {
+                                  ...values.users,
+                                  [key]: id,
+                                });
+                              }
+                            }}
+                            selected={selected}
+                            disabled={disabled}
+                            key={index}
+                          />
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        : [""].map((v, i) => {
+            return (
+              <div className="grid grid-cols-6 gap-4" key={i}>
+                {userServices.map((user, index) => {
+                  const key = "0";
+                  const selected = values.users[key] == user.user?.id;
+                  if (user.user)
+                    return (
+                      <ArtistCard
+                        data={user.user}
+                        onClick={(id: string) => {
+                          if (!selected) {
+                            onChange("users", { ...values.users, [key]: id });
+                          }
+                        }}
+                        selected={selected}
+                        key={index}
+                      />
+                    );
+                })}
+              </div>
+            );
+          })} */}
     </div>
   );
 }

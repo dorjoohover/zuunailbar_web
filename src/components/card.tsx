@@ -85,7 +85,10 @@ export const ServiceCard = ({
           1,
           data.max_price ? 2 : undefined
         )}
-        {data.max_price && ` - ${money(data.max_price.toString(), "", 1, 2)}`}₮
+        {data.max_price &&
+          data.max_price != data.min_price &&
+          ` - ${money(data.max_price.toString(), "", 1, 2)}`}
+        ₮
       </p>
     </div>
   );

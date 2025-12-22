@@ -16,16 +16,18 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="w-full h-screen">
-      <h2 className="text-center">Алдаа гарлаа</h2>
-      <button
-        onClick={
-          // Attempt to recover by trying to re-render the segment
-          () => reset()
-        }
-      >
-        Дахин оролдоно
-      </button>
+    <div className="w-full h-screen flex items-center justify-center">
+      <div>
+        <h2 className="text-center">Алдаа гарлаа</h2>
+        <button
+          onClick={
+            // Attempt to recover by trying to re-render the segment
+            () => reset()
+          }
+        >
+          Дахин оролдоно уу
+        </button>
+      </div>
     </div>
   );
 }

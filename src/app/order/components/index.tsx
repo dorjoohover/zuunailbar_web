@@ -37,11 +37,11 @@ import {
 } from "@heroui/modal";
 import { PaymentView } from "./payment";
 import { Invoice } from "@/types";
-import { formatTime, money, parseDate } from "@/lib/functions";
+import { formatTime, money, parseDate, toYMD } from "@/lib/functions";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { OrderSlot, ParallelOrderSlot, Slot } from "@/models/slot.model";
 import { PaymentMethod } from "@/lib/enum";
+import { OrderSlot, ParallelOrderSlot, Slot } from "@/models/slot.model";
 
 function getMergedSlots(slotsArray: DateTime[]): DateTime {
   if (slotsArray == undefined || slotsArray?.length === 0) return {};
@@ -87,10 +87,17 @@ export default function OrderPage({
 
   const userMap = arrayToMap<User>(users.items);
   const serviceMap = arrayToMap<Service>(data.items);
-  const [slots, setSlots] = useState<OrderSlot | ParallelOrderSlot | null>(
-    null
-  );
+  const [slots, setSlots] = useState<OrderSlot | ParallelOrderSlot>();
+  const [availableSlots, setAvailableSlots] = useState<
+    Record<string, number[]>
+  >({});
   const getUserService = async () => {
+    console.log({
+      branch_id: selected.branch_id,
+      services:
+        (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
+      parallel: selected.parallel,
+    });
     const artistService = await create(
       Api.user_service,
       {
@@ -98,10 +105,11 @@ export default function OrderPage({
         services:
           (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
         parallel: selected.parallel,
+        date: selected.order_date,
+        start_time: selected.start_time,
       },
       "client"
     );
-    console.log(artistService.data.payload);
     setSlots(artistService.data.payload);
   };
   const [limit, setLimit] = useState(7);
@@ -124,7 +132,7 @@ export default function OrderPage({
     [selected.branch_id, selected.details as IOrderDetail[]]
   );
 
-  const step3Errors = useMemo(
+  const step2Errors = useMemo(
     () => ({
       date: selected.order_date ? undefined : "Захиалгын өдрөө сонгоно уу!",
       time: selected.start_time ? undefined : "Захиалгын цагаа сонгоно уу!",
@@ -148,8 +156,8 @@ export default function OrderPage({
   const activeErrors =
     step === 1
       ? step1Errors
-      : step === 3
-        ? step3Errors
+      : step === 2
+        ? step2Errors
         : ({} as Record<string, string | undefined>);
   const isStepComplete = useMemo(
     () => Object.values(activeErrors).every((v) => !v),
@@ -165,12 +173,35 @@ export default function OrderPage({
     fetcher(step + 1);
   };
 
+  const getSlots = async () => {
+    const res = await find<Slot>(Api.slots, {
+      branch_id: selected.branch_id,
+      limit: -1,
+    });
+    const data: Record<string, number[]> = {};
+    res.data.items.forEach((item) => {
+      const key = toYMD(new Date(item.date));
+
+      data[key] ??= [];
+
+      item.slots.map(Number).forEach((slot) => {
+        if (!data[key].includes(slot)) {
+          data[key].push(slot);
+        }
+      });
+
+      data[key].sort((a, b) => a - b);
+    });
+    setAvailableSlots(data);
+  };
+
   const fetcher = async (currentStep: number) => {
     if (currentStep == 1) setField("users", undefined);
     if (currentStep == 2) {
+      await getSlots();
+    }
+    if (currentStep == 3) {
       await getUserService();
-      setField("order_date", undefined);
-      setField("start_time", undefined);
     }
     // onSubmit();
     go(currentStep);
@@ -298,16 +329,16 @@ export default function OrderPage({
   const [checked, setChecked] = useState(false);
   const [order, setOrder] = useState<string | null>(null);
   const onSubmit = async () => {
-    const st = selected.start_time?.slice(0, 2);
     const payload = {
       branch_id: selected.branch_id,
       details: formatDetails(),
       order_date: selected.order_date,
-      start_time: st,
+      start_time: selected.start_time,
       description: selected.description,
       method: PaymentMethod.P2P,
       parallel: selected.parallel,
     };
+    console.log(payload);
     const res = await create<IOrder>(Api.order, payload);
     if (!res.success) {
       addToast({
@@ -351,15 +382,13 @@ export default function OrderPage({
             : undefined;
       return value;
     }
-    if (index == 1) {
+    if (index == 2) {
       const selected_users = selected.users
         ? Object.values(selected.users).filter((a) => a != undefined)
         : [];
 
       if (selected_users.length === 0) {
-        return selected_services && selected_services?.length > 0
-          ? "Артистыг автоматаар оноох"
-          : undefined;
+        return undefined;
       }
       const matchedUsers = users.items.filter((u) =>
         selected_users.includes(u.id)
@@ -373,7 +402,7 @@ export default function OrderPage({
 
       return matchedUsers[0]?.nickname;
     }
-    if (index == 2) {
+    if (index == 1) {
       const date = selected.order_date;
       const time = selected.start_time;
       if (!date || !time) return undefined;
@@ -476,37 +505,38 @@ export default function OrderPage({
 
           {/* Step Components */}
 
-          {step === 2 && slots != null && (
+          {step === 2 && availableSlots != null && (
             <Step2
-              showError={showError}
-              values={{
-                details: selected.details ?? [],
-                users: selected.users ?? {},
-                parallel: selected.parallel ?? false,
-              }}
-              users={userMap}
-              services={serviceMap}
-              onChange={setField}
-              slots={slots}
-            />
-          )}
-
-          {step === 3 && slots != null && (
-            <Step3
               values={{
                 date: selected.order_date,
                 time: selected.start_time,
                 details: selected.details ?? [],
                 description: selected.description,
-                parallel: selected.parallel,
-                users: selected.users,
+                // parallel: selected.parallel,
+                // users: selected.users,
               }}
               loading={false}
-              slots={slots}
+              slots={availableSlots}
               limit={limit}
-              errors={step3Errors}
+              errors={step2Errors}
               onChange={setField}
               showError={showError}
+            />
+          )}
+          {step === 3 && slots != null && (
+            <Step3
+              showError={showError}
+              values={{
+                details: selected.details ?? [],
+                users: selected.users ?? {},
+                parallel: selected.parallel ?? false,
+                order_date: selected.order_date,
+                start_time: selected.start_time,
+              }}
+              users={userMap}
+              services={serviceMap}
+              onChange={setField}
+              slots={slots}
             />
           )}
           {step === 4 && (
