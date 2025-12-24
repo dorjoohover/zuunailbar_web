@@ -59,10 +59,21 @@ export default function Step2({
 
   values,
 }: Step2Props) {
-  const isDateUnavailable = (value: DateValue) => {
-    const date = toYMD(new Date(value.year, value.month - 1, value.day));
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-    return slots[date] != undefined;
+  const isDateUnavailable = (value: DateValue) => {
+    const date = new Date(value.year, value.month - 1, value.day);
+
+    if (
+      value.year == today.getFullYear() &&
+      value.month == today.getMonth() + 1 &&
+      value.day < today.getDate()
+    )
+      return false;
+
+    // slot байгаа бол unavailable
+    return slots[toYMD(date)] !== undefined;
   };
   const duration = values.details?.reduce(
     (acc, item) => acc + (item?.duration ?? 0),
