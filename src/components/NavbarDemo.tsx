@@ -61,14 +61,6 @@ const UserMenu = ({ user }: { user: User }) => {
             Профайл
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link
-            href={"/my"}
-            className="bg-gradient-to-br hover:from-rose-100/80 hover:to-pink-100/80 cursor-pointer w-full py-2 my-1 text-gray-700 transition-all duration-300"
-          >
-            Миний захиалгын түүх
-          </Link>
-        </DropdownMenuItem>
 
         <DropdownMenuSeparator />
         <div className="px-2 py-1.5">
@@ -109,8 +101,9 @@ export function NavbarDemo({ token }: { token?: string }) {
   return (
     <Navbar>
       {/* Desktop Navigation */}
-      <NavBody className="min-w-[630px] md:flex">
+      <NavBody className="min-w-[830px] md:flex">
         <NavItems items={siteData.navItems} />
+
         <NavbarLogo />
 
         <div className="flex items-center gap-4">
@@ -158,13 +151,6 @@ export function NavbarDemo({ token }: { token?: string }) {
                 className="relative "
               >
                 Профайл
-              </Link>
-              <Link
-                href={"/my"}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="relative "
-              >
-                Миний захиалгын түүх
               </Link>
             </>
           )}

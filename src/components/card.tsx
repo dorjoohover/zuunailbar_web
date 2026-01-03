@@ -8,6 +8,7 @@ import CustomImage from "./image";
 import { ReactNode } from "react";
 import { OrderStatus } from "@/lib/constants";
 import { mnDate } from "@/lib/const";
+import { cn } from "@/lib/utils";
 export const LocationCard = ({
   data,
   selected,
@@ -39,11 +40,14 @@ export const ServiceCard = ({
 }) => {
   return (
     <div
-      className={`col-span-1 flex justify-between items-start w-full cursor-pointer rounded-md p-4 border transition-all duration-200 ${
-        selected
-          ? "border-rose-600/50 border-2 bg-rose-100/50"
-          : "border-border hover:border-rose-400/50"
-      }`}
+      className={cn(
+        `col-span-1 flex justify-between items-start w-full cursor-pointer rounded-md p-4 border transition-all duration-200 ${
+          data.meta?.categoryName?.toLowerCase() === "гар"
+            ? "border-slate-200 bg-rose-50 hover:border-rose-200"
+            : "border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300"
+        }`,
+        selected ? "border-rose-600/50 border-2" : ""
+      )}
       onClick={() => onClick(data.service_id)}
     >
       {/* Left Section */}

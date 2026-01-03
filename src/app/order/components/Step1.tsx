@@ -71,7 +71,14 @@ export default function Step1({
       </div>
 
       {values.branch ? (
-        <div className="pt-6 w-full">
+        <div className=" w-full">
+          <div className="mb-2 rounded-md bg-rose-50 border border-rose-100 p-3">
+            <p className="text-md mb-1 font-medium text-rose-800">Санамж</p>
+            <p className="text-sm text-rose-700">
+              Маникюр болон педикюрын бүх будалтын үйлчилгээнд арилгалт,
+              салгалтын цаг багтсан тул тусад нь сонгох шаардлагагүй.
+            </p>
+          </div>
           <p className="font-medium mb-2">Үйлчилгээ сонгох</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
             {filteredServices.map((service, i) => {
@@ -148,10 +155,12 @@ export default function Step1({
                 Та зэрэг үйлчилгээ авах боломжтой
               </ModalHeader>
               <ModalBody>
-                <p>
-                  Эдгээр үйлчилгээг хоёр артист нэгэн зэрэг хийж болно. Та
-                  үйлчилгээг зэрэг үйлчлүүлэх (түргэн) эсвэл дарааллаар
-                  үйлчлүүлэх (нэг нэгээр нь) байдлаар авах уу?
+                <p className="text-sm text-muted-foreground">
+                  Эдгээр үйлчилгээг хоёр артист нэгэн зэрэг хийж болно.
+                  <br />
+                  Та үйлчилгээг <b>зэрэг </b> (маникюр, педикюрийг 2
+                  артист нэгэн зэрэг хийх) эсвэл <b>дарааллаар</b> (нэг артист
+                  нэг нэгээр нь хийх) авах уу?
                 </p>
               </ModalBody>
               <ModalFooter>
@@ -169,7 +178,7 @@ export default function Step1({
                 </Button>
                 <Button
                   color="primary"
-                  className={cn(button, 'rounded-md')}
+                  className={cn(button, "rounded-md")}
                   onPress={() => {
                     onChange("parallel", true);
                     onClose();

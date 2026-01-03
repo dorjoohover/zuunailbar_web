@@ -32,6 +32,10 @@ export const siteData = {
       name: "Бидний тухай",
       link: "/about",
     },
+    {
+      name: "Миний цаг захиалга",
+      link: "/my",
+    },
   ],
   features: [
     {

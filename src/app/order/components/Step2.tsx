@@ -1,33 +1,13 @@
 "use client";
-
 import { Calendar } from "@heroui/calendar";
-import { Button } from "@heroui/button";
-import { Clock, Clock1 } from "lucide-react";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Clock1 } from "lucide-react";
 import { DateValue, fromDate } from "@internationalized/date";
-import {
-  BookingSchedule,
-  DateTime,
-  IOrder,
-  IOrderDetail,
-  User,
-} from "@/models";
-import { ListType, mnDate } from "@/lib/const";
-import {
-  formatTime,
-  selectDate,
-  toYMD,
-  usernameFormatter,
-} from "@/lib/functions";
-import { useCallback, useMemo } from "react";
+import { IOrder, IOrderDetail } from "@/models";
+import { formatTime, selectDate, toYMD } from "@/lib/functions";
 import { Textarea } from "@heroui/input";
 import { motion } from "motion/react";
 import LoadingScreen from "./loading";
-import { I18nProvider } from "@react-aria/i18n";
-import { ParallelOrderSlot, Slot } from "@/models/slot.model";
-import { isEqual, isSameDay } from "date-fns";
+import { isSameDay } from "date-fns";
 interface Step2Props {
   errors: {
     date?: string;
@@ -40,7 +20,7 @@ interface Step2Props {
     time?: string;
     details: IOrderDetail[] | undefined;
     description: string | undefined;
-    // parallel?: boolean;
+    parallel?: boolean;
     // users?: Record<string, string>;
   };
   limit: number;
@@ -75,10 +55,9 @@ export default function Step2({
     // slot байгаа бол unavailable
     return slots[toYMD(date)] !== undefined;
   };
-  const duration = values.details?.reduce(
-    (acc, item) => acc + (item?.duration ?? 0),
-    0 // reduce-ийн анхны утга
-  );
+  const duration = values.parallel
+    ? Math.max(...(values.details?.map((item) => item?.duration ?? 0) ?? [0]))
+    : values.details?.reduce((acc, item) => acc + (item?.duration ?? 0), 0);
   return (
     <div className="w-full space-y-6">
       <div className="space-y-2">
@@ -101,25 +80,47 @@ export default function Step2({
               errorMessage={"Буруу өдөр сонгосон."}
               isDateUnavailable={(v) => !isDateUnavailable(v)}
               calendarWidth={"100%"}
-              className="w-full border border-rose-200/50"
+              className="
+    w-full border border-rose-200/50
+    [&_[data-selected=true]:not([aria-disabled=true])]:bg-rose-500/90
+    [&_[data-selected=true]:not([aria-disabled=true])]:text-white
+    [&_[data-hover=true]:not([aria-disabled=true])]:bg-rose-100
+    [&_[data-hover=true]:not([aria-disabled=true])]:text-rose-500/90
+
+    /* disabled дээр effect унтраах */
+    [&_[aria-disabled=true]]:bg-transparent
+    [&_[aria-disabled=true]]:text-muted-foreground
+        [&_[data-today=true]:not([data-selected=true]):not([aria-disabled=true])]:ring-1
+    [&_[data-today=true]:not([data-selected=true]):not([aria-disabled=true])]:ring-rose-400
+    [&_[data-today=true]:not([data-selected=true]):not([aria-disabled=true])]:text-rose-700
+  "
               classNames={{
-                pickerHighlight: "bg-rose-400",
+                content: "bg-rose-50",
+                title: "text-black",
+                gridHeaderRow: "text-black",
+                nextButton: "text-black",
+                prevButton: "text-black",
+                cellButton: "rounded-sm",
               }}
             />
+
             {errors.date && showError && (
               <p className="mt-1 text-sm text-red-600">{errors.date}</p>
             )}
           </div>
           <div className="flex-1 ">
             <p className="text-muted-foreground text-xs mb-1">Цаг сонгох</p>
-            <div className="flex rounded-xl mb-2 justify-between border bg-rose-100/50 p-2 border border-rose-400/50">
-              <div className="flex items-center gap-1.5 ">
-                <Clock1 size={15} className="text-primary" />
+            <div className="flex rounded-xl mb-2 justify-between border text-rose-500 shadow-lg shadow-rose-50 p-2 border border-rose-400/50">
+              <div className="flex items-center gap-1.5 text-rose-500">
+                <Clock1 size={15} className="text-rose-500" />
                 <p className="text-sm ">Хугацаа:</p>
               </div>
 
               {duration ? <p className="text-sm">{duration} мин</p> : <span />}
             </div>
+            <p className="text-muted-foreground text-xs mb-1">
+              Боломжит цагууд
+            </p>
             <div className="grid grid-cols-3 gap-2">
               {loading ? (
                 <motion.div exit={{ opacity: 0 }} className="w-full col-span-3">
@@ -144,11 +145,11 @@ export default function Step2({
                       key={i}
                       type="button"
                       onClick={() => onChange("start_time", String(time))}
-                      className={`text-start text-sm border p-2 transition-all duration-300 hover:shadow-sm rounded-lg
+                      className={`text-center shadow-sm shadow-rose-500/10 text-sm border p-2 transition-all duration-300 hover:shadow-sm rounded-lg
       ${
         isSelected
-          ? "border-rose-400 bg-rose-200 text-primary-foreground"
-          : "border-rose-400/50 bg-rose-100/50 hover:border-rose-600/50"
+          ? "border-none bg-rose-500/90 text-primary-foreground"
+          : "border-rose-400/50 bg-rose-50 text-rose-800 hover:border-rose-600/50"
       }
     `}
                     >

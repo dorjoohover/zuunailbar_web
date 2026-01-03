@@ -411,6 +411,17 @@ export default function OrderPage({
     return undefined;
   };
 
+  const canJump = (s: number) => {
+    if (s == 1) return true;
+    if (s == 2)
+      return (
+        selected.branch_id && selected.details && selected.details?.length > 0
+      );
+    if (s == 3) return selected.order_date && selected.start_time;
+    if (s == 4)
+      return selected.users && Object.values(selected.users).length > 0 && invoice?.invoice_id;
+  };
+
   return (
     <div className="relative py-10">
       <div className="flex flex-col justify-center max-w-3xl p-6 py-12 md:py-18 xl:py-24 mx-auto space-y-6 ">
@@ -438,7 +449,7 @@ export default function OrderPage({
                   <div
                     className={`space-x-2 z-10 flex flex-col cursor-pointer relative px-2 bg-white flex-center `}
                     onClick={() => {
-                      // if (canJump(s)) go(s);
+                      if (canJump(i + 1)) go(i + 1);
                     }}
                   >
                     <span
@@ -512,7 +523,7 @@ export default function OrderPage({
                 time: selected.start_time,
                 details: selected.details ?? [],
                 description: selected.description,
-                // parallel: selected.parallel,
+                parallel: selected.parallel,
                 // users: selected.users,
               }}
               loading={false}
@@ -577,8 +588,8 @@ export default function OrderPage({
                 onPress={() => onOpen()}
                 className={cn(
                   isStepComplete ? "" : "",
-                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
-                  "bg-gray-500 bg-no-repeat bg-cover bg-[url(/bg/banner-gradient.png)]"
+                  button,
+                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center"
                 )}
               >
                 Илгээх
@@ -644,7 +655,12 @@ export default function OrderPage({
               </ModalBody>
 
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <Button
+                  color="danger"
+                  className="h-8 rounded-sm"
+                  variant="light"
+                  onPress={onClose}
+                >
                   Буцах
                 </Button>
                 <Button
@@ -654,6 +670,10 @@ export default function OrderPage({
                     onClose();
                     setStep(5);
                   }}
+                  className={cn(
+                    button,
+                    "text-white border shadow-xl h-8 border-white/5 rounded-sm w-28 aspect-square flex-center"
+                  )}
                 >
                   Үргэлжлүүлэх
                 </Button>
