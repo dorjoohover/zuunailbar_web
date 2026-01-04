@@ -127,8 +127,8 @@ export const Header = () => {
       <div className="container pt-20 space-y-8 text-center">
         <h1 className="text-5xl font-semibold text-center sm:text-7xl">
           <span>Zu Nailbar</span>
-          <br /> Төгс
-          <span className="gradient-text"> гоо сайхан</span>
+          <br /> Чанар
+          <span className="gradient-text"> Стандарт</span>
         </h1>
         <p className="max-w-2xl mx-auto text-lg sm:text-xl text-dark-200">
           Орчин үеийн хумсны урлаг, амралт, гоо сайхныг хослуулсан үйлчилгээ.

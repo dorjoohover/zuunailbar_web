@@ -21,8 +21,8 @@ export default function Page() {
         <div className="space-y-8">
           <h1 className="text-5xl font-semibold sm:text-7xl">
             <span>Zu Nailbar</span>
-            <br /> Төгс
-            <span className="gradient-text"> гоо сайхан</span>
+            <br /> Чанар
+            <span className="gradient-text"> Стандарт</span>
           </h1>
           <p className="max-w-2xl mb-2 mx-auto text-lg sm:text-xl text-dark-200">
             {" "}
