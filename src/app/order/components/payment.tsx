@@ -136,7 +136,7 @@ export const PaymentView = ({
         <Clock
           size={14}
           className="mt-1"
-          color={progress > 30 ? "primary" : "#FCA5A5"}
+          color={progress > 30 ? "#F43F5E" : "#F59E0B"}
         />
         <div className="">
           <p
@@ -148,7 +148,9 @@ export const PaymentView = ({
           <Progress
             value={progress}
             size="sm"
-            color={progress > 30 ? "primary" : "warning"}
+            classNames={{
+              indicator: progress > 30 ? "bg-rose-500" : "#F59E0B",
+            }}
           />
         </div>
       </div>
