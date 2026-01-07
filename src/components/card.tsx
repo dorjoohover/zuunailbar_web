@@ -238,6 +238,7 @@ export function OrderCard({ data }: { data: Order }) {
     end_time,
     description,
     total_amount,
+    pre_amount,
   } = data;
   const config = statusConfig[order_status as OrderStatus];
   // Format date
@@ -283,7 +284,7 @@ export function OrderCard({ data }: { data: Order }) {
       {/* Amount */}
       <div className="flex items-center gap-1">
         <span className="text-gray-900">
-          {money((total_amount ?? 0).toString())} ₮
+          {money((total_amount ?? pre_amount ?? 0).toString())} ₮
         </span>
       </div>
     </div>
