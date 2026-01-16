@@ -1,33 +1,9 @@
 "use client";
-
-import { Calendar } from "@heroui/calendar";
 import { Button } from "@heroui/button";
-import { ArrowRight, Clock, User2, XIcon } from "lucide-react";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { DateValue, fromDate } from "@internationalized/date";
-import {
-  BookingSchedule,
-  DateTime,
-  IOrder,
-  IOrderDetail,
-  IUserService,
-  Service,
-  User,
-  UserDateTime,
-  UserService,
-} from "@/models";
-import { ListType, MapType } from "@/lib/const";
-import {
-  firstLetterUpper,
-  formatTime,
-  money,
-  selectDate,
-  usernameFormatter,
-} from "@/lib/functions";
-import { useCallback, useMemo } from "react";
-import { Textarea } from "@heroui/input";
+import { ArrowRight, User2, XIcon } from "lucide-react";
+import { IOrder, IOrderDetail, Service, User } from "@/models";
+import { MapType } from "@/lib/const";
+import { firstLetterUpper, money } from "@/lib/functions";
 import { ArtistCard } from "@/components/card";
 import { OrderSlot, ParallelOrderSlot } from "@/models/slot.model";
 
@@ -40,7 +16,7 @@ interface Step3Props {
     order_date?: Date | string;
     start_time?: string;
   };
-  slots: OrderSlot | ParallelOrderSlot;
+  slots: OrderSlot;
 
   // eniig hiine
   users: MapType<User>;
@@ -92,109 +68,107 @@ export default function Step3({
       )}
       {!values.parallel && (
         <div className="grid grid-cols-6 gap-4">
-          {Object.entries(slots as OrderSlot).map(([artistId], index) => {
-            const key = "0";
-            const artist = users[artistId];
-            const selected = values.users[key] == artistId;
-            return (
-              <ArtistCard
-                data={artist}
-                onClick={(id: string) => {
-                  if (!selected) {
-                    onChange("users", { ...values.users, [key]: id });
-                  }
-                }}
-                selected={selected}
-                key={index}
-              />
-            );
-          })}{" "}
+          {Array.from(new Set(Object.values(slots).flat())).map(
+            (artistId, index) => {
+              const key = "0";
+              const artist = users[artistId];
+              const selected = values.users[key] == artistId;
+              return (
+                <ArtistCard
+                  data={artist}
+                  onClick={(id: string) => {
+                    if (!selected) {
+                      onChange("users", { ...values.users, [key]: id });
+                    }
+                  }}
+                  selected={selected}
+                  key={index}
+                />
+              );
+            }
+          )}{" "}
         </div>
       )}
       {values.parallel &&
-        Object.entries(slots as ParallelOrderSlot).map(
-          ([serviceId, slot], i) => {
-            const service = services[serviceId];
-            const key = serviceId ?? "";
-            const selectedUserId = values.users[key];
-            const selectedUser = selectedUserId ? users[selectedUserId] : null;
+        Object.entries(slots).map(([serviceId, artists], i) => {
+          const service = services[serviceId];
+          const key = serviceId ?? "";
+          const selectedUserId = values.users[key];
+          const selectedUser = selectedUserId ? users[selectedUserId] : null;
 
-            return (
-              <div className="flex w-full gap-3" key={i}>
-                <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
-                  <span>{i + 1}</span>
-                </div>
-                <div className="w-full">
-                  <div className="flex w-full mb-2 justify-between items-center">
-                    <div>
-                      <p className="text-sm">{service.name}</p>
-                      <p className="text-xs text-gray-300">
-                        {service.duration && `${service.duration} мин • `}
-                        {money(
-                          (service?.min_price ?? 0).toString(),
-                          "",
-                          1,
-                          service.max_price ? 2 : undefined
-                        )}
-                        {service.max_price &&
-                          ` - ${money(service.max_price.toString(), "", 1, 2)}`}
-                      </p>
+          return (
+            <div className="flex w-full gap-3" key={i}>
+              <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
+                <span>{i + 1}</span>
+              </div>
+              <div className="w-full">
+                <div className="flex w-full mb-2 justify-between items-center">
+                  <div>
+                    <p className="text-sm">{service.name}</p>
+                    <p className="text-xs text-gray-300">
+                      {service.duration && `${service.duration} мин • `}
+                      {money(
+                        (service?.min_price ?? 0).toString(),
+                        "",
+                        1,
+                        service.max_price ? 2 : undefined
+                      )}
+                      {service.max_price &&
+                        ` - ${money(service.max_price.toString(), "", 1, 2)}`}
+                    </p>
+                  </div>
+                  {selectedUser && (
+                    <div className="flex gap-3 items-center">
+                      <span>
+                        <ArrowRight size={14} />
+                      </span>
+                      <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
+                        <User2 size={14} color="gray" />
+                        {firstLetterUpper(selectedUser.nickname ?? "")}
+                      </span>
                     </div>
-                    {selectedUser && (
-                      <div className="flex gap-3 items-center">
-                        <span>
-                          <ArrowRight size={14} />
-                        </span>
-                        <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
-                          <User2 size={14} color="gray" />
-                          {firstLetterUpper(selectedUser.nickname ?? "")}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-6 gap-3">
-                    {Object.entries(slot).map(([artistId], index) => {
-                      const prevKey = Object.keys(values.users).find(
-                        (k) => k != artistId
-                      );
-                      const user = users[artistId];
-                      const prevArtistId = prevKey
-                        ? values.users[prevKey]
-                        : null;
+                  )}
+                </div>
+                <div className="grid grid-cols-6 gap-3">
+                  {artists.map((artistId, index) => {
+                    const prevKey = Object.keys(values.users).find(
+                      (k) => k != artistId
+                    );
+                    const user = users[artistId];
+                    const prevArtistId = prevKey ? values.users[prevKey] : null;
 
-                      const selected = values.users[serviceId] == artistId;
-
-                      return (
-                        <ArtistCard
-                          mini={true}
-                          data={user}
-                          onClick={(id: string) => {
-                            if (!selected) {
-                              const current = Object.entries(values.users).some(
-                                ([k, v]) => k != key && v == id
-                              );
-                              current
-                                ? onChange("users", {
-                                    [key]: id,
-                                  })
-                                : onChange("users", {
-                                    ...values.users,
-                                    [key]: id,
-                                  });
-                            }
-                          }}
-                          selected={selected}
-                          disabled={false}
-                          key={index}
-                        />
-                      );
-                    })}
-                  </div>
+                    const selected = values.users[serviceId] == artistId;
+                    console.log(user);
+                    return (
+                      <ArtistCard
+                        mini={true}
+                        data={user}
+                        onClick={(id: string) => {
+                          if (!selected) {
+                            const current = Object.entries(values.users).some(
+                              ([k, v]) => k != key && v == id
+                            );
+                            current
+                              ? onChange("users", {
+                                  [key]: id,
+                                })
+                              : onChange("users", {
+                                  ...values.users,
+                                  [key]: id,
+                                });
+                          }
+                        }}
+                        selected={selected}
+                        disabled={false}
+                        key={index}
+                      />
+                    );
+                  })}
                 </div>
               </div>
-            );
-          }
-        )}
+            </div>
+          );
+        })}
       {/* {values.parallel
         ? values.details.map((v, i) => {
             const key = v.service_id ?? "";

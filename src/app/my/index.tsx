@@ -45,6 +45,7 @@ export const MyOrderPage = ({
       <div className="mb-6">
         <h2 className="text-gray-900">Захиалгууд</h2>
       </div>
+
       <div className="grid grid-cols-4 gap-4 max-w-7xl mb-10">
         {getEnumValues(OrderStatus).map((status, i) => {
           if (invisibleStatus.includes(status)) return;
@@ -73,7 +74,11 @@ export const MyOrderPage = ({
           <div
             key={order.id}
             className="cursor-pointer"
-            onClick={() => view(order.id)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              view(order.id);
+            }}
           >
             <OrderCard data={order} />
           </div>

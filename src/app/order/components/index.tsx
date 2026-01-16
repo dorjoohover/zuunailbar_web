@@ -87,31 +87,12 @@ export default function OrderPage({
 
   const userMap = arrayToMap<User>(users.items);
   const serviceMap = arrayToMap<Service>(data.items);
-  const [slots, setSlots] = useState<OrderSlot | ParallelOrderSlot>();
-  const [availableSlots, setAvailableSlots] = useState<
-    Record<string, number[]>
-  >({});
-  const getUserService = async () => {
-    console.log({
-      branch_id: selected.branch_id,
-      services:
-        (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
-      parallel: selected.parallel,
-    });
-    const artistService = await create(
-      Api.user_service,
-      {
-        branch_id: selected.branch_id,
-        services:
-          (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
-        parallel: selected.parallel,
-        date: selected.order_date,
-        start_time: selected.start_time,
-      },
-      "client"
-    );
-    setSlots(artistService.data.payload);
-  };
+  // zasna
+  const [userService, setUserService] = useState<OrderSlot>({});
+  const [availableSlots, setAvailableSlots] = useState<Record<string, Slot[]>>(
+    {}
+  );
+
   const [limit, setLimit] = useState(7);
   const [showError, setShowError] = useState(false);
   function setField<K extends keyof IOrder>(key: K, value: IOrder[K]) {
@@ -174,25 +155,64 @@ export default function OrderPage({
   };
 
   const getSlots = async () => {
-    const res = await find<Slot>(Api.slots, {
+    const body = {
       branch_id: selected.branch_id,
-      limit: -1,
-    });
-    const data: Record<string, number[]> = {};
-    res.data.items.forEach((item) => {
-      const key = toYMD(new Date(item.date));
+      services: selected.details?.map((s) => s.service_id),
+      parallel: selected.parallel,
+    };
+    console.log(body);
+    const res = await find<Slot>(Api.order, body, "slots");
+    // console.log(res);
 
-      data[key] ??= [];
+    const data: Record<string, Slot[]> = (res.data as unknown as Slot[]).reduce(
+      (acc, item) => {
+        const key = toYMD(new Date(item.date));
 
-      item.slots.map(Number).forEach((slot) => {
-        if (!data[key].includes(slot)) {
-          data[key].push(slot);
+        if (!acc[key]) {
+          acc[key] = [];
         }
-      });
 
-      data[key].sort((a, b) => a - b);
-    });
+        acc[key].push({ ...item, key });
+        return acc;
+      },
+      {} as Record<string, Slot[]>
+    );
     setAvailableSlots(data);
+  };
+  const getArtists = async () => {
+    // selected.start_time, selected.parallel, selected.order_date;
+    const userServices = await create(
+      Api.user_service,
+      {
+        branch_id: selected.branch_id,
+        services:
+          (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
+      },
+      "client"
+    );
+    // serviceId: artists
+    const data: OrderSlot = userServices.data.payload;
+    console.log(data);
+    const slots =
+      availableSlots[toYMD(new Date(selected.order_date as Date))] ?? [];
+
+    const artistIds = slots
+      .filter(
+        (s) => s.start_time?.toString().slice(0, 5) === selected.start_time
+      )
+      .map((s) => s.artist_id);
+
+    console.log(artistIds);
+    const result = Object.fromEntries(
+      Object.entries(data)
+        .map(([service, artists]) => [
+          service,
+          artists.filter((a) => artistIds.includes(a)),
+        ])
+        .filter(([_, artists]) => artists.length > 0)
+    );
+    console.log(result);
+    setUserService(result);
   };
 
   const fetcher = async (currentStep: number) => {
@@ -201,7 +221,7 @@ export default function OrderPage({
       await getSlots();
     }
     if (currentStep == 3) {
-      await getUserService();
+      getArtists();
     }
     // onSubmit();
     go(currentStep);
@@ -286,45 +306,6 @@ export default function OrderPage({
     return details;
   };
 
-  // const availableTimes = (): DateTime => {
-  //   const artists = Object.values(selected.users ?? {}).length;
-  //   if (selected.parallel && artists > 1) {
-  //     const slots = getCommonSlots(
-  //       userDatetimes
-  //         .filter((u) =>
-  //           Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
-  //         )
-  //         .map((u) => u.slots),
-  //       1
-  //     );
-  //     console.log(slots);
-  //     return slots;
-  //   }
-
-  //   const selectedServiceIds = selected.details?.map((d) => d.service_id) ?? [];
-  //   console.log(
-  //     userDatetimes.filter((u) =>
-  //       Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
-  //     )
-  //   );
-  //   const slotsArray =
-  //     artists > 0
-  //       ? userDatetimes
-  //           .filter((u) =>
-  //             Object.values(selected.users ?? {}).includes(u.user?.id ?? "")
-  //           )
-  //           .map((u) => u.slots)
-  //       : userDatetimes
-  //           .filter((u) =>
-  //             u.services.every((s) => selectedServiceIds.includes(s))
-  //           )
-  //           .map((u) => u.slots);
-  //   console.log(slotsArray);
-  //   const slots = selected.parallel
-  //     ? getCommonSlots(slotsArray, artists > 0 ? 1 : 2)
-  //     : getMergedSlots(slotsArray);
-  //   return slots;
-  // };
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [checked, setChecked] = useState(false);
   const [order, setOrder] = useState<string | null>(null);
@@ -419,7 +400,11 @@ export default function OrderPage({
       );
     if (s == 3) return selected.order_date && selected.start_time;
     if (s == 4)
-      return selected.users && Object.values(selected.users).length > 0 && invoice?.invoice_id;
+      return (
+        selected.users &&
+        Object.values(selected.users).length > 0 &&
+        invoice?.invoice_id
+      );
   };
 
   return (
@@ -534,7 +519,7 @@ export default function OrderPage({
               showError={showError}
             />
           )}
-          {step === 3 && slots != null && (
+          {step === 3 && userService != null && (
             <Step3
               showError={showError}
               values={{
@@ -547,7 +532,7 @@ export default function OrderPage({
               users={userMap}
               services={serviceMap}
               onChange={setField}
-              slots={slots}
+              slots={userService}
             />
           )}
           {step === 4 && (

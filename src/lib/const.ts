@@ -198,6 +198,12 @@ export const OrderStatusValues = {
   [OrderStatus.Friend]: "Танил",
 };
 
+export const ActiveOrderStatuses = [
+  OrderStatus.Active,
+  OrderStatus.Friend,
+  OrderStatus.Pending,
+];
+
 export const button =
   " whitespace-nowrap text-sm transition-all h-auto py-2  rounded-full bg-rose-500/90 hover:bg-pink-600 text-white hover:scale-105 font-medium shadow-lg shadow-rose-200/50 px-5 duration-300";
 

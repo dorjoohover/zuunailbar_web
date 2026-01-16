@@ -8,6 +8,7 @@ import { Textarea } from "@heroui/input";
 import { motion } from "motion/react";
 import LoadingScreen from "./loading";
 import { isSameDay } from "date-fns";
+import { Slot } from "@/models/slot.model";
 interface Step2Props {
   errors: {
     date?: string;
@@ -25,7 +26,7 @@ interface Step2Props {
   };
   limit: number;
   loading: boolean;
-  slots: Record<string, number[]>;
+  slots: Record<string, Slot[]>;
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
 }
 
@@ -53,11 +54,25 @@ export default function Step2({
       return false;
 
     // slot байгаа бол unavailable
-    return slots[toYMD(date)] !== undefined;
+    return slots[toYMD(date) as any] !== undefined;
   };
+  console.log(slots);
   const duration = values.parallel
     ? Math.max(...(values.details?.map((item) => item?.duration ?? 0) ?? [0]))
     : values.details?.reduce((acc, item) => acc + (item?.duration ?? 0), 0);
+  console.log(values.date, "values date");
+  const dayKey = values.date && (toYMD(values.date as any) as any);
+
+  const uniqueSlots = slots[dayKey]
+    ? Array.from(
+        new Map(
+          slots[dayKey].map((slot) => [
+            slot.start_time,
+            slot, // start_time ижил бол эхнийх нь үлдэнэ
+          ])
+        ).values()
+      ).sort((a, b) => (a.start_time as any).localeCompare(b.start_time))
+    : [];
   return (
     <div className="w-full space-y-6">
       <div className="space-y-2">
@@ -127,33 +142,39 @@ export default function Step2({
                   <LoadingScreen />
                 </motion.div>
               ) : values.date ? (
-                slots[toYMD(values.date)]?.map((time, i) => {
+                uniqueSlots.map((slot, i) => {
+                  const time = slot.start_time?.toString().slice(0, 5);
                   const selectedDate = new Date(
                     values.date as unknown as string
                   );
                   const now = new Date();
 
                   const isToday = isSameDay(selectedDate, now);
-                  const isPastTime = isToday && now.getHours() >= Number(time);
+
+                  const [h, m] = time.split(":").map(Number);
+                  const isPastTime =
+                    isToday &&
+                    (now.getHours() > h ||
+                      (now.getHours() === h && now.getMinutes() >= m));
 
                   if (isPastTime) return null;
 
-                  const isSelected = values.time === String(time);
+                  const isSelected = values.time === time;
 
                   return (
                     <button
-                      key={i}
+                      key={time} // ⚠️ i биш
                       type="button"
-                      onClick={() => onChange("start_time", String(time))}
+                      onClick={() => onChange("start_time", time)}
                       className={`text-center shadow-sm shadow-rose-500/10 text-sm border p-2 transition-all duration-300 hover:shadow-sm rounded-lg
-      ${
-        isSelected
-          ? "border-none bg-rose-500/90 text-primary-foreground"
-          : "border-rose-400/50 bg-rose-50 text-rose-800 hover:border-rose-600/50"
-      }
-    `}
+        ${
+          isSelected
+            ? "border-none bg-rose-500/90 text-primary-foreground"
+            : "border-success-100 bg-success-50 text-success-600 hover:border-success-600/50"
+        }
+      `}
                     >
-                      {formatTime(time)}
+                      {time}
                     </button>
                   );
                 })

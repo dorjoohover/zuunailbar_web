@@ -18,7 +18,7 @@ import { Clock, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 export const AlertDialog = ({
   isOpen,
@@ -26,12 +26,14 @@ export const AlertDialog = ({
   title = " Та итгэлтэй байна уу",
   text = "Баталгаажсан",
   submit,
+  children,
 }: {
   isOpen: boolean;
   onOpenChange: (e: boolean) => void;
   title?: string;
   text?: string;
   submit: () => void;
+  children?: ReactNode;
 }) => {
   return (
     <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -39,7 +41,7 @@ export const AlertDialog = ({
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">{title}</ModalHeader>
-
+            {children}
             <ModalFooter>
               <Button color="danger" variant="light" onPress={onClose}>
                 Буцах
@@ -84,7 +86,7 @@ export const PaymentView = ({
       const now = mnDate();
       const diff = end.getTime() - now.getTime();
       if (diff <= 0) cancel();
-      if (+diffSeconds % 10 == 0 && +diffSeconds != 0) checkPayment();
+      if (+diffSeconds % 30 == 0 && +diffSeconds != 0) checkPayment();
       setTimeLeft(diff > 0 ? diff : 0);
     }, 1000);
 
@@ -120,7 +122,12 @@ export const PaymentView = ({
         }}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-      />
+        text="Зөвшөөрөх"
+      >
+        <div className="px-6">
+          <p>Та цагаа цуцалвал урьдчилгаа буцаагдахгүй.</p>
+        </div>
+      </AlertDialog>
       <div className="flex mb-4 justify-between items-center">
         <p className="">Төлбөр гүйцээх</p>
         <button

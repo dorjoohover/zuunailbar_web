@@ -2,13 +2,25 @@ import { getDayName, money } from "@/lib/functions";
 import { Branch, BranchService, Order, Service, User } from "@/models";
 import { Api } from "@/utils/api";
 import { Checkbox } from "@heroui/checkbox";
-import { Calendar, Clock, DollarSign, LocationEdit, Users } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  DollarSign,
+  LocationEdit,
+  Users,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import CustomImage from "./image";
 import { ReactNode } from "react";
 import { OrderStatus } from "@/lib/constants";
-import { mnDate } from "@/lib/const";
+import { ActiveOrderStatuses, mnDate } from "@/lib/const";
 import { cn } from "@/lib/utils";
+import { AlertDialog } from "@/app/order/components/payment";
+import { useDisclosure } from "@heroui/modal";
+import { addToast } from "@heroui/toast";
+import { find } from "@/app/(api)";
+import { useRouter } from "next/navigation";
 export const LocationCard = ({
   data,
   selected,
@@ -230,6 +242,14 @@ export const statusConfig = {
 };
 
 export function OrderCard({ data }: { data: Order }) {
+  const router = useRouter();
+  const cancel = async () => {
+    const res = await find(Api.order, {}, `cancel/${data.id}`);
+    addToast({
+      title: `Захиалга амжилттай цуцлагдлаа.`,
+    });
+    router.push("/");
+  };
   const {
     order_date,
     order_status,
@@ -245,8 +265,21 @@ export function OrderCard({ data }: { data: Order }) {
 
   const artist = artist_name?.split(" ");
   const date = new Date(order_date);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   return (
-    <div className="bg-white rounded-2xl h-full p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+    <div className="bg-white rounded-2xl group h-full p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
+      <AlertDialog
+        submit={() => {
+          cancel();
+        }}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        text="Зөвшөөрөх"
+      >
+        <div className="px-6">
+          <p>Та цагаа цуцалвал урьдчилгаа буцаагдахгүй.</p>
+        </div>
+      </AlertDialog>
       {/* Artist Name */}
       <div className="flex items-start justify-between mb-3">
         <h3 className="text-rose-600">{artist?.[0]}</h3>
@@ -287,6 +320,19 @@ export function OrderCard({ data }: { data: Order }) {
           {money((total_amount ?? pre_amount ?? 0).toString())} ₮
         </span>
       </div>
+      {ActiveOrderStatuses.includes(data.order_status) ? (
+        <div className="flex justify-end">
+          <button
+            className="flex border-rose-500 border rounded-md px-2 py-1 bg-rose-50 text-rose-600 items-center cursor-pointer gap-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpen();
+            }}
+          >
+            <X size={14} /> Цуцлах
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
