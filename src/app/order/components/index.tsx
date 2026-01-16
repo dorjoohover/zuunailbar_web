@@ -133,6 +133,7 @@ export default function OrderPage({
   const prev = () => {
     fetcher(step - 1);
   };
+  const [cant, setCant] = useState<boolean | undefined>(undefined);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const activeErrors =
     step === 1
@@ -154,11 +155,11 @@ export default function OrderPage({
     fetcher(step + 1);
   };
 
-  const getSlots = async () => {
+  const getSlots = async (parallel?: boolean) => {
     const body = {
       branch_id: selected.branch_id,
       services: selected.details?.map((s) => s.service_id),
-      parallel: selected.parallel,
+      parallel,
     };
     console.log(body);
     const res = await find<Slot>(Api.order, body, "slots");
@@ -192,7 +193,6 @@ export default function OrderPage({
     );
     // serviceId: artists
     const data: OrderSlot = userServices.data.payload;
-    console.log(data);
     const slots =
       availableSlots[toYMD(new Date(selected.order_date as Date))] ?? [];
 
@@ -202,7 +202,6 @@ export default function OrderPage({
       )
       .map((s) => s.artist_id);
 
-    console.log(artistIds);
     const result = Object.fromEntries(
       Object.entries(data)
         .map(([service, artists]) => [
@@ -211,17 +210,35 @@ export default function OrderPage({
         ])
         .filter(([_, artists]) => artists.length > 0)
     );
-    console.log(result);
-    setUserService(result);
+    return result;
+  };
+
+  const step3Checker = async () => {
+    let result = await getArtists();
+    const checker = selected.details?.every((detail) => {
+      console.log(result[detail.service_id]);
+      return result[detail.service_id].length <= 1;
+    });
+    console.log(selected.parallel, checker, "check");
+    if (selected.parallel && checker) {
+      setField("parallel", false);
+      await getSlots(false);
+      result = await getArtists();
+      setUserService(result);
+      setCant(true);
+    } else {
+      setCant(false);
+      setUserService(result);
+    }
   };
 
   const fetcher = async (currentStep: number) => {
     if (currentStep == 1) setField("users", undefined);
     if (currentStep == 2) {
-      await getSlots();
+      await getSlots(selected.parallel);
     }
     if (currentStep == 3) {
-      getArtists();
+      step3Checker();
     }
     // onSubmit();
     go(currentStep);
@@ -531,6 +548,7 @@ export default function OrderPage({
               }}
               users={userMap}
               services={serviceMap}
+              cant={cant}
               onChange={setField}
               slots={userService}
             />

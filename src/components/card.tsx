@@ -232,7 +232,7 @@ export const statusConfig = {
   [OrderStatus.ABSENT]: {
     bg: "bg-gray-100",
     text: "text-secondary-foreground",
-    label: "Ирээгүй",
+    label: "Цуцалсан",
   },
   [OrderStatus.Friend]: {
     bg: "bg-purple-100",

@@ -16,6 +16,7 @@ interface Step3Props {
     order_date?: Date | string;
     start_time?: string;
   };
+  cant?: boolean;
   slots: OrderSlot;
 
   // eniig hiine
@@ -33,15 +34,22 @@ export default function Step3({
   showError,
   services,
   values,
+  cant,
   // clearError,
 }: Step3Props) {
   return (
     <div className="w-full space-y-6">
+      {cant && (
+        <div className="mb-2 rounded-md bg-rose-50 border border-rose-100 p-3">
+          <p className="text-md mb-1 font-medium text-rose-800">Санамж</p>
+          <p className="text-sm text-rose-700">
+            Таны сонгосон цагт 2 артист зэрэг үйлчлэх боломжгүй тул 1 артист
+            дарааллаар үйлчилгээг үзүүлэхийг анхаарна уу.
+          </p>
+        </div>
+      )}
       <div className="space-y-2">
         <p className="font-medium ">Артист сонгох </p>
-        {/* <p className="text-gray-500 text-xs">
-          Артистаа сонгох эсвэл автоматаар хуваарилах боломжтой.
-        </p> */}
       </div>
       {Object.keys(values.users).length === 0 ? (
         <div className="w-full  border-rose-400/50 flex justify-center items-center border bg-rose-100/50 rounded-sm h-[60px]">
