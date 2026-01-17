@@ -201,7 +201,6 @@ export const OrderStatusValues = {
 export const ActiveOrderStatuses = [
   OrderStatus.Active,
   OrderStatus.Friend,
-  OrderStatus.Pending,
 ];
 
 export const button =
