@@ -227,7 +227,7 @@ export const statusConfig = {
   [OrderStatus.Cancelled]: {
     bg: "bg-red-100",
     text: "text-red-700",
-    label: "Цуцлагдсан",
+    label: "Урьдчилгаа төлбөр төлөөгүй тул цуцлагдсан",
   },
   [OrderStatus.ABSENT]: {
     bg: "bg-gray-100",
@@ -274,10 +274,10 @@ export function OrderCard({ data }: { data: Order }) {
         }}
         isOpen={isOpen}
         onOpenChange={onOpenChange}
-        text="Зөвшөөрөх"
+        text="Цаг цуцлах"
       >
         <div className="px-6">
-          <p>Та цагаа цуцалвал урьдчилгаа буцаагдахгүй.</p>
+          <p>Та захиалсан цагаа цуцалсан тохиолдолд урьдчилгаа төлбөр буцаан олгогдохгүй болохыг анхаарна уу. Та үүнийг зөвшөөрч байвал цаг цуцлах товчийг дарна уу?.</p>
         </div>
       </AlertDialog>
       {/* Artist Name */}

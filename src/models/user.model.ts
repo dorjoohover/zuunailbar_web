@@ -36,9 +36,15 @@ export interface User {
   experience?: number;
   profile_img?: string;
   description?: string;
+
   created_at?: Date;
 }
 
+export interface UserPassword {
+  newPassword?: string;
+  repeatPassword?: string;
+  password?: string;
+}
 export interface ILoginUser {
   mobile: string;
   password: string;

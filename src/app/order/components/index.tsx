@@ -653,7 +653,7 @@ export default function OrderPage({
                       style={{ marginTop: 3, marginLeft: 2 }}
                     />
                   )}
-                  <span>Би үйлчилгээний нөхцөлийг уншиж, зөвшөөрч байна.</span>
+                  <span>Би үйлчилгээний нөхцөлийг зөвшөөрч байна.</span>
                 </label>
               </ModalBody>
 

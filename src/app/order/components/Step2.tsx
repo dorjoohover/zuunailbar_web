@@ -69,8 +69,8 @@ export default function Step2({
           slots[dayKey].map((slot) => [
             slot.start_time,
             slot, // start_time ижил бол эхнийх нь үлдэнэ
-          ])
-        ).values()
+          ]),
+        ).values(),
       ).sort((a, b) => (a.start_time as any).localeCompare(b.start_time))
     : [];
   return (
@@ -141,11 +141,11 @@ export default function Step2({
                 <motion.div exit={{ opacity: 0 }} className="w-full col-span-3">
                   <LoadingScreen />
                 </motion.div>
-              ) : values.date ? (
+              ) : values.date && uniqueSlots.length > 0 ? (
                 uniqueSlots.map((slot, i) => {
                   const time = slot.start_time?.toString().slice(0, 5);
                   const selectedDate = new Date(
-                    values.date as unknown as string
+                    values.date as unknown as string,
                   );
                   const now = new Date();
 
@@ -180,7 +180,7 @@ export default function Step2({
                 })
               ) : (
                 <div className="w-full mt-4 col-span-3">
-                  <p className="text-lg text-center">Цаг олдсонгүй.</p>
+                  <p className="text-lg text-center">Сул цаг байхгүй байна.</p>
                 </div>
               )}
             </div>

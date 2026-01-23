@@ -12,6 +12,7 @@ const BASE = process.env.API;
 
 export enum Api {
   login = "login",
+  resetPassword = "reset_password",
   home = "home",
   register = "register",
   user = "user",
@@ -45,6 +46,7 @@ export const API = {
   [Api.otp]: BASE + "otp",
   [Api.send_otp]: BASE + "send/otp",
   [Api.send_otp_forget]: BASE + "forget/otp",
+  [Api.resetPassword]: BASE + "reset_password",
   [Api.forget]: BASE + "forget",
   [Api.home]: BASE + "home",
   [Api.user]: BASE + "user",

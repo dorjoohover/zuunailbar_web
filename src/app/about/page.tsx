@@ -24,8 +24,8 @@ export default function Page() {
             <br /> Чанар
             <span className="gradient-text"> Стандарт</span>
           </h1>
-          <p className="max-w-2xl mb-2 mx-auto text-lg sm:text-xl text-dark-200">
-            {" "}
+          <p className="max-w-2xl mb-2 mx-auto text-lg text-justify sm:text-xl text-dark-200">
+          {" "}
             Zu Nailbar хумсны салон нь 2018 оноос хойш тасралтгүй үйл
             ажиллагаагаа явуулж байгаа бөгөөд 2021 онд Солонгос улсын чанар,
             аюулгүй байдлын стандартыг бүрэн хангасан Yogurt хумсны будагны

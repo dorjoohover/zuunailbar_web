@@ -2,7 +2,7 @@
 import { OrderCard } from "@/components/card";
 import { getEnumValues, ListType, OrderStatusValues } from "@/lib/const";
 import { OrderStatus } from "@/lib/constants";
-import { money } from "@/lib/functions";
+import { money, parseDate } from "@/lib/functions";
 import { cn } from "@/lib/utils";
 import { Order } from "@/models";
 import {
@@ -14,6 +14,10 @@ import {
 } from "@heroui/modal";
 import {
   Building,
+  Calendar,
+  Calendar1,
+  CalendarCheck,
+  CalendarX,
   CircleCheck,
   Clock,
   Clock4,
@@ -33,7 +37,7 @@ export const MyOrderPage = ({
   params?: string;
 }) => {
   const pathname = usePathname();
-  const invisibleStatus = [OrderStatus.Cancelled, OrderStatus.Friend];
+  const invisibleStatus = [OrderStatus.Friend];
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const view = async (id: string) => {
@@ -46,7 +50,7 @@ export const MyOrderPage = ({
         <h2 className="text-gray-900">Захиалгууд</h2>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 max-w-7xl mb-10">
+      <div className="grid grid-cols-5 gap-4 max-w-7xl mb-10">
         {getEnumValues(OrderStatus).map((status, i) => {
           if (invisibleStatus.includes(status)) return;
           return (
@@ -57,7 +61,7 @@ export const MyOrderPage = ({
                 "px-4 py-2 text-center  text-sm rounded-md hover:bg-500/50 transition-all duration-300 bg-rose-300 text-white",
                 (params ?? `${OrderStatus.Active}`)?.includes(status.toString())
                   ? "bg-rose-500"
-                  : ""
+                  : "",
               )}
             >
               {OrderStatusValues[status]}
@@ -129,8 +133,21 @@ export const MyOrderPage = ({
                           </div>
                           <div className="mb-2">
                             <p className="text-sm text-muted-foreground mb-1">
+                              <p className="text-sm text-muted-foreground mb-1">
+                                Цаг захиалга хийсэн огноо
+                              </p>
+                            </p>
+
+                            <p className="flex gap-2 items-center ">
+                              <Calendar className="text-primary" size={20} />
+                              {selectedOrder.order_date}
+                            </p>
+                          </div>
+                          <div className="mb-2">
+                            <p className="text-sm text-muted-foreground mb-1">
                               Эхлэх цаг
                             </p>
+
                             <p className="flex gap-2 items-center ">
                               <Clock4 className="text-primary" size={20} />
                               {detail.start_time?.slice(0, 5)}
@@ -174,6 +191,50 @@ export const MyOrderPage = ({
                           </p>
                           <span>{pre}</span>
                         </div>
+                        <div className="mb-2">
+                          <p className="text-sm text-muted-foreground flex gap-2 items-center ">
+                            <Calendar1 className="text-primary" size={20} />
+                            Цаг захиалга үүсгэсэн огноо
+                          </p>
+                          <span>
+                            {parseDate(
+                              new Date(
+                                selectedOrder?.created_at as unknown as string,
+                              ),
+                              true,
+                            )}
+                          </span>
+                        </div>
+                        {selectedOrder?.updated_at && (
+                          <div className="mb-2">
+                            <p className="text-sm text-muted-foreground flex gap-2 items-center ">
+                              {selectedOrder.order_status ==
+                                OrderStatus.Active && (
+                                <CalendarCheck
+                                  className="text-primary"
+                                  size={20}
+                                />
+                              )}
+                              {selectedOrder.order_status ==
+                                OrderStatus.Cancelled && (
+                                <CalendarX className="text-primary" size={20} />
+                              )}
+                              {selectedOrder.order_status ==
+                              OrderStatus.Cancelled
+                                ? "Цаг цуцлагдсан огноо"
+                                : selectedOrder.order_status ==
+                                    OrderStatus.Active
+                                  ? "Төлбөр төлж баталгаажсан огноо"
+                                  : ""}
+                            </p>
+                            <span>
+                              {parseDate(
+                                new Date(selectedOrder?.updated_at.toString()),
+                                true,
+                              )}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
