@@ -49,9 +49,9 @@ export default function Step1({
       pre?: number;
     }[]
   >([]);
-  const filteredServices = branch_services.items.filter(
-    (service) => service.branch_id == values.branch
-  );
+  const filteredServices = branch_services.items
+    .filter((service) => service.branch_id == values.branch)
+    .sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
   return (
     <div className="flex flex-col items-center justify-center w-full space-y-4 ">
       <div className="flex flex-col xs:flex-row justify-between w-full gap-4">
@@ -158,9 +158,9 @@ export default function Step1({
                 <p className="text-sm text-muted-foreground">
                   Эдгээр үйлчилгээг хоёр артист нэгэн зэрэг хийж болно.
                   <br />
-                  Та үйлчилгээг <b>зэрэг </b> (маникюр, педикюрийг 2
-                  артист нэгэн зэрэг хийх) эсвэл <b>дарааллаар</b> (нэг артист
-                  нэг нэгээр нь хийх) авах уу?
+                  Та үйлчилгээг <b>зэрэг </b> (маникюр, педикюрийг 2 артист
+                  нэгэн зэрэг хийх) эсвэл <b>дарааллаар</b> (нэг артист нэг
+                  нэгээр нь хийх) авах уу?
                 </p>
               </ModalBody>
               <ModalFooter>
@@ -210,7 +210,7 @@ export const totalPrice = ({
   // Нийт max
   const totalMax = selectedServices.reduce(
     (sum, s) => sum + +(s.max_price ?? s.min_price),
-    0
+    0,
   );
 
   // Дисплейд

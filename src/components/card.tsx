@@ -36,6 +36,7 @@ export const LocationCard = ({
       onClick={() => onClick(data.id)}
     >
       <h2 className="text-sm font-medium">{data.name}</h2>
+
       <p className="text-muted-foreground text-sm">{data.address}</p>
     </div>
   );
@@ -58,7 +59,7 @@ export const ServiceCard = ({
             ? "border-slate-200 bg-rose-50 hover:border-rose-200"
             : "border-slate-200 bg-slate-100 text-slate-700 hover:border-slate-300"
         }`,
-        selected ? "border-rose-600/50 border-2" : ""
+        selected ? "border-rose-600/50 border-2" : "",
       )}
       onClick={() => onClick(data.service_id)}
     >
@@ -71,10 +72,12 @@ export const ServiceCard = ({
           color="default"
         />
         <div className="flex flex-col gap-1">
-          <h2 className="text-sm font-medium">{data.meta?.serviceName}</h2>
+          <h2 className="text-sm font-medium">
+            {data.custom_name ?? data.meta?.serviceName}
+          </h2>
 
           <p className="text-muted-foreground min-h-[1.6rem] leading-4 text-xs line-clamp-2">
-            {data.meta?.description || "\u00A0"}
+            {data.custom_description ?? (data.meta?.description || "\u00A0")}
           </p>
 
           <div className="flex gap-2 mt-1">
@@ -99,7 +102,7 @@ export const ServiceCard = ({
           data.min_price.toString(),
           "",
           1,
-          data.max_price ? 2 : undefined
+          data.max_price ? 2 : undefined,
         )}
         {data.max_price &&
           data.max_price != data.min_price &&
@@ -153,6 +156,7 @@ export const ArtistCard = ({
         </div>
       </div>
     );
+  console.log(data);
   return (
     <div
       className={`h-[60px] col-span-6 xs:col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-rose-400/50 bg-rose-100/50" : selected ? "border-rose-600/50 bg-rose-100/50" : "border-rose-100"} duration-300 ease-out hover:shadow-lg transition-shadow`}
@@ -277,7 +281,11 @@ export function OrderCard({ data }: { data: Order }) {
         text="Цаг цуцлах"
       >
         <div className="px-6">
-          <p>Та захиалсан цагаа цуцалсан тохиолдолд урьдчилгаа төлбөр буцаан олгогдохгүй болохыг анхаарна уу. Та үүнийг зөвшөөрч байвал цаг цуцлах товчийг дарна уу?.</p>
+          <p>
+            Та захиалсан цагаа цуцалсан тохиолдолд урьдчилгаа төлбөр буцаан
+            олгогдохгүй болохыг анхаарна уу. Та үүнийг зөвшөөрч байвал цаг
+            цуцлах товчийг дарна уу?.
+          </p>
         </div>
       </AlertDialog>
       {/* Artist Name */}

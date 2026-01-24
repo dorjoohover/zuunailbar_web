@@ -90,7 +90,7 @@ export default function OrderPage({
   // zasna
   const [userService, setUserService] = useState<OrderSlot>({});
   const [availableSlots, setAvailableSlots] = useState<Record<string, Slot[]>>(
-    {}
+    {},
   );
 
   const [limit, setLimit] = useState(7);
@@ -105,12 +105,12 @@ export default function OrderPage({
     () => ({
       branch: selected.branch_id ? undefined : "Салбараа сонгоно уу!",
       service: (selected.details as IOrderDetail[])?.some(
-        (d) => d?.service_id != undefined
+        (d) => d?.service_id != undefined,
       )
         ? undefined
         : "Үйлчилгээгээ сонгоно уу!",
     }),
-    [selected.branch_id, selected.details as IOrderDetail[]]
+    [selected.branch_id, selected.details as IOrderDetail[]],
   );
 
   const step2Errors = useMemo(
@@ -118,7 +118,7 @@ export default function OrderPage({
       date: selected.order_date ? undefined : "Захиалгын өдрөө сонгоно уу!",
       time: selected.start_time ? undefined : "Захиалгын цагаа сонгоно уу!",
     }),
-    [selected.order_date, selected.start_time]
+    [selected.order_date, selected.start_time],
   );
   const total = 4;
   const [step, setStep] = useState(1);
@@ -143,7 +143,7 @@ export default function OrderPage({
         : ({} as Record<string, string | undefined>);
   const isStepComplete = useMemo(
     () => Object.values(activeErrors).every((v) => !v),
-    [activeErrors]
+    [activeErrors],
   );
 
   const handleNext = () => {
@@ -176,7 +176,7 @@ export default function OrderPage({
         acc[key].push({ ...item, key });
         return acc;
       },
-      {} as Record<string, Slot[]>
+      {} as Record<string, Slot[]>,
     );
     setAvailableSlots(data);
   };
@@ -189,7 +189,7 @@ export default function OrderPage({
         services:
           (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
       },
-      "client"
+      "client",
     );
     // serviceId: artists
     const data: OrderSlot = userServices.data.payload;
@@ -198,7 +198,7 @@ export default function OrderPage({
 
     const artistIds = slots
       .filter(
-        (s) => s.start_time?.toString().slice(0, 5) === selected.start_time
+        (s) => s.start_time?.toString().slice(0, 5) === selected.start_time,
       )
       .map((s) => s.artist_id);
 
@@ -208,18 +208,18 @@ export default function OrderPage({
           service,
           artists.filter((a) => artistIds.includes(a)),
         ])
-        .filter(([_, artists]) => artists.length > 0)
+        .filter(([_, artists]) => artists.length > 0),
     );
     return result;
   };
 
   const step3Checker = async () => {
     let result = await getArtists();
-    const checker = selected.details?.every((detail) => {
-      console.log(result[detail.service_id]);
-      return result[detail.service_id].length <= 1;
+    let checker = selected.details?.every((detail) => {
+      if (result[detail.service_id] == undefined) return true;
+      return result[detail.service_id]?.length <= 1;
     });
-    console.log(selected.parallel, checker, "check");
+
     if (selected.parallel && checker) {
       setField("parallel", false);
       await getSlots(false);
@@ -306,7 +306,7 @@ export default function OrderPage({
 
       // parallel биш — 1 artist
       const availableTimes = userDatetimes.filter(
-        (u) => u.service_id === service && u.slots?.[day]?.includes(startHour)
+        (u) => u.service_id === service && u.slots?.[day]?.includes(startHour),
       );
 
       const selectedUser = selected.users?.[service] ?? selected.users?.[0];
@@ -389,7 +389,7 @@ export default function OrderPage({
         return undefined;
       }
       const matchedUsers = users.items.filter((u) =>
-        selected_users.includes(u.id)
+        selected_users.includes(u.id),
       );
 
       const uniqueUserIds = Array.from(new Set(matchedUsers.map((u) => u.id)));
@@ -423,6 +423,7 @@ export default function OrderPage({
         invoice?.invoice_id
       );
   };
+  console.log(branch_services)
 
   return (
     <div className="relative py-10">
@@ -505,7 +506,7 @@ export default function OrderPage({
                 branch: selected.branch_id,
                 services:
                   (selected.details as IOrderDetail[])?.map(
-                    (d) => d.service_id
+                    (d) => d.service_id,
                   ) ?? [],
               }}
               showError={showError}
@@ -580,7 +581,7 @@ export default function OrderPage({
                 className={cn(
                   isStepComplete ? "" : "",
                   button,
-                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center"
+                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
                 )}
                 onPress={handleNext}
               >
@@ -592,7 +593,7 @@ export default function OrderPage({
                 className={cn(
                   isStepComplete ? "" : "",
                   button,
-                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center"
+                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
                 )}
               >
                 Илгээх
@@ -675,7 +676,7 @@ export default function OrderPage({
                   }}
                   className={cn(
                     button,
-                    "text-white border shadow-xl h-8 border-white/5 rounded-sm w-28 aspect-square flex-center"
+                    "text-white border shadow-xl h-8 border-white/5 rounded-sm w-28 aspect-square flex-center",
                   )}
                 >
                   Үргэлжлүүлэх

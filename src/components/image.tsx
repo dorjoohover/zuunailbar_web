@@ -13,18 +13,17 @@ export default function CustomImage({
   alt?: string;
 }) {
   const [imgSrc, setImgSrc] = useState(
-    img ? `/api/file/${img}` : "/logo/zu-black.png"
+    img ? `/api/file/${img}` : "/logo/zu-black.png",
   );
 
   return (
     <Image
-      src={imgSrc}
+      src={`/api/file/${img}`}
       objectFit="contain"
       alt={alt ?? "logo"}
       width={w ?? 50}
       className="h-full rounded-full"
       height={h ?? 50}
-      onError={() => setImgSrc("/logo/zu-black.png")} // fallback зураг
     />
   );
 }
