@@ -93,7 +93,6 @@ export default function OrderPage({
     {},
   );
 
-  const [limit, setLimit] = useState(7);
   const [showError, setShowError] = useState(false);
   function setField<K extends keyof IOrder>(key: K, value: IOrder[K]) {
     setSelected((prev) => ({ ...prev, [key]: value }));
@@ -161,7 +160,6 @@ export default function OrderPage({
       services: selected.details?.map((s) => s.service_id),
       parallel,
     };
-    console.log(body);
     const res = await find<Slot>(Api.order, body, "slots");
     // console.log(res);
 
@@ -178,7 +176,28 @@ export default function OrderPage({
       },
       {} as Record<string, Slot[]>,
     );
-    setAvailableSlots(data);
+    let date;
+
+    const keys = Object.keys(data);
+
+    for (const k of keys) {
+      const value = data[k];
+      if (value?.length > 0) {
+        date = k;
+        break;
+      }
+    }
+
+    if (!date) {
+      addToast({
+        title: "Тухайн үйлчилгээнд сул цаг одоогоор дууссан байна.",
+      });
+
+      return;
+    } else {
+      setField("order_date", new Date(date));
+      setAvailableSlots(data);
+    }
   };
   const getArtists = async () => {
     // selected.start_time, selected.parallel, selected.order_date;
@@ -191,7 +210,16 @@ export default function OrderPage({
       },
       "client",
     );
+    if (userServices.error) {
+      fetcher(2);
+      addToast({
+        title: userServices.error ?? "Алдаа гарлаа",
+        color: "warning",
+      });
+      return;
+    }
     // serviceId: artists
+
     const data: OrderSlot = userServices.data.payload;
     const slots =
       availableSlots[toYMD(new Date(selected.order_date as Date))] ?? [];
@@ -233,7 +261,9 @@ export default function OrderPage({
   };
 
   const fetcher = async (currentStep: number) => {
-    if (currentStep == 1) setField("users", undefined);
+    if (currentStep == 1) {
+      setField("users", undefined);
+    }
     if (currentStep == 2) {
       await getSlots(selected.parallel);
     }
@@ -247,13 +277,6 @@ export default function OrderPage({
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [step]);
-
-  const reset = () => {
-    setSelected({ details: [] });
-    setUserDateTimes([]);
-    setLimit(7);
-    go(1);
-  };
 
   const formatDetails = () => {
     const details: IOrderDetail[] = [];
@@ -336,16 +359,17 @@ export default function OrderPage({
       method: PaymentMethod.P2P,
       parallel: selected.parallel,
     };
-    console.log(payload);
     const res = await create<IOrder>(Api.order, payload);
     if (!res.success) {
       addToast({
         title: res.error ?? "Алдаа гарлаа дахин оролдоно уу",
-        color: "danger",
+        color: "warning",
       });
+
+      fetcher(2);
+
       return;
     }
-    console.log(res.data.payload);
     if (res.data?.payload?.invoice) {
       setInvoice(res.data.payload.invoice);
       setOrder(res.data.payload.id);
@@ -423,7 +447,6 @@ export default function OrderPage({
         invoice?.invoice_id
       );
   };
-  console.log(branch_services)
 
   return (
     <div className="relative py-10">
@@ -531,7 +554,6 @@ export default function OrderPage({
               }}
               loading={false}
               slots={availableSlots}
-              limit={limit}
               errors={step2Errors}
               onChange={setField}
               showError={showError}

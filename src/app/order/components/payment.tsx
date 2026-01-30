@@ -72,7 +72,9 @@ export const PaymentView = ({
 }) => {
   const end = mnDate(invoice.created);
   end.setMinutes(end.getMinutes() + 10); // 10 минут нэмэх
-  const [timeLeft, setTimeLeft] = useState(end.getTime() - mnDate().getTime());
+  const endTime = end.getTime();
+  const time = mnDate().getTime();
+  const [timeLeft, setTimeLeft] = useState(endTime - time);
 
   let diffMinutes = Math.floor(timeLeft / (1000 * 60)).toString();
   let diffSeconds = Math.floor((timeLeft % (1000 * 60)) / 1000).toString();
@@ -86,7 +88,7 @@ export const PaymentView = ({
       const now = mnDate();
       const diff = end.getTime() - now.getTime();
       if (diff <= 0) cancel();
-      if (+diffSeconds % 30 == 0 && +diffSeconds != 0) checkPayment();
+      if (+diffSeconds % 15 == 0) checkPayment();
       setTimeLeft(diff > 0 ? diff : 0);
     }, 1000);
 

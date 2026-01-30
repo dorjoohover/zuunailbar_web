@@ -1,7 +1,7 @@
 "use client";
 import { Calendar } from "@heroui/calendar";
 import { Clock1 } from "lucide-react";
-import { DateValue, fromDate } from "@internationalized/date";
+import { CalendarDate, DateValue, fromDate } from "@internationalized/date";
 import { IOrder, IOrderDetail } from "@/models";
 import { formatTime, selectDate, toYMD } from "@/lib/functions";
 import { Textarea } from "@heroui/input";
@@ -9,6 +9,7 @@ import { motion } from "motion/react";
 import LoadingScreen from "./loading";
 import { isSameDay } from "date-fns";
 import { Slot } from "@/models/slot.model";
+import { useMemo } from "react";
 interface Step2Props {
   errors: {
     date?: string;
@@ -24,7 +25,6 @@ interface Step2Props {
     parallel?: boolean;
     // users?: Record<string, string>;
   };
-  limit: number;
   loading: boolean;
   slots: Record<string, Slot[]>;
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
@@ -56,11 +56,9 @@ export default function Step2({
     // slot байгаа бол unavailable
     return slots[toYMD(date) as any] !== undefined;
   };
-  console.log(slots);
   const duration = values.parallel
     ? Math.max(...(values.details?.map((item) => item?.duration ?? 0) ?? [0]))
     : values.details?.reduce((acc, item) => acc + (item?.duration ?? 0), 0);
-  console.log(values.date, "values date");
   const dayKey = values.date && (toYMD(values.date as any) as any);
 
   const uniqueSlots = slots[dayKey]
@@ -73,6 +71,7 @@ export default function Step2({
         ).values(),
       ).sort((a, b) => (a.start_time as any).localeCompare(b.start_time))
     : [];
+
   return (
     <div className="w-full space-y-6">
       <div className="space-y-2">
@@ -90,6 +89,9 @@ export default function Step2({
                 onChange("start_time", undefined);
               }}
               defaultValue={
+                values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
+              }
+              defaultFocusedValue={
                 values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
               }
               errorMessage={"Буруу өдөр сонгосон."}
