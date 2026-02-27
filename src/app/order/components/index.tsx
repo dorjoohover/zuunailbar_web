@@ -207,6 +207,9 @@ export default function OrderPage({
         branch_id: selected.branch_id,
         services:
           (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
+        order_date: selected.order_date,
+        start_time: selected.start_time,
+        parallel: selected.parallel,
       },
       "client",
     );
