@@ -5,9 +5,9 @@ export enum METHOD {
   patch = "PATCH",
   delete = "DELETE",
 }
-const BASE = process.env.API;
-// ? process.env.API
-// : "https://api.zunailbar.mn/api/v1/";
+const BASE = process.env.API
+? process.env.API
+: "https://api.zunailbar.mn/api/v1/";
 // : "https://api.zunailbar.mn/api/v1/";
 
 export enum Api {

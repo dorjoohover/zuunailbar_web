@@ -162,7 +162,7 @@ export default function OrderPage({
     };
     const res = await find<Slot>(Api.order, body, "slots");
     // console.log(res);
-
+    console.log(res.data);
     const data: Record<string, Slot[]> = (res.data as unknown as Slot[]).reduce(
       (acc, item) => {
         const key = toYMD(new Date(item.date));

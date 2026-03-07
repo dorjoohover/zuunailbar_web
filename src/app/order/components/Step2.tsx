@@ -9,7 +9,7 @@ import { motion } from "motion/react";
 import LoadingScreen from "./loading";
 import { isSameDay } from "date-fns";
 import { Slot } from "@/models/slot.model";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 interface Step2Props {
   errors: {
     date?: string;
@@ -40,6 +40,7 @@ export default function Step2({
 
   values,
 }: Step2Props) {
+  console.log(slots);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -71,7 +72,31 @@ export default function Step2({
         ).values(),
       ).sort((a, b) => (a.start_time as any).localeCompare(b.start_time))
     : [];
+  useEffect(() => {
+    if (!values.date || uniqueSlots.length === 0) return;
 
+    const selectedDate = new Date(values.date as unknown as string);
+    const now = new Date();
+    const isToday = isSameDay(selectedDate, now);
+
+    if (!isToday) return;
+
+    const hasFutureSlot = uniqueSlots.some((slot) => {
+      const time = slot.start_time?.toString().slice(0, 5);
+      const [h, m] = time.split(":").map(Number);
+
+      return (
+        now.getHours() < h || (now.getHours() === h && now.getMinutes() < m)
+      );
+    });
+
+    if (!hasFutureSlot) {
+      const nextDay = new Date(selectedDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      onChange("order_date", nextDay);
+    }
+  }, [values.date, uniqueSlots]);
   return (
     <div className="w-full space-y-6">
       <div className="space-y-2">
@@ -158,7 +183,6 @@ export default function Step2({
                     isToday &&
                     (now.getHours() > h ||
                       (now.getHours() === h && now.getMinutes() >= m));
-
                   if (isPastTime) return null;
 
                   const isSelected = values.time === time;
