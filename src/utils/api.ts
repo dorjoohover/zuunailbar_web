@@ -5,11 +5,11 @@ export enum METHOD {
   patch = "PATCH",
   delete = "DELETE",
 }
-const BASE = process.env.API
+const BASE = 
+process.env.API
 ? process.env.API
 : "https://api.zunailbar.mn/api/v1/";
-// : "https://api.zunailbar.mn/api/v1/";
-
+// "http://localhost:5000/api/v1/"
 export enum Api {
   login = "login",
   resetPassword = "reset_password",

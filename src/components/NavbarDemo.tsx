@@ -94,7 +94,8 @@ export function NavbarDemo({ token }: { token?: string }) {
       }
     }
   };
-
+  const pathname = usePathname();
+  if (pathname.includes("/terms")) return null;
   useEffect(() => {
     me();
   }, [token]);

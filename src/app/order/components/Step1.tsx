@@ -63,6 +63,7 @@ export default function Step1({
               onClick={(id: string) => {
                 onChange("branch_id", id);
                 onChange("details", []);
+                onChange("parallel", false);
               }}
               key={i}
             />
@@ -128,6 +129,9 @@ export default function Step1({
                     } else {
                       setChosen(updatedDetail);
                       onChange("details", updatedDetail);
+                      if (updatedDetail.length < 2) {
+                        onChange("parallel", false);
+                      }
                     }
                   }}
                   selected={selected}
