@@ -92,12 +92,33 @@ export default function OrderPage({
   const [availableSlots, setAvailableSlots] = useState<Record<string, Slot[]>>(
     {},
   );
-
+  const itemsQueue: (keyof IOrder)[] = [
+    "branch_id",
+    "details",
+    "order_date",
+    "start_time",
+    "users",
+  ];
   const [showError, setShowError] = useState(false);
   function setField<K extends keyof IOrder>(key: K, value: IOrder[K]) {
-    setSelected((prev) => ({ ...prev, [key]: value }));
-  }
+    if (key != "parallel") {
+      let index = itemsQueue.indexOf(key);
+      index = index < 0 ? 0 : index;
+      console.log(index);
+      setSelected((prev) => {
+        const updated = { ...prev, [key]: value };
 
+        for (let i = index + 1; i < itemsQueue.length; i++) {
+          const nextKey = itemsQueue[i];
+          updated[nextKey] = undefined as any;
+        }
+
+        return updated;
+      });
+    } else {
+      setSelected((prev) => ({ ...prev, [key]: value }));
+    }
+  }
   const [userDatetimes, setUserDateTimes] = useState<UserDateTime[]>([]);
 
   const step1Errors = useMemo(
@@ -476,10 +497,10 @@ export default function OrderPage({
               return (
                 <div key={i} className="flex flex-col">
                   <div
-                    className={`space-x-2 z-10 flex flex-col cursor-pointer relative px-2 bg-white flex-center `}
-                    onClick={() => {
-                      if (canJump(i + 1)) go(i + 1);
-                    }}
+                    className={`space-x-2 z-10 flex flex-col  relative px-2 bg-white flex-center `}
+                    // onClick={() => {
+                    //   if (canJump(i + 1)) go(i + 1);
+                    // }}
                   >
                     <span
                       className={`font-bolder pb-1 mb-1 text-sm ${current ? "bg-gradient-to-r from-rose-600 via-pink-600 to-rose-500 bg-clip-text text-transparent " : ""} ${!value && current ? "border-b-2 border-rose-600" : ""}`}
