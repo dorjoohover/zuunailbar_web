@@ -13,8 +13,8 @@ import {
 import Image from "next/image";
 import CustomImage from "./image";
 import { ReactNode } from "react";
-import { OrderStatus } from "@/lib/constants";
-import { ActiveOrderStatuses, mnDate } from "@/lib/const";
+import { OrderStatus, UserLevel } from "@/lib/constants";
+import { ActiveOrderStatuses, levelConfig, mnDate } from "@/lib/const";
 import { cn } from "@/lib/utils";
 import { AlertDialog } from "@/app/order/components/payment";
 import { useDisclosure } from "@heroui/modal";
@@ -133,7 +133,7 @@ export const ArtistCard = ({
         onClick={() => onClick(data.id)}
       >
         <div className="flex items-start gap-2">
-          <div className="w-[40px] h-[40px]">
+          <div className="w-[40px] h-[40px] min-w-[40px]">
             <CustomImage img={data.profile_img} w={40} h={40} />
           </div>
           <div>
@@ -156,19 +156,35 @@ export const ArtistCard = ({
         </div>
       </div>
     );
-  console.log(data);
+    const level = data.level ? levelConfig[data.level as UserLevel] : null
   return (
     <div
-      className={`h-[60px] col-span-6 xs:col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-rose-400/50 bg-rose-100/50" : selected ? "border-rose-600/50 bg-rose-100/50" : "border-rose-100"} duration-300 ease-out hover:shadow-lg transition-shadow`}
+      className={`min-h-[80px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] col-span-6 xs:col-span-3 md:col-span-3 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-rose-400/50 bg-rose-100/50" : selected ? "border-rose-600/50 bg-rose-100/50" : "border-rose-100"}  duration-300 ease-out hover:shadow-lg transition-shadow p-4`}
       onClick={() => onClick(data.id)}
     >
-      <div className="flex items-start gap-2">
-        <div className="w-[50px] h-[50px]">
-          <CustomImage img={data.profile_img} />
+      <div className="flex items-start gap-4 ">
+        <div className="w-20 h-20 min-w-20">
+          <CustomImage img={data.profile_img} w={80} h={80}/>
         </div>
         <div>
-          <h2 className="text-sm font-medium mb-1">{data.nickname}</h2>
-          <p className="text-muted-foreground text-sm line-clamp-2">
+          <div className="flex gap-4 justify-between items-center w-full">
+              
+            <h2 className="text-lg font-[700] mb-1">{data.nickname} </h2>
+          
+            <div>
+                {level && (
+              <span className={cn("flex gap-0.5 px-2 py-1 rounded-xl bg-rose-200 text-rose-700 ", )}>
+                <p className="text-xs">{level?.text ?? ''}</p>
+              </span>
+            )}
+            </div>
+            {/* {data.experience && (
+              <div className="flex gap-0.5 px-2 py-1 rounded-xl bg-rose-200 ">
+                <p className="text-xs">{data.experience} жил</p>
+              </div>
+            )} */}
+          </div>
+          <p className="text-muted-foreground text-sm ">
             {data.description}
           </p>
           <div className="flex gap-2">
@@ -176,11 +192,7 @@ export const ArtistCard = ({
               <Clock size={15} />
               <p className="text-xs">{data.duration} мин</p>
             </div> */}
-            {data.experience && (
-              <div className="flex gap-0.5 px-2 py-1 rounded-xl bg-rose-200 ">
-                <p className="text-xs">{data.experience} жил</p>
-              </div>
-            )}
+          
           </div>
         </div>
       </div>

@@ -524,9 +524,9 @@ export default function OrderPage({
               showValueLabel={true}
               classNames={{
                 svg: "w-20 h-20 drop-shadow-md",
-                indicator: "stroke-black",
-                track: "stroke-black/10",
-                value: "text-xl font-semibold text-black",
+                indicator: "stroke-rose-700",
+                track: "stroke-rose-700/20",
+                value: "text-xl font-semibold text-rose-700",
               }}
               value={(step / 4) * 100}
             />
@@ -611,13 +611,13 @@ export default function OrderPage({
           )}
 
           {/* Navigation buttons */}
-          <div className="flex w-full justify-between mt-6 px-2">
+          <div className="flex w-full justify-between gap-4 mt-6 px-2">
             <Button
               onPress={prev}
               disabled={step === 1}
               variant="bordered"
               className={
-                "h-12 w-28 border-rose-400 text-rose-500 hover:scale-105 transition-all duration-150"
+                "h-12 w-full md:w-28 border-rose-400 text-rose-500 hover:scale-105 transition-all duration-150"
               }
             >
               Буцах
@@ -627,7 +627,7 @@ export default function OrderPage({
                 className={cn(
                   isStepComplete ? "" : "",
                   button,
-                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
+                  "h-12 text-white border shadow-xl w-full md:w-28 border-white/5 rounded-xl aspect-square flex-center",
                 )}
                 onPress={handleNext}
               >
@@ -639,7 +639,7 @@ export default function OrderPage({
                 className={cn(
                   isStepComplete ? "" : "",
                   button,
-                  "h-12 text-white border shadow-xl w-28 border-white/5 rounded-xl aspect-square flex-center",
+                  "h-12 text-white border shadow-xl w-full md:w-28 border-white/5 rounded-xl aspect-square flex-center",
                 )}
               >
                 Илгээх

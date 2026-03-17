@@ -4,27 +4,15 @@ import { UserLevel } from "@/lib/constants";
 import { firstLetterUpper, mobileFormatter } from "@/lib/functions";
 import { User, UserPassword } from "@/models";
 import { Api, API } from "@/utils/api";
-import { IdCard, KeyRound, Mail, Phone, UserCog, UserPen } from "lucide-react";
+import { Crown, IdCard, KeyRound, Mail, Phone, Sparkles, UserCog, UserPen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { EditProfileModal } from "./edit";
 import { create, updateOne } from "../(api)";
 import { imageUploader } from "../(api)/base";
 import { addToast } from "@heroui/toast";
 import { ResetPasswordModal } from "./reset";
-const levelConfig = {
-  [UserLevel.GOLD]: {
-    gradient: "bg-gradient-to-r from-[#FFD700] to-[#FFA500]",
-    text: "Gold",
-  },
-  [UserLevel.SILVER]: {
-    gradient: "bg-gradient-to-r from-[#C0C0C0] to-[#E0E0E0]",
-    text: "Silver",
-  },
-  [UserLevel.BRONZE]: {
-    gradient: "bg-gradient-to-r from-[#CD7F32] to-[#D89B6E]",
-    text: "Bronze",
-  },
-};
+import { levelConfig } from "@/lib/const";
+
 export const ProfilePage = ({
   token,
   orders,

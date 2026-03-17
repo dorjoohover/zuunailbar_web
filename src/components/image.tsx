@@ -22,7 +22,7 @@ export default function CustomImage({
       objectFit="contain"
       alt={alt ?? "logo"}
       width={w ?? 50}
-      className="h-full rounded-full"
+      className="h-full rounded-md"
       height={h ?? 50}
     />
   );

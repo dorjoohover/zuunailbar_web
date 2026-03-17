@@ -22,7 +22,7 @@ import {
   UserStatus,
 } from "./enum";
 import { DateValue } from "@heroui/calendar";
-import { OrderStatus } from "./constants";
+import { OrderStatus, UserLevel } from "./constants";
 
 export const roleIconMap = {
   [ROLE.SYSTEM]: { icon: Crown, color: "yellow" },
@@ -41,6 +41,33 @@ export const RoleValue = {
   [ROLE.CLIENT]: "CLIENT",
   [ROLE.ANY]: "ANY",
   [ROLE.E_M]: "ANY",
+};
+export const levelConfig = {
+  [UserLevel.GOLD]: {
+    gradient: "bg-gradient-to-r from-[#FFD700] to-[#FFA500]",
+    text: "Gold",
+  },
+  [UserLevel.SILVER]: {
+    gradient: "bg-gradient-to-r from-[#C0C0C0] to-[#E0E0E0]",
+    text: "Silver",
+  },
+  [UserLevel.BRONZE]: {
+    gradient: "bg-gradient-to-r from-[#CD7F32] to-[#D89B6E]",
+    text: "Bronze",
+  },
+  [UserLevel.JUNIOR]: {
+    text: "Junior",
+    textColor: "#fff",
+    gradient: "bg-gradient-to-r from-orange-400 to-orange-600",
+    Icon: Sparkles,
+  },
+
+  [UserLevel.SENIOR]: {
+    text: "Senior",
+    textColor: "#fff",
+    gradient: "bg-gradient-to-r from-purple-500 to-indigo-600",
+    Icon: Crown,
+  },
 };
 
 // export const EmployeeStatusValue = {
