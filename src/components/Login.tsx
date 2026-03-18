@@ -95,7 +95,7 @@ export function AuthModal() {
     if (error) return addToast({ title: error, size: "lg", color: "danger" });
     setOtpSent(true);
     setTimer(59);
-    addToast({ title: "OTP илгээлээ", size: "lg", color: "success" });
+    addToast({ title: "4 оронтой кодыг мессежээр илгээлээ", size: "lg", color: "success" });
   };
 
   const forgetPasswordSendOtp = async () => {
@@ -113,7 +113,7 @@ export function AuthModal() {
       setTimer(0);
       return addToast({ title: error, size: "lg", color: "danger" });
     }
-    addToast({ title: "OTP илгээлээ", size: "lg", color: "success" });
+    addToast({ title: "4 оронтой кодыг имейлээр илгээлээ", size: "lg", color: "success" });
   };
 
   const handleRegister = async () => {

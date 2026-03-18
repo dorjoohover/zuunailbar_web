@@ -12,6 +12,9 @@ export function middleware(req: NextRequest) {
     pathname === "/" ||
     pathname === "/about" ||
     pathname === "/order" ||
+    pathname === "/terms" ||
+    pathname === "/deletion" ||
+    pathname === "/privacy" ||
     pathname === "/service" ||
     pathname.startsWith("/api/file") ||
     pathname.startsWith("/api/log") ||
