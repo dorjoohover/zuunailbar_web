@@ -238,3 +238,6 @@ export const text =
 
 export const icon =
   "flex items-center size-18 rounded-full transition-transform duration-300 bg-gradient-to-br from-rose-400 via-pink-400 to-rose-500 justify-center";
+
+
+  
