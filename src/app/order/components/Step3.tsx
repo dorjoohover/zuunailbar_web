@@ -146,7 +146,6 @@ export default function Step3({
                     const prevArtistId = prevKey ? values.users[prevKey] : null;
 
                     const selected = values.users[serviceId] == artistId;
-                    console.log(user);
                     return (
                       <ArtistCard
                         mini={true}

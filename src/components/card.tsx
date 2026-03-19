@@ -157,6 +157,7 @@ export const ArtistCard = ({
       </div>
     );
     const level = data.level ? levelConfig[data.level as UserLevel] : null
+    console.log(data.level)
   return (
     <div
       className={`min-h-[80px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] col-span-6 xs:col-span-3 md:col-span-3 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-rose-400/50 bg-rose-100/50" : selected ? "border-rose-600/50 bg-rose-100/50" : "border-rose-100"}  duration-300 ease-out hover:shadow-lg transition-shadow p-4`}

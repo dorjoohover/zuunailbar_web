@@ -22,7 +22,7 @@ export enum UserLevel {
   SILVER = 10,
   GOLD = 20,
   SENIOR = 110,
-  JUNIOR = 120,
+  JUNIOR = 100,
 }
 export const siteData = {
   navItems: [
