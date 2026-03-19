@@ -104,7 +104,6 @@ export default function OrderPage({
     if (key != "parallel") {
       let index = itemsQueue.indexOf(key);
       index = index < 0 ? 0 : index;
-      console.log(index);
       setSelected((prev) => {
         const updated = { ...prev, [key]: value };
 
@@ -143,10 +142,7 @@ export default function OrderPage({
   const total = 4;
   const [step, setStep] = useState(1);
   const go = async (n: number) => {
-    if (n == 4 && !order) {
-      const result = await onSubmit();
-      if (!result) return;
-    }
+  
     setStep(Math.min(Math.max(1, n), total));
   };
 
@@ -578,6 +574,7 @@ export default function OrderPage({
               }}
               loading={false}
               slots={availableSlots}
+              userService={userService}
               errors={step2Errors}
               onChange={setField}
               showError={showError}
@@ -700,7 +697,7 @@ export default function OrderPage({
                       style={{ marginTop: 3, marginLeft: 2 }}
                     />
                   )}
-                  <span>Би үйлчилгээний нөхцөлийг зөвшөөрч байна.</span>
+                  <span>Би <a href="/terms" target="_blank" className="font-bold">үйлчилгээний нөхцөлийг</a> зөвшөөрч байна.</span>
                 </label>
               </ModalBody>
 
@@ -716,9 +713,12 @@ export default function OrderPage({
                 <Button
                   color="primary"
                   isDisabled={!checked} // 👈 checkbox шалгаагүй бол disable
-                  onPress={() => {
-                    onClose();
-                    setStep(5);
+                  onPress={async () => {
+                    await onSubmit().then((d) => {
+
+                      setStep(5);
+                      onClose();
+                    })
                   }}
                   className={cn(
                     button,

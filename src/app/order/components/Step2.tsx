@@ -8,7 +8,7 @@ import { Textarea } from "@heroui/input";
 import { motion } from "motion/react";
 import LoadingScreen from "./loading";
 import { isSameDay } from "date-fns";
-import { Slot } from "@/models/slot.model";
+import { OrderSlot, Slot } from "@/models/slot.model";
 import { useEffect, useMemo } from "react";
 interface Step2Props {
   errors: {
@@ -27,6 +27,7 @@ interface Step2Props {
   };
   loading: boolean;
   slots: Record<string, Slot[]>;
+  userService: OrderSlot
   onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
 }
 
@@ -37,13 +38,11 @@ export default function Step2({
 
   errors,
   showError,
-
+  userService,
   values,
 }: Step2Props) {
-  console.log(slots);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
   const isDateUnavailable = (value: DateValue) => {
     const date = new Date(value.year, value.month - 1, value.day);
 
@@ -97,6 +96,12 @@ export default function Step2({
       onChange("order_date", nextDay);
     }
   }, [values.date, uniqueSlots]);
+  function hasArtist(
+ 
+  artistId: string
+): boolean {
+  return Object.values(userService).some(arr => arr.includes(artistId));
+}
   return (
     <div className="w-full space-y-6">
       <div className="space-y-2">
@@ -170,6 +175,7 @@ export default function Step2({
                 </motion.div>
               ) : values.date && uniqueSlots.length > 0 ? (
                 uniqueSlots.map((slot, i) => {
+              
                   const time = slot.start_time?.toString().slice(0, 5);
                   const selectedDate = new Date(
                     values.date as unknown as string,

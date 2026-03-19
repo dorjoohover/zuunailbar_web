@@ -48,6 +48,8 @@ export function AuthModal() {
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [password, setPassword] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [timer, setTimer] = useState(0);
   const [error, setError] = useState("");
@@ -58,21 +60,24 @@ export function AuthModal() {
 
   // ----------------- REFS -----------------
   const usernameRef = useRef<HTMLInputElement>(null);
+  const lastnameRef = useRef<HTMLInputElement>(null);
+  const firstnameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
   const otpRef = useRef<HTMLDivElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
   const passwordConfirmRef = useRef<HTMLInputElement>(null);
 
   // ----------------- AUTO FOCUS -----------------
-  useAutoFocus(forget, usernameRef);
+  useAutoFocus(true, usernameRef);
+  // useAutoFocus(tab == "register" || forget, firstnameRef);
   useAutoFocus(tab === "login", phoneRef);
   useAutoFocus(otpSent, otpRef);
 
   // OTP дуусмагц → Password руу focus
   useEffect(() => {
     if (otp.length === 4 && (forget || tab === "register")) {
-      const pass = passwordRef.current;
-      pass?.focus?.() ?? pass?.querySelector?.("input")?.focus?.();
+      const last = lastnameRef.current;
+      last?.focus?.() ?? last?.querySelector?.("input")?.focus?.();
     }
   }, [otp, forget, tab]);
 
@@ -95,7 +100,11 @@ export function AuthModal() {
     if (error) return addToast({ title: error, size: "lg", color: "danger" });
     setOtpSent(true);
     setTimer(59);
-    addToast({ title: "4 оронтой кодыг мессежээр илгээлээ", size: "lg", color: "success" });
+    addToast({
+      title: "4 оронтой кодыг мессежээр илгээлээ",
+      size: "lg",
+      color: "success",
+    });
   };
 
   const forgetPasswordSendOtp = async () => {
@@ -113,13 +122,23 @@ export function AuthModal() {
       setTimer(0);
       return addToast({ title: error, size: "lg", color: "danger" });
     }
-    addToast({ title: "4 оронтой кодыг имейлээр илгээлээ", size: "lg", color: "success" });
+    addToast({
+      title: "4 оронтой кодыг имейлээр илгээлээ",
+      size: "lg",
+      color: "success",
+    });
   };
 
   const handleRegister = async () => {
     if (password !== passwordConfirm)
       return setError("Нууц үг таарахгүй байна");
-    const { data, error } = await register({ mobile: phone, otp, password });
+    const { data, error } = await register({
+      mobile: phone,
+      otp,
+      password,
+      firstname,
+      lastname,
+    });
     if (error) return addToast({ title: error, size: "lg", color: "danger" });
     if (data?.accessToken) {
       addToast({
@@ -145,6 +164,12 @@ export function AuthModal() {
   };
 
   const forgetPassword = async () => {
+    if(!password || !passwordConfirm ) {
+      return setError('Нууц үг оруулна уу')
+    }
+    if(!lastname || !firstname) {
+      return setError('Овог нэр оруулна уу')
+    }
     if (password !== passwordConfirm)
       return setError("Нууц үг таарахгүй байна");
     if (!username) return;
@@ -152,6 +177,8 @@ export function AuthModal() {
       mobile: username,
       otp,
       password,
+      lastname,
+      firstname,
     });
     if (error) return addToast({ title: error, size: "lg", color: "danger" });
     addToast({
@@ -283,24 +310,40 @@ export function AuthModal() {
 
                       {/* PASSWORD RESET */}
                       {otpSent && (
-                        <>
-                          <PasswordInput
-                            innerRef={passwordRef}
-                            nextRef={passwordConfirmRef}
-                            label="Нууц үг"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                          />
-                          <PasswordInput
-                            innerRef={passwordConfirmRef}
-                            label="Нууц үг давтах"
-                            value={passwordConfirm}
-                            onChange={(e) => setPasswordConfirm(e.target.value)}
-                            required
-                          />
-                        </>
-                      )}
+                      <>
+                        <Input
+                          ref={lastnameRef}
+                          type="text"
+                          label="Овог"
+                          value={lastname}
+                          onChange={(e) => setLastname(e.target.value)}
+                          isRequired
+                        />
+                        <Input
+                          ref={firstnameRef}
+                          type="text"
+                          label="Нэр"
+                          value={firstname}
+                          onChange={(e) => setFirstname(e.target.value)}
+                          isRequired
+                        />
+                        <PasswordInput
+                          innerRef={passwordRef}
+                          nextRef={passwordConfirmRef}
+                          label="Нууц үг"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                        <PasswordInput
+                          innerRef={passwordConfirmRef}
+                          label="Нууц үг давтах"
+                          value={passwordConfirm}
+                          onChange={(e) => setPasswordConfirm(e.target.value)}
+                          required
+                        />
+                      </>
+                       )}
                     </div>
                   ) : (
                     <>
@@ -316,7 +359,7 @@ export function AuthModal() {
                                 : "bg-transparent text-black",
                               t === "login"
                                 ? "rounded-l-full"
-                                : "rounded-r-full"
+                                : "rounded-r-full",
                             )}
                             onPress={() => {
                               setTab(t as any);
@@ -336,6 +379,7 @@ export function AuthModal() {
                             label="Утасны дугаар"
                             onChange={(e) => setPhone(e.target.value)}
                             isRequired
+                            autoFocus={true}
                             errorMessage="Утасны дугаар оруулна уу"
                           />
                           <PasswordInput
@@ -400,6 +444,22 @@ export function AuthModal() {
 
                           {otpSent && (
                             <>
+                              <Input
+                                ref={lastnameRef}
+                                type="text"
+                                label="Овог"
+                                value={lastname}
+                                onChange={(e) => setLastname(e.target.value)}
+                                isRequired
+                              />
+                              <Input
+                                ref={firstnameRef}
+                                type="text"
+                                label="Нэр"
+                                value={firstname}
+                                onChange={(e) => setFirstname(e.target.value)}
+                                isRequired
+                              />
                               <PasswordInput
                                 innerRef={passwordRef}
                                 nextRef={passwordConfirmRef}
