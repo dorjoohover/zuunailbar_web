@@ -142,7 +142,6 @@ export default function OrderPage({
   const total = 4;
   const [step, setStep] = useState(1);
   const go = async (n: number) => {
-  
     setStep(Math.min(Math.max(1, n), total));
   };
 
@@ -380,6 +379,7 @@ export default function OrderPage({
       parallel: selected.parallel,
     };
     const res = await create<IOrder>(Api.order, payload);
+    console.log(res)
     if (!res.success) {
       addToast({
         title: res.error ?? "Алдаа гарлаа дахин оролдоно уу",
@@ -697,7 +697,13 @@ export default function OrderPage({
                       style={{ marginTop: 3, marginLeft: 2 }}
                     />
                   )}
-                  <span>Би <a href="/terms" target="_blank" className="font-bold">үйлчилгээний нөхцөлийг</a> зөвшөөрч байна.</span>
+                  <span>
+                    Би{" "}
+                    <a href="/terms" target="_blank" className="font-bold">
+                      үйлчилгээний нөхцөлийг
+                    </a>{" "}
+                    зөвшөөрч байна.
+                  </span>
                 </label>
               </ModalBody>
 
@@ -715,10 +721,13 @@ export default function OrderPage({
                   isDisabled={!checked} // 👈 checkbox шалгаагүй бол disable
                   onPress={async () => {
                     await onSubmit().then((d) => {
-
-                      setStep(5);
+                      if (d) {
+                        setStep(5);
+                      } else {
+                        setStep(1);
+                      }
                       onClose();
-                    })
+                    });
                   }}
                   className={cn(
                     button,
