@@ -206,6 +206,7 @@ export default function OrderPage({
     if (!date) {
       addToast({
         title: "Тухайн үйлчилгээнд сул цаг одоогоор дууссан байна.",
+         timeout: 3000
       });
 
       return;
@@ -234,6 +235,7 @@ export default function OrderPage({
       addToast({
         title: userServices.error ?? "Алдаа гарлаа",
         color: "warning",
+        timeout: 3000
       });
       return;
     }
@@ -259,7 +261,7 @@ export default function OrderPage({
     );
     return result;
   };
-
+  const isEmpty = (obj: object) => Object.keys(obj).length === 0;
   const step3Checker = async () => {
     let result = await getArtists();
     let checker = selected.details?.every((detail) => {
@@ -271,12 +273,22 @@ export default function OrderPage({
       setField("parallel", false);
       await getSlots(false);
       result = await getArtists();
-      setUserService(result);
+
       setCant(true);
     } else {
       setCant(false);
-      setUserService(result);
     }
+    if (isEmpty(result)) {
+      addToast({
+        title: "Цаг олдсонгүй дахин сонгоно уу",
+        color: "warning",
+         timeout: 3000
+      });
+      setField("start_time", undefined);
+      fetcher(2)
+      return;
+    }
+    setUserService(result);
   };
 
   const fetcher = async (currentStep: number) => {
@@ -379,11 +391,12 @@ export default function OrderPage({
       parallel: selected.parallel,
     };
     const res = await create<IOrder>(Api.order, payload);
-    console.log(res)
+    console.log(res);
     if (!res.success) {
       addToast({
         title: res.error ?? "Алдаа гарлаа дахин оролдоно уу",
         color: "warning",
+         timeout: 3000
       });
 
       fetcher(2);
@@ -394,7 +407,7 @@ export default function OrderPage({
       setInvoice(res.data.payload.invoice);
       setOrder(res.data.payload.id);
     } else {
-      addToast({ title: "Амжилттай.", color: "success" });
+      addToast({ title: "Амжилттай.", color: "success",  timeout: 3000 });
       // reset();
     }
     return res.success;
@@ -408,7 +421,7 @@ export default function OrderPage({
         </div>
       );
     else {
-      addToast({ title: "Амжилттай.", color: "success" });
+      addToast({ title: "Амжилттай.", color: "success",  timeout: 3000 });
       router.refresh();
     }
   }

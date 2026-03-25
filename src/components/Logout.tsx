@@ -33,6 +33,7 @@ export const Logout = () => {
         title: "Амжилттай гарлаа",
         size: "lg",
         color: "success",
+        timeout: 3000,
       });
       setTimeout(() => {
         window.location.replace(window.location.href);

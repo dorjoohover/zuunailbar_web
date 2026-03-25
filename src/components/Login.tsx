@@ -95,15 +95,23 @@ export function AuthModal() {
         title: "Дугаараа оруулна уу",
         size: "lg",
         color: "warning",
+        timeout: 3000,
       });
     const { data, error } = await sendOtp(phone);
-    if (error) return addToast({ title: error, size: "lg", color: "danger" });
+    if (error)
+      return addToast({
+        title: error,
+        size: "lg",
+        color: "danger",
+        timeout: 3000,
+      });
     setOtpSent(true);
     setTimer(59);
     addToast({
       title: "4 оронтой кодыг мессежээр илгээлээ",
       size: "lg",
       color: "success",
+      timeout: 3000,
     });
   };
 
@@ -113,6 +121,7 @@ export function AuthModal() {
         title: "Дугаар эсвэл майл оруулна уу",
         size: "lg",
         color: "warning",
+        timeout: 3000,
       });
     setOtpSent(true);
     setTimer(59);
@@ -120,12 +129,18 @@ export function AuthModal() {
     if (error) {
       setOtpSent(false);
       setTimer(0);
-      return addToast({ title: error, size: "lg", color: "danger" });
+      return addToast({
+        title: error,
+        size: "lg",
+        color: "danger",
+        timeout: 3000,
+      });
     }
     addToast({
       title: "4 оронтой кодыг имейлээр илгээлээ",
       size: "lg",
       color: "success",
+      timeout: 3000,
     });
   };
 
@@ -139,12 +154,19 @@ export function AuthModal() {
       firstname,
       lastname,
     });
-    if (error) return addToast({ title: error, size: "lg", color: "danger" });
+    if (error)
+      return addToast({
+        title: error,
+        size: "lg",
+        color: "danger",
+        timeout: 3000,
+      });
     if (data?.accessToken) {
       addToast({
         title: "Амжилттай бүртгүүллээ",
         size: "lg",
         color: "success",
+        timeout: 3000,
       });
       save(data.accessToken, data.merchant_id);
       onClose();
@@ -155,20 +177,30 @@ export function AuthModal() {
     setError("");
     const res = await login({ mobile: phone, password });
     if (res.error)
-      return addToast({ title: res.error, size: "lg", color: "danger" });
+      return addToast({
+        title: res.error,
+        size: "lg",
+        color: "danger",
+        timeout: 3000,
+      });
     if (res.data?.accessToken) {
-      addToast({ title: "Амжилттай нэвтэрлээ", size: "lg", color: "success" });
+      addToast({
+        title: "Амжилттай нэвтэрлээ",
+        size: "lg",
+        color: "success",
+        timeout: 3000,
+      });
       save(res.data.accessToken, res.data.merchant_id);
       onClose();
     }
   };
 
   const forgetPassword = async () => {
-    if(!password || !passwordConfirm ) {
-      return setError('Нууц үг оруулна уу')
+    if (!password || !passwordConfirm) {
+      return setError("Нууц үг оруулна уу");
     }
-    if(!lastname || !firstname) {
-      return setError('Овог нэр оруулна уу')
+    if (!lastname || !firstname) {
+      return setError("Овог нэр оруулна уу");
     }
     if (password !== passwordConfirm)
       return setError("Нууц үг таарахгүй байна");
@@ -180,7 +212,13 @@ export function AuthModal() {
       lastname,
       firstname,
     });
-    if (error) return addToast({ title: error, size: "lg", color: "danger" });
+    if (error)
+      return addToast({
+        title: error,
+        size: "lg",
+        color: "danger",
+        timeout: 3000,
+      });
     addToast({
       title: "Нууц үг амжилттай шинэчлэгдлээ",
       size: "lg",
@@ -310,40 +348,40 @@ export function AuthModal() {
 
                       {/* PASSWORD RESET */}
                       {otpSent && (
-                      <>
-                        <Input
-                          ref={lastnameRef}
-                          type="text"
-                          label="Овог"
-                          value={lastname}
-                          onChange={(e) => setLastname(e.target.value)}
-                          isRequired
-                        />
-                        <Input
-                          ref={firstnameRef}
-                          type="text"
-                          label="Нэр"
-                          value={firstname}
-                          onChange={(e) => setFirstname(e.target.value)}
-                          isRequired
-                        />
-                        <PasswordInput
-                          innerRef={passwordRef}
-                          nextRef={passwordConfirmRef}
-                          label="Нууц үг"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          required
-                        />
-                        <PasswordInput
-                          innerRef={passwordConfirmRef}
-                          label="Нууц үг давтах"
-                          value={passwordConfirm}
-                          onChange={(e) => setPasswordConfirm(e.target.value)}
-                          required
-                        />
-                      </>
-                       )}
+                        <>
+                          <Input
+                            ref={lastnameRef}
+                            type="text"
+                            label="Овог"
+                            value={lastname}
+                            onChange={(e) => setLastname(e.target.value)}
+                            isRequired
+                          />
+                          <Input
+                            ref={firstnameRef}
+                            type="text"
+                            label="Нэр"
+                            value={firstname}
+                            onChange={(e) => setFirstname(e.target.value)}
+                            isRequired
+                          />
+                          <PasswordInput
+                            innerRef={passwordRef}
+                            nextRef={passwordConfirmRef}
+                            label="Нууц үг"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                          />
+                          <PasswordInput
+                            innerRef={passwordConfirmRef}
+                            label="Нууц үг давтах"
+                            value={passwordConfirm}
+                            onChange={(e) => setPasswordConfirm(e.target.value)}
+                            required
+                          />
+                        </>
+                      )}
                     </div>
                   ) : (
                     <>

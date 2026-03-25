@@ -26,7 +26,7 @@ export function ResetPasswordModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.newPassword) {
-      addToast({ title: "Шинэ нууц үгээ оруулна уу.", color: "warning" });
+      addToast({ title: "Шинэ нууц үгээ оруулна уу.", color: "warning" , timeout: 3000});
 
       return;
     }
@@ -38,14 +38,14 @@ export function ResetPasswordModal({
       return;
     }
     if (!formData.password) {
-      addToast({ title: "Одоогийн нууц үгээ оруулна уу.", color: "warning" });
+      addToast({ title: "Одоогийн нууц үгээ оруулна уу.", color: "warning", timeout: 3000});
 
       return;
     }
     if (formData.repeatPassword != formData.newPassword) {
       addToast({
         title: "Шинэ нууц үг болон давтан оруулсан нууц үг таарахгүй байна.",
-        color: "warning",
+        color: "warning", timeout: 3000
       });
       return;
     }

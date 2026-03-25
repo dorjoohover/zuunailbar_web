@@ -105,6 +105,7 @@ export const PaymentView = ({
     }
     addToast({
       title: `${data.paid ? "Амжилттай төлөгдлөө." : "Төлбөр төлөгдөөгүй байна."}`,
+      timeout: 3000,
     });
   };
   const cancel = async () => {

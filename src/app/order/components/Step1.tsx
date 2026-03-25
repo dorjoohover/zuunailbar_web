@@ -110,7 +110,7 @@ export default function Step1({
                     const allSame = new Set(categoryIds).size === 1;
                     if (updatedDetail.length > 1 && allSame) {
                       addToast({
-                        title: "Ижил төрлийн үйлчилгээ зэрэг авах боломжгүй",
+                        title: "Ижил төрлийн үйлчилгээ зэрэг авах боломжгүй", timeout: 3000
                       });
                       return;
                     }
@@ -119,7 +119,7 @@ export default function Step1({
                     }
                     if (updatedDetail.length > 2) {
                       addToast({
-                        title: "Хамгийн ихдээ 2 үйлчилгээ сонгоно уу.",
+                        title: "Хамгийн ихдээ 2 үйлчилгээ сонгоно уу.", timeout: 3000
                       });
                       return;
                     }

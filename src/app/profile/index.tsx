@@ -4,7 +4,16 @@ import { UserLevel } from "@/lib/constants";
 import { firstLetterUpper, mobileFormatter } from "@/lib/functions";
 import { User, UserPassword } from "@/models";
 import { Api, API } from "@/utils/api";
-import { Crown, IdCard, KeyRound, Mail, Phone, Sparkles, UserCog, UserPen } from "lucide-react";
+import {
+  Crown,
+  IdCard,
+  KeyRound,
+  Mail,
+  Phone,
+  Sparkles,
+  UserCog,
+  UserPen,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { EditProfileModal } from "./edit";
 import { create, updateOne } from "../(api)";
@@ -37,6 +46,7 @@ export const ProfilePage = ({
     const success = res.success;
     addToast({
       title: `${success ? "Амжилттай солигдлоо." : "Дахин оролдоно уу."}`,
+      timeout: 3000,
     });
     if (success) me();
   };
@@ -48,6 +58,7 @@ export const ProfilePage = ({
     const success = res.success;
     addToast({
       title: `${success ? "Амжилттай солигдлоо." : (res.error ?? "Дахин оролдоно уу.")}`,
+      timeout: 3000,
     });
     if (success) me();
   };

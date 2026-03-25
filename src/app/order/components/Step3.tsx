@@ -37,6 +37,7 @@ export default function Step3({
   cant,
   // clearError,
 }: Step3Props) {
+  console.log(values.users)
   return (
     <div className="w-full space-y-6">
       {cant && (

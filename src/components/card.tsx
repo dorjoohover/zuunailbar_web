@@ -262,7 +262,7 @@ export function OrderCard({ data }: { data: Order }) {
   const cancel = async () => {
     const res = await find(Api.order, {}, `cancel/${data.id}`);
     addToast({
-      title: `Захиалга амжилттай цуцлагдлаа.`,
+      title: `Захиалга амжилттай цуцлагдлаа.`, timeout: 3000
     });
     router.push("/");
   };
