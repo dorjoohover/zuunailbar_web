@@ -2,7 +2,7 @@
 import { OrderCard } from "@/components/card";
 import { getEnumValues, ListType, OrderStatusValues } from "@/lib/const";
 import { OrderStatus } from "@/lib/constants";
-import { money, parseDate } from "@/lib/functions";
+import { firstLetterUpper, money, parseDate } from "@/lib/functions";
 import { cn } from "@/lib/utils";
 import { Order } from "@/models";
 import {
@@ -44,6 +44,7 @@ export const MyOrderPage = ({
     setSelectedOrder(data.items.filter((d) => d.id == id)[0]);
     onOpen();
   };
+  console.log(data)
   return (
     <div className="max-w-6xl mt-14 mx-auto px-4 md:px-6 py-6 md:py-8">
       <div className="mb-6">
@@ -114,7 +115,7 @@ export const MyOrderPage = ({
                     </p>
                     <span className="flex gap-2 items-center">
                       <Building className="text-primary" size={20} />
-                      {selectedOrder?.details?.[0]?.user?.branch_name}
+                      {selectedOrder?.details?.[0]?.branch_name}
                     </span>
                   </div>
                   <div>
@@ -160,7 +161,7 @@ export const MyOrderPage = ({
                             <div>
                               <p className="flex gap-2 items-center">
                                 <User className="text-primary" size={20} />
-                                {detail.user?.nickname}
+                                {firstLetterUpper(detail?.nickname ?? '-')}
                               </p>
                             </div>
                           </div>
@@ -207,9 +208,10 @@ export const MyOrderPage = ({
                         </div>
                         {selectedOrder?.updated_at && (
                           <div className="mb-2">
+                            
                             <p className="text-sm text-muted-foreground flex gap-2 items-center ">
-                              {selectedOrder.order_status ==
-                                OrderStatus.Active && (
+                              {(selectedOrder.order_status ==
+                                OrderStatus.Active || selectedOrder.order_status == OrderStatus.Finished) && (
                                 <CalendarCheck
                                   className="text-primary"
                                   size={20}
@@ -225,7 +227,8 @@ export const MyOrderPage = ({
                                 : selectedOrder.order_status ==
                                     OrderStatus.Active
                                   ? "Төлбөр төлж баталгаажсан огноо"
-                                  : ""}
+                                  : "Дууссан огноо"}
+                             
                             </p>
                             <span>
                               {parseDate(

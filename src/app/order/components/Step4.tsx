@@ -11,7 +11,6 @@ import {
 import { Branch, IOrder, IUserService, Service, User } from "@/models";
 import { Button } from "@heroui/button";
 import Image from "next/image";
-import { totalPrice } from "./Step1";
 import { ReviewCard } from "@/components/card";
 import {
   Calendar,
@@ -47,11 +46,18 @@ export default function Step4({
     (acc, item) => acc + (item?.duration ?? 0),
     0
   );
-  const service_ids = values.details?.map((d) => d.service_id);
-  const total = totalPrice({
-    services: services.items,
-    values: service_ids!,
-  });
+  const totalMin = values.details?.reduce(
+    (sum, item) => sum + +(item?.min_price ?? 0),
+    0,
+  ) ?? 0;
+  const totalMax = values.details?.reduce(
+    (sum, item) => sum + +(item?.max_price ?? item?.min_price ?? 0),
+    0,
+  ) ?? 0;
+  const total =
+    totalMin === totalMax
+      ? money(totalMin.toString())
+      : `${money(totalMin.toString())} - ${money(totalMax.toString())}`;
   const pre = invoice?.price ?? 0;
   const date = values.order_date ?? mnDate();
 

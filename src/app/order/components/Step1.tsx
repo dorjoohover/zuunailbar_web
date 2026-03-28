@@ -95,15 +95,19 @@ export default function Step1({
                       : [...details, id];
                     let prev = false;
                     const updatedDetail = updatedDetails?.map((v) => {
-                      const value = services.items.filter((s) => s.id == v)[0];
+                      const value = filteredServices.filter(
+                        (s) => s.service_id == v,
+                      )[0];
                       return {
                         service_id: v,
-                        service_name: value.name ?? "",
+                        service_name:
+                          value.custom_name ?? value.meta?.serviceName ?? "",
                         duration: value.duration,
                         max_price: value.max_price,
                         min_price: value.min_price,
                         pre: value.pre,
-                        category_id: value.category_id,
+                        category_id:
+                          services.items.filter((s) => s.id == v)[0]?.category_id,
                       };
                     });
                     const categoryIds = updatedDetail.map((a) => a.category_id);
@@ -149,7 +153,7 @@ export default function Step1({
         <p className="mt-1 text-sm text-red-600">{errors.service}</p>
       )}
       {values.services && values.services.length > 0 && (
-        <Price services={services.items} values={values.services} />
+        <Price services={filteredServices} values={values.services} />
       )}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
@@ -203,17 +207,27 @@ export const totalPrice = ({
   services,
   values,
 }: {
-  services: Service[];
+  services: Array<{
+    id?: string;
+    service_id?: string;
+    min_price?: number;
+    max_price?: number;
+  }>;
   values: string[];
 }) => {
-  const selectedServices = services.filter((s) => values.includes(s.id));
+  const selectedServices = services.filter((s) =>
+    values.includes((s.service_id ?? s.id) as string),
+  );
 
   // Нийт min
-  const totalMin = selectedServices.reduce((sum, s) => sum + +s.min_price, 0);
+  const totalMin = selectedServices.reduce(
+    (sum, s) => sum + +(s.min_price ?? 0),
+    0,
+  );
 
   // Нийт max
   const totalMax = selectedServices.reduce(
-    (sum, s) => sum + +(s.max_price ?? s.min_price),
+    (sum, s) => sum + +(s.max_price ?? s.min_price ?? 0),
     0,
   );
 
@@ -229,7 +243,7 @@ const Price = ({
   services,
   values,
 }: {
-  services: Service[];
+  services: BranchService[];
   values: string[];
 }) => {
   const totalDisplay = totalPrice({ services: services, values: values });

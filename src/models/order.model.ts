@@ -52,6 +52,8 @@ export interface IOrderDetail {
   user?: User;
   start_time?: string;
   end_time?: string;
+  branch_name?: string
+  nickname?: string
   pre?: number;
 }
 
