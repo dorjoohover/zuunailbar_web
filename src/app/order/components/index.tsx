@@ -391,7 +391,6 @@ export default function OrderPage({
       parallel: selected.parallel,
     };
     const res = await create<IOrder>(Api.order, payload);
-    console.log(res);
     if (!res.success) {
       addToast({
         title: res.error ?? "Алдаа гарлаа дахин оролдоно уу",

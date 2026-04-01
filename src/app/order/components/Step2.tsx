@@ -9,7 +9,7 @@ import { motion } from "motion/react";
 import LoadingScreen from "./loading";
 import { isSameDay } from "date-fns";
 import { OrderSlot, Slot } from "@/models/slot.model";
-import { useEffect, useMemo } from "react";
+import { PointerEvent, useEffect, useState } from "react";
 interface Step2Props {
   errors: {
     date?: string;
@@ -43,7 +43,15 @@ export default function Step2({
 }: Step2Props) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const isDateUnavailable = (value: DateValue) => {
+  const [focusedDate, setFocusedDate] = useState<DateValue | null>(
+    values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null,
+  );
+
+  useEffect(() => {
+    setFocusedDate(values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null);
+  }, [values.date]);
+
+  const isDateAvailable = (value: DateValue) => {
     const date = new Date(value.year, value.month - 1, value.day);
 
     if (
@@ -53,8 +61,47 @@ export default function Step2({
     )
       return false;
 
-    // slot байгаа бол unavailable
     return slots[toYMD(date) as any] !== undefined;
+  };
+  const selectOrderDate = (value: DateValue) => {
+    onChange("order_date", selectDate(value));
+    onChange("start_time", undefined);
+  };
+
+  const handleOutsideMonthPointerUp = (
+    event: PointerEvent<HTMLDivElement>,
+  ) => {
+    const target = event.target as HTMLElement | null;
+    const outsideCell = target?.closest("[data-outside-month='true']");
+
+    if (!outsideCell) return;
+
+    const day = Number(outsideCell.textContent?.trim() ?? "");
+    if (!Number.isInteger(day)) return;
+
+    const baseDate =
+      focusedDate ??
+      (values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null) ??
+      fromDate(new Date(), "Asia/Ulaanbaatar");
+
+    const monthOffset = day <= 14 ? 1 : -1;
+    const monthStart = new CalendarDate(
+      baseDate.calendar,
+      baseDate.year,
+      baseDate.month,
+      1,
+    ).add({ months: monthOffset });
+    const nextDate = new CalendarDate(
+      monthStart.calendar,
+      monthStart.year,
+      monthStart.month,
+      day,
+    );
+
+    if (!isDateAvailable(nextDate)) return;
+
+    setFocusedDate(nextDate);
+    selectOrderDate(nextDate);
   };
   const duration = values.parallel
     ? Math.max(...(values.details?.map((item) => item?.duration ?? 0) ?? [0]))
@@ -109,25 +156,25 @@ export default function Step2({
         <div className="flex flex-col sm:flex-row  gap-4">
           <div className="flex-1">
             <p className="text-muted-foreground text-xs mb-1">Өдөр сонгох</p>
-            <Calendar
-              aria-label="Өдөр сонгох"
-              value={
-                values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
-              }
-              onChange={(val) => {
-                onChange("order_date", selectDate(val));
-                onChange("start_time", undefined);
-              }}
-              defaultValue={
-                values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
-              }
-              defaultFocusedValue={
-                values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
-              }
-              errorMessage={"Буруу өдөр сонгосон."}
-              isDateUnavailable={(v) => !isDateUnavailable(v)}
-              calendarWidth={"100%"}
-              className="
+            <div onPointerUpCapture={handleOutsideMonthPointerUp}>
+              <Calendar
+                aria-label="Өдөр сонгох"
+                value={
+                  values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
+                }
+                onChange={selectOrderDate}
+                defaultValue={
+                  values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
+                }
+                focusedValue={focusedDate}
+                onFocusChange={setFocusedDate}
+                defaultFocusedValue={
+                  values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
+                }
+                errorMessage={"Буруу өдөр сонгосон."}
+                isDateUnavailable={(v) => !isDateAvailable(v)}
+                calendarWidth={"100%"}
+                className="
     w-full border border-rose-200/50
     [&_[data-selected=true]:not([aria-disabled=true])]:bg-rose-500/90
     [&_[data-selected=true]:not([aria-disabled=true])]:text-white
@@ -137,19 +184,25 @@ export default function Step2({
     /* disabled дээр effect унтраах */
     [&_[aria-disabled=true]]:bg-transparent
     [&_[aria-disabled=true]]:text-muted-foreground
-        [&_[data-today=true]:not([data-selected=true]):not([aria-disabled=true])]:ring-1
+    [&_[data-outside-month=true][data-disabled=true]:not([data-unavailable=true])]:cursor-pointer
+    [&_[data-outside-month=true][data-disabled=true]:not([data-unavailable=true])]:text-rose-500/90
+    [&_[data-outside-month=true][data-disabled=true]:not([data-unavailable=true])]:opacity-100
+    [&_[data-outside-month=true][data-disabled=true][data-hover=true]:not([data-unavailable=true])]:bg-rose-100
+    [&_[data-outside-month=true][data-disabled=true][data-hover=true]:not([data-unavailable=true])]:text-rose-500/90
+    [&_[data-today=true]:not([data-selected=true]):not([aria-disabled=true])]:ring-1
     [&_[data-today=true]:not([data-selected=true]):not([aria-disabled=true])]:ring-rose-400
     [&_[data-today=true]:not([data-selected=true]):not([aria-disabled=true])]:text-rose-700
   "
-              classNames={{
-                content: "bg-rose-50",
-                title: "text-black",
-                gridHeaderRow: "text-black",
-                nextButton: "text-black",
-                prevButton: "text-black",
-                cellButton: "rounded-sm",
-              }}
-            />
+                classNames={{
+                  content: "bg-rose-50",
+                  title: "text-black",
+                  gridHeaderRow: "text-black",
+                  nextButton: "text-black",
+                  prevButton: "text-black",
+                  cellButton: "rounded-sm",
+                }}
+              />
+            </div>
 
             {errors.date && showError && (
               <p className="mt-1 text-sm text-red-600">{errors.date}</p>
