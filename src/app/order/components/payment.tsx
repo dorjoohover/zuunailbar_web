@@ -148,6 +148,7 @@ export const PaymentView = ({
           className="mt-1"
           color={progress > 30 ? "#F43F5E" : "#F59E0B"}
         />
+
         <div className="">
           <p
             className={`${progress > 30 ? "text-gray-500" : "text-red-300"} text-sm mb-2`}
@@ -166,8 +167,26 @@ export const PaymentView = ({
       </div>
 
       <div className="flex flex-col items-center rounded-md bg-white py-4 px-3 border border-gray-300">
-        <p className="text-sm">Нийт төлбөр</p>
+        <p className="text-sm">Урьдчилгаа төлбөр</p>
         <p className="text-xl mb-2">{money(invoice.price.toString())}₮</p>
+        <div className="flex items-center justify-center">
+          <Image
+            className="border border-gray-300 rounded-md"
+            src={`data:image/png;base64,${invoice.qr_image}`}
+            width={300}
+            height={300}
+            alt={invoice.invoice_id}
+          />
+        </div>
+
+        <p className="mt-4 mb-6 text-sm">
+          QPay апп-аар QR код уншиж, төлбөрөө хийнэ үү.
+        </p>
+
+        <div className="border-y border-gray-300 w-full mt-3 pt-3 pb-6 flex items-center gap-2 justify-center">
+          <div className={`w-2 h-2 ${StatusColor[status]} rounded-full`} />
+          <p className="text-md">{StatusValue[status]}</p>
+        </div>
         <div className="md:hidden grid grid-cols-12 px-2 gap-4 mt-2 mb-4">
           {invoice.urls.map((url, i) => {
             return (
@@ -189,24 +208,7 @@ export const PaymentView = ({
             );
           })}
         </div>
-        <div className="flex items-center justify-center">
-          <Image
-            className="border border-gray-300 rounded-md"
-            src={`data:image/png;base64,${invoice.qr_image}`}
-            width={300}
-            height={300}
-            alt={invoice.invoice_id}
-          />
-        </div>
 
-        <p className="mt-4 mb-6 text-sm">
-          QPay апп-аар QR код уншиж, төлбөрөө хийнэ үү.
-        </p>
-
-        <div className="border-y border-gray-300 w-full mt-3 pt-3 pb-6 flex items-center gap-2 justify-center">
-          <div className={`w-2 h-2 ${StatusColor[status]} rounded-full`} />
-          <p className="text-md">{StatusValue[status]}</p>
-        </div>
         <button
           className="my-4 cursor-pointer mx-auto w-full bg-gray-100 border border-gray-300 rounded-md py-2"
           onClick={checkPayment}

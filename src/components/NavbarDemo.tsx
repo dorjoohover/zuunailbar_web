@@ -5,7 +5,6 @@ import {
   NavItems,
   MobileNav,
   NavbarLogo,
-  NavbarButton,
   MobileNavHeader,
   MobileNavToggle,
   MobileNavMenu,
@@ -24,12 +23,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { ChevronDownIcon } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarImage } from "./ui/avatar";
 import { User } from "@/models";
 import { mobileFormatter } from "@/lib/functions";
-import { usePathname, useRouter } from "next/navigation";
-import { API, Api, baseUrl } from "@/utils/api";
+import { API } from "@/utils/api";
 
 const UserMenu = ({ user }: { user: User }) => {
   const name = user.nickname ?? mobileFormatter(user.mobile ?? "");
@@ -74,8 +71,20 @@ const UserMenu = ({ user }: { user: User }) => {
 export function NavbarDemo({ token }: { token?: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | undefined>();
-  const me = async () => {
-    if (token) {
+  const [isCheckingUser, setIsCheckingUser] = useState(Boolean(token));
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadUser = async () => {
+      if (!token) {
+        setUser(undefined);
+        setIsCheckingUser(false);
+        return;
+      }
+
+      setIsCheckingUser(true);
+
       try {
         const res = await fetch(`${API.user}/me`, {
           headers: {
@@ -85,20 +94,43 @@ export function NavbarDemo({ token }: { token?: string }) {
           cache: "no-store",
         });
         const data = await res.json();
-        if (data?.payload && data?.payload?.user) {
-          setUser(data.payload.user);
-        }
+
+        if (cancelled) return;
+
+        setUser(data?.payload?.user);
       } catch (error) {
-        console.log("error", error);
-        // deleteCookie();
+        if (!cancelled) {
+          console.log("error", error);
+          setUser(undefined);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsCheckingUser(false);
+        }
       }
-    }
-  };
-  const pathname = usePathname();
-  // if (pathname.includes("/terms")) return null;
-  useEffect(() => {
-    me();
+    };
+
+    loadUser();
+
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
+
+  const authContent = isCheckingUser ? (
+    <div aria-hidden="true" className="h-9 w-9" />
+  ) : user ? (
+    <UserMenu user={user} />
+  ) : (
+    <AuthModal />
+  );
+
+  const mobileAuthContent = isCheckingUser ? null : user ? (
+    <Logout />
+  ) : (
+    <AuthModal />
+  );
+
   return (
     <Navbar>
       {/* Desktop Navigation */}
@@ -116,7 +148,7 @@ export function NavbarDemo({ token }: { token?: string }) {
           >
             Захиалга
           </Button>
-          {user ? <UserMenu user={user} /> : <AuthModal />}
+          {authContent}
         </div>
       </NavBody>
 
@@ -163,7 +195,7 @@ export function NavbarDemo({ token }: { token?: string }) {
             >
               Захиалга өгөх
             </Link>
-            {token ? <Logout /> : <AuthModal />}
+            {mobileAuthContent}
           </div>
         </MobileNavMenu>
       </MobileNav>

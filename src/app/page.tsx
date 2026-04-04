@@ -20,7 +20,6 @@ export default async function Page() {
     view: ServiceView.FEATURED,
     sort: false,
   });
-  console.log(res)
   return (
     <>
       <HeroSection data={res.data} />

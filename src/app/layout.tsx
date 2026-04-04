@@ -29,7 +29,6 @@ export const viewport: Viewport = {
     { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
 };
-
 export default async function RootLayout({
   children,
 }: {
@@ -37,13 +36,14 @@ export default async function RootLayout({
 }) {
   const store = await cookies();
   const token = store.get("token")?.value;
+
   return (
     <html suppressHydrationWarning lang="en">
       <head />
       <body
         className={clsx(
           "min-h-screen text-foreground bg-background font-sans antialiased scroll-smooth ",
-          fontSans.variable
+          fontSans.variable,
         )}
         style={{
           margin: "0 !important",
