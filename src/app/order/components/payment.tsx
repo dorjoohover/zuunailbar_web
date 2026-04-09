@@ -70,6 +70,8 @@ export const PaymentView = ({
   invoice: Invoice;
   id: string;
 }) => {
+  const qrImage = invoice.qr_image?.trim();
+  const paymentLinks = invoice.urls ?? [];
   const end = mnDate(invoice.created);
   end.setMinutes(end.getMinutes() + 10); // 10 минут нэмэх
   const endTime = end.getTime();
@@ -170,25 +172,38 @@ export const PaymentView = ({
         <p className="text-sm">Урьдчилгаа төлбөр</p>
         <p className="text-xl mb-2">{money(invoice.price.toString())}₮</p>
         <div className="flex items-center justify-center">
-          <Image
-            className="border border-gray-300 rounded-md"
-            src={`data:image/png;base64,${invoice.qr_image}`}
-            width={300}
-            height={300}
-            alt={invoice.invoice_id}
-          />
+          {qrImage ? (
+            <Image
+              className="border border-gray-300 rounded-md"
+              src={`data:image/png;base64,${qrImage}`}
+              width={300}
+              height={300}
+              alt={invoice.invoice_id}
+            />
+          ) : (
+            <div className="max-w-[300px] rounded-md border border-amber-200 bg-amber-50 px-4 py-6 text-center text-sm text-amber-800">
+              QR код ачаалагдсангүй. Доорх холбоосоор эсвэл QPay app дээр
+              нэхэмжлэлээ шалгаж төлбөрөө үргэлжлүүлнэ үү.
+            </div>
+          )}
         </div>
 
         <p className="mt-4 mb-6 text-sm">
           QPay апп-аар QR код уншиж, төлбөрөө хийнэ үү.
         </p>
 
+        {!qrImage && invoice.qr_text && (
+          <div className="mb-4 w-full rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-xs break-all text-gray-500">
+            {invoice.qr_text}
+          </div>
+        )}
+
         <div className="border-y border-gray-300 w-full mt-3 pt-3 pb-6 flex items-center gap-2 justify-center">
           <div className={`w-2 h-2 ${StatusColor[status]} rounded-full`} />
           <p className="text-md">{StatusValue[status]}</p>
         </div>
         <div className="md:hidden grid grid-cols-12 px-2 gap-4 mt-2 mb-4">
-          {invoice.urls.map((url, i) => {
+          {paymentLinks.map((url, i) => {
             return (
               <Link
                 href={url.link}
