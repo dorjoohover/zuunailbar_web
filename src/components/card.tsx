@@ -1,4 +1,4 @@
-import { getDayName, money } from "@/lib/functions";
+import { firstLetterUpper, getDayName, money } from "@/lib/functions";
 import { Branch, BranchService, Order, Service, User } from "@/models";
 import { Api } from "@/utils/api";
 import { Checkbox } from "@heroui/checkbox";
@@ -128,75 +128,126 @@ export const ArtistCard = ({
 }) => {
   if (mini)
     return (
-      <div
-        className={`h-[60px] col-span-6 xs:col-span-3 md:col-span-2 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-rose-400/50 bg-rose-100/50 opacity-50" : selected ? "border-rose-600/50 bg-rose-100/50" : "border-rose-50"} duration-300 ease-out hover:shadow-lg transition-shadow`}
-        onClick={() => onClick(data.id)}
+      <button
+        type="button"
+        className={cn(
+          "flex min-h-[88px] w-full items-start gap-3 rounded-2xl border bg-white p-3 text-left transition-all duration-200",
+          disabled
+            ? "cursor-not-allowed border-slate-200 bg-slate-50 opacity-50"
+            : "hover:-translate-y-0.5 hover:shadow-md",
+          selected
+            ? "border-rose-300 bg-rose-50 shadow-sm ring-2 ring-rose-100"
+            : "border-rose-100",
+        )}
+        onClick={() => {
+          if (!disabled) onClick(data.id);
+        }}
       >
-        <div className="flex items-start gap-2">
-          <div className="w-[40px] h-[40px] min-w-[40px]">
-            <CustomImage img={data.profile_img} w={40} h={40} />
-          </div>
-          <div>
-            <h2 className="text-sm font-medium mb-1">{data.nickname}</h2>
-            <p className="text-muted-foreground text-sm line-clamp-2">
-              {data.description}
-            </p>
-            <div className="flex gap-2">
-              {/* <div className="flex gap-0.5 py-1">
-              <Clock size={15} />
-              <p className="text-xs">{data.duration} мин</p>
-            </div> */}
-              {data.experience && (
-                <div className="flex gap-0.5 px-2 py-0.5 rounded-xl bg-rose-200/50 ">
-                  <p className="text-xs">{data.experience} жил</p>
-                </div>
+        <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+          <CustomImage
+            img={data.profile_img}
+            w={44}
+            h={44}
+            alt={data.nickname ?? "artist"}
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h2 className="truncate text-sm font-semibold text-slate-900">
+                {firstLetterUpper(data.nickname ?? "")}
+              </h2>
+              {data.branch_name && (
+                <p className="mt-0.5 truncate text-xs text-slate-500">
+                  {data.branch_name}
+                </p>
               )}
             </div>
-          </div>
-        </div>
-      </div>
-    );
-    const level = data.level ? levelConfig[data.level as UserLevel] : null
-  return (
-    <div
-      className={`min-h-[80px] shadow-[0_4px_20px_rgba(0,0,0,0.06)] col-span-6 xs:col-span-3 md:col-span-3 flex justify-between w-full cursor-pointer justify-between rounded-sm p-2 border ${disabled ? "border-rose-400/50 bg-rose-100/50" : selected ? "border-rose-600/50 bg-rose-100/50" : "border-rose-100"}  duration-300 ease-out hover:shadow-lg transition-shadow p-4`}
-      onClick={() => onClick(data.id)}
-    >
-      <div className="flex items-start gap-4 ">
-        <div className="w-20 h-20 min-w-20">
-          <CustomImage img={data.profile_img} w={80} h={80}/>
-        </div>
-        <div>
-          <div className="flex gap-4 justify-between items-center w-full">
-              
-            <h2 className="text-lg font-[700] mb-1">{data.nickname} </h2>
-          
-            <div>
-                {level && (
-              <span className={cn("flex gap-0.5 px-2 py-1 rounded-xl bg-rose-200 text-rose-700 ", )}>
-                <p className="text-xs">{level?.text ?? ''}</p>
+            {selected && (
+              <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                Сонгосон
               </span>
             )}
-            </div>
-            {/* {data.experience && (
-              <div className="flex gap-0.5 px-2 py-1 rounded-xl bg-rose-200 ">
-                <p className="text-xs">{data.experience} жил</p>
-              </div>
-            )} */}
           </div>
-          <p className="text-muted-foreground text-sm ">
-            {data.description}
-          </p>
-          <div className="flex gap-2">
-            {/* <div className="flex gap-0.5 py-1">
-              <Clock size={15} />
-              <p className="text-xs">{data.duration} мин</p>
-            </div> */}
-          
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {data.experience != null && (
+              <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-medium text-rose-700">
+                {data.experience} жил
+              </span>
+            )}
+            {data.level ? (
+              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                {levelConfig[data.level as UserLevel]?.text ?? "Артист"}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </button>
+    );
+  const level = data.level ? levelConfig[data.level as UserLevel] : null;
+  return (
+    <button
+      type="button"
+      className={cn(
+        "col-span-6 xs:col-span-3 md:col-span-3 flex min-h-[112px] w-full items-start gap-4 rounded-3xl border bg-white p-4 text-left shadow-sm transition-all duration-200",
+        disabled
+          ? "cursor-not-allowed border-rose-200 bg-rose-50/60 opacity-60"
+          : "hover:-translate-y-0.5 hover:shadow-lg",
+        selected
+          ? "border-rose-400 bg-rose-50 ring-2 ring-rose-100"
+          : "border-rose-100",
+      )}
+      onClick={() => {
+        if (!disabled) onClick(data.id);
+      }}
+    >
+      <div className="flex items-start gap-4">
+        <div className="h-20 w-20 min-w-20 overflow-hidden rounded-2xl bg-slate-100">
+          <CustomImage
+            img={data.profile_img}
+            w={80}
+            h={80}
+            alt={data.nickname ?? "artist"}
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold text-slate-900">
+                {firstLetterUpper(data.nickname ?? "")}
+              </h2>
+              {data.description && (
+                <p className="mt-1 line-clamp-2 text-sm text-slate-500">
+                  {data.description}
+                </p>
+              )}
+            </div>
+            {selected && (
+              <span className="rounded-full bg-rose-500 px-2.5 py-1 text-xs font-semibold text-white">
+                Сонгосон
+              </span>
+            )}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {level && (
+              <span className="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700">
+                {level.text}
+              </span>
+            )}
+            {data.experience != null && (
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                {data.experience} жил
+              </span>
+            )}
+            {data.branch_name && (
+              <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                {data.branch_name}
+              </span>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 

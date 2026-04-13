@@ -1,3 +1,4 @@
+import { PaymentMethod } from "@/lib/enum";
 import { User } from "./user.model";
 import { UserService } from "./user.service.model";
 
@@ -15,6 +16,8 @@ export interface IOrder {
   user_desc?: string;
   details?: IOrderDetail[] | any[];
   parallel?: boolean;
+  method?: PaymentMethod;
+  pre_method?: PaymentMethod;
 }
 
 export interface Order {

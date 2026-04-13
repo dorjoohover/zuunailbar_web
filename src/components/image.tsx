@@ -18,12 +18,12 @@ export default function CustomImage({
 
   return (
     <Image
-      src={`/api/file/${img}`}
-      objectFit="contain"
+      src={imgSrc}
       alt={alt ?? "logo"}
       width={w ?? 50}
-      className="h-full rounded-md"
+      className="h-full rounded-md object-cover"
       height={h ?? 50}
+      onError={() => setImgSrc("/logo/zu-black.png")}
     />
   );
 }

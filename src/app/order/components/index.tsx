@@ -3,18 +3,14 @@ import { useState, useEffect, useMemo } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@heroui/button";
-import { arrayToMap, button, ListDefault, ListType, mnDate } from "@/lib/const";
+import { arrayToMap, button, ListType } from "@/lib/const";
 import {
   Branch,
   BranchService,
-  DateTime,
   IOrder,
   IOrderDetail,
-  IUserService,
   Service,
   User,
-  UserDateTime,
-  UserService,
 } from "@/models";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
@@ -37,34 +33,11 @@ import {
 } from "@heroui/modal";
 import { PaymentView } from "./payment";
 import { Invoice } from "@/types";
-import { formatTime, money, parseDate, toYMD } from "@/lib/functions";
+import { formatTime, parseDate, toYMD } from "@/lib/functions";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { PaymentMethod } from "@/lib/enum";
-import { OrderSlot, ParallelOrderSlot, Slot } from "@/models/slot.model";
-
-function getMergedSlots(slotsArray: DateTime[]): DateTime {
-  if (slotsArray == undefined || slotsArray?.length === 0) return {};
-
-  const merged: DateTime = {};
-
-  for (const slots of slotsArray) {
-    for (const [dayStr, times] of Object.entries(slots)) {
-      const day = Number(dayStr);
-      if (!merged[day]) merged[day] = [];
-
-      // unique болгож нэмж байна
-      for (const t of times) {
-        if (!merged[day].includes(t)) {
-          merged[day].push(t);
-        }
-      }
-      // хүсвэл цагуудыг эрэмбэлж болно
-      merged[day].sort((a, b) => a - b);
-    }
-  }
-  return merged;
-}
+import { OrderSlot, Slot } from "@/models/slot.model";
 
 export default function OrderPage({
   data,
@@ -100,6 +73,8 @@ export default function OrderPage({
     "users",
   ];
   const [showError, setShowError] = useState(false);
+  const [stepLoading, setStepLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
   function setField<K extends keyof IOrder>(key: K, value: IOrder[K]) {
     if (key != "parallel") {
       let index = itemsQueue.indexOf(key);
@@ -118,7 +93,6 @@ export default function OrderPage({
       setSelected((prev) => ({ ...prev, [key]: value }));
     }
   }
-  const [userDatetimes, setUserDateTimes] = useState<UserDateTime[]>([]);
 
   const step1Errors = useMemo(
     () => ({
@@ -139,6 +113,15 @@ export default function OrderPage({
     }),
     [selected.order_date, selected.start_time],
   );
+  const step3Errors = useMemo(
+    () => ({
+      user:
+        selected.users && Object.values(selected.users).some((value) => !!value)
+          ? undefined
+          : "Артистаа сонгоно уу!",
+    }),
+    [selected.users],
+  );
   const total = 4;
   const [step, setStep] = useState(1);
   const go = async (n: number) => {
@@ -146,39 +129,71 @@ export default function OrderPage({
   };
 
   const prev = () => {
+    if (stepLoading || submitLoading) return;
     fetcher(step - 1);
   };
   const [cant, setCant] = useState<boolean | undefined>(undefined);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const {
+    isOpen: isQueueModalOpen,
+    onOpen: onQueueModalOpen,
+    onOpenChange: onQueueModalChange,
+  } = useDisclosure();
   const activeErrors =
     step === 1
       ? step1Errors
       : step === 2
         ? step2Errors
-        : ({} as Record<string, string | undefined>);
+        : step === 3
+          ? step3Errors
+          : ({} as Record<string, string | undefined>);
   const isStepComplete = useMemo(
     () => Object.values(activeErrors).every((v) => !v),
     [activeErrors],
   );
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (stepLoading || submitLoading) return;
     if (!isStepComplete) {
       setShowError(true);
       return;
     }
     setShowError(false);
-    fetcher(step + 1);
+    await fetcher(step + 1);
   };
 
-  const getSlots = async (parallel?: boolean) => {
+  const getSlots = async (
+    parallel?: boolean,
+    options?: {
+      date?: Date | string;
+      updateSelectedDate?: boolean;
+      suppressEmptyToast?: boolean;
+      updateState?: boolean;
+    },
+  ) => {
     const body = {
       branch_id: selected.branch_id,
       services: selected.details?.map((s) => s.service_id),
       parallel,
+      date: options?.date ? toYMD(new Date(options.date)) : undefined,
     };
     const res = await find<Slot>(Api.order, body, "slots");
-    // console.log(res);
-    const data: Record<string, Slot[]> = (res.data as unknown as Slot[]).reduce(
+    const slotItems = Array.isArray(res.data)
+      ? res.data
+      : Array.isArray((res.data as { items?: Slot[] })?.items)
+        ? ((res.data as { items?: Slot[] }).items ?? [])
+        : [];
+
+    if (res.error) {
+      addToast({
+        title: res.error ?? "Сул цаг ачаалах үед алдаа гарлаа.",
+        color: "warning",
+        timeout: 3000,
+      });
+      return null;
+    }
+
+    const data: Record<string, Slot[]> = slotItems.reduce(
       (acc, item) => {
         const key = toYMD(new Date(item.date));
 
@@ -203,20 +218,29 @@ export default function OrderPage({
       }
     }
 
-    if (!date) {
-      addToast({
-        title: "Тухайн үйлчилгээнд сул цаг одоогоор дууссан байна.",
-         timeout: 3000
-      });
-
-      return;
-    } else {
-      setField("order_date", new Date(date));
+    if (options?.updateState !== false) {
       setAvailableSlots(data);
     }
+
+    if (!date) {
+      if (!options?.suppressEmptyToast) {
+        addToast({
+          title: "Тухайн үйлчилгээнд сул цаг одоогоор дууссан байна.",
+          timeout: 3000,
+        });
+      }
+
+      return null;
+    }
+
+    if (options?.updateSelectedDate !== false) {
+      setField("order_date", new Date(date));
+    }
+
+    return data;
   };
-  const getArtists = async () => {
-    // selected.start_time, selected.parallel, selected.order_date;
+  const getArtists = async (slotSource?: Record<string, Slot[]>) => {
+    if (!selected.order_date || !selected.start_time) return {};
 
     const userServices = await create(
       Api.user_service,
@@ -224,26 +248,21 @@ export default function OrderPage({
         branch_id: selected.branch_id,
         services:
           (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
-        order_date: selected.order_date,
-        start_time: selected.start_time,
-        parallel: selected.parallel,
       },
       "client",
     );
     if (userServices.error) {
-      fetcher(2);
       addToast({
         title: userServices.error ?? "Алдаа гарлаа",
         color: "warning",
-        timeout: 3000
+        timeout: 3000,
       });
-      return;
+      return null;
     }
-    // serviceId: artists
 
     const data: OrderSlot = userServices.data.payload;
-    const slots =
-      availableSlots[toYMD(new Date(selected.order_date as Date))] ?? [];
+    const dayKey = toYMD(new Date(selected.order_date as Date));
+    const slots = (slotSource ?? availableSlots)[dayKey] ?? [];
 
     const artistIds = slots
       .filter(
@@ -261,48 +280,168 @@ export default function OrderPage({
     );
     return result;
   };
+  const getSelectedArtistForService = (serviceId: string) =>
+    selected.users?.[serviceId] ?? selected.users?.["0"];
+  const canAssignParallelArtists = (slots: OrderSlot) => {
+    const services = (selected.details ?? [])
+      .map((detail) => detail.service_id)
+      .filter((serviceId, index, array) => array.indexOf(serviceId) === index)
+      .sort((a, b) => (slots[a]?.length ?? 0) - (slots[b]?.length ?? 0));
+
+    const usedArtists = new Set<string>();
+
+    const assign = (index: number): boolean => {
+      if (index >= services.length) return true;
+
+      const serviceId = services[index];
+      const artists = slots[serviceId] ?? [];
+      for (const artistId of artists) {
+        if (usedArtists.has(artistId)) continue;
+        usedArtists.add(artistId);
+        if (assign(index + 1)) return true;
+        usedArtists.delete(artistId);
+      }
+
+      return false;
+    };
+
+    return assign(0);
+  };
+  const hasValidSelectedArtists = (slots: OrderSlot) =>
+    (selected.details ?? []).every((detail) => {
+      const selectedArtist = getSelectedArtistForService(detail.service_id);
+      if (!selectedArtist) return false;
+
+      const artists = slots[detail.service_id] ?? [];
+      return artists.includes(selectedArtist);
+    });
   const isEmpty = (obj: object) => Object.keys(obj).length === 0;
   const step3Checker = async () => {
-    let result = await getArtists();
-    let checker = selected.details?.every((detail) => {
-      if (result[detail.service_id] == undefined) return true;
-      return result[detail.service_id]?.length <= 1;
+    const refreshedSlots = await getSlots(selected.parallel, {
+      date: selected.order_date,
+      updateSelectedDate: false,
+      suppressEmptyToast: true,
+      updateState: false,
     });
 
-    if (selected.parallel && checker) {
-      setField("parallel", false);
-      await getSlots(false);
-      result = await getArtists();
-
-      setCant(true);
-    } else {
-      setCant(false);
-    }
-    if (isEmpty(result)) {
+    if (!refreshedSlots) {
       addToast({
         title: "Цаг олдсонгүй дахин сонгоно уу",
         color: "warning",
-         timeout: 3000
+        timeout: 3000,
       });
       setField("start_time", undefined);
-      fetcher(2)
-      return;
+      await go(2);
+      return false;
     }
+
+    let result = await getArtists(refreshedSlots);
+    if (result == null) {
+      await go(2);
+      return false;
+    }
+    if (result == null || isEmpty(result)) {
+      addToast({
+        title: "Цаг олдсонгүй дахин сонгоно уу",
+        color: "warning",
+        timeout: 3000,
+      });
+      setField("start_time", undefined);
+      await go(2);
+      return false;
+    }
+
+    if (selected.parallel && !canAssignParallelArtists(result)) {
+      onQueueModalOpen();
+      return false;
+    }
+
+    setCant(false);
+
+    if (
+      selected.users &&
+      Object.values(selected.users).some(Boolean) &&
+      !hasValidSelectedArtists(result)
+    ) {
+      addToast({
+        title: "Сонгосон артист боломжгүй боллоо. Дахин сонгоно уу",
+        color: "warning",
+        timeout: 3000,
+      });
+      setField("users", undefined);
+      setUserService(result);
+      await go(3);
+      return false;
+    }
+
     setUserService(result);
+    return true;
+  };
+  const switchToSequentialFlow = async () => {
+    setStepLoading(true);
+    try {
+      setField("parallel", false);
+      setField("users", undefined);
+      setCant(true);
+
+      const sequentialSlots = await getSlots(false, {
+        date: selected.order_date,
+        updateSelectedDate: false,
+        suppressEmptyToast: true,
+        updateState: false,
+      });
+
+      if (!sequentialSlots) {
+        addToast({
+          title: "Цаг олдсонгүй дахин сонгоно уу",
+          color: "warning",
+          timeout: 3000,
+        });
+        setField("start_time", undefined);
+        await go(2);
+        return;
+      }
+
+      const result = await getArtists(sequentialSlots);
+      if (result == null || isEmpty(result)) {
+        addToast({
+          title: "Цаг олдсонгүй дахин сонгоно уу",
+          color: "warning",
+          timeout: 3000,
+        });
+        setField("start_time", undefined);
+        await go(2);
+        return;
+      }
+
+      setUserService(result);
+      await getSlots(false, {
+        updateSelectedDate: false,
+        suppressEmptyToast: true,
+      });
+      await go(3);
+    } finally {
+      setStepLoading(false);
+    }
   };
 
   const fetcher = async (currentStep: number) => {
-    if (currentStep == 1) {
-      setField("users", undefined);
+    setStepLoading(true);
+    try {
+      if (currentStep == 1) {
+        setField("users", undefined);
+      }
+      if (currentStep == 2) {
+        await getSlots(selected.parallel);
+      }
+      if (currentStep == 3) {
+        const canProceed = await step3Checker();
+        if (!canProceed) return;
+      }
+      await go(currentStep);
+    } finally {
+      setStepLoading(false);
     }
-    if (currentStep == 2) {
-      await getSlots(selected.parallel);
-    }
-    if (currentStep == 3) {
-      step3Checker();
-    }
-    // onSubmit();
-    go(currentStep);
   };
 
   useEffect(() => {
@@ -311,64 +450,19 @@ export default function OrderPage({
 
   const formatDetails = () => {
     const details: IOrderDetail[] = [];
-    let day = mnDate(selected.order_date)?.getDay() - 1;
-    if (day === -1) day = 6;
 
-    const startHour = +(selected?.start_time?.slice(0, 2) ?? "");
-
-    selected.details?.forEach((d, i) => {
+    selected.details?.forEach((d) => {
       const service = d.service_id;
       let user_id = d.user_id;
 
-      // аль хэдийн user_id байгаа бол тэрийг хадгална
       if (user_id) {
         details.push({ ...d, user_id });
         return;
       }
 
-      // parallel тохиолдолд 2 artist байх боломжтой
-      if (selected.parallel) {
-        const selectedUser = selected.users?.[service];
-        if (selectedUser) {
-          details.push({ ...d, user_id: selectedUser });
-          return;
-        }
-
-        // тухайн цагт хийж чадах artist-ууд
-        const availableArtists = userDatetimes.filter((u) => {
-          const canDoService = u.service_id === service;
-          const hasSlot = u.slots?.[day]?.includes(startHour);
-          if (!canDoService || !hasSlot) return false;
-
-          // 2 дахь service-ийн artist өмнөхтэй давхцахгүй байх ёстой
-          if (i === 1 && details.length > 0) {
-            return u.user?.id !== details[0].user_id;
-          }
-          return true;
-        });
-
-        if (availableArtists.length > 0) {
-          const index = Math.floor(Math.random() * availableArtists.length);
-          details.push({
-            ...d,
-            user_id: availableArtists[index].user?.id,
-          });
-        }
-
-        return;
-      }
-
-      // parallel биш — 1 artist
-      const availableTimes = userDatetimes.filter(
-        (u) => u.service_id === service && u.slots?.[day]?.includes(startHour),
-      );
-
-      const selectedUser = selected.users?.[service] ?? selected.users?.[0];
+      const selectedUser = getSelectedArtistForService(service);
       if (selectedUser && selectedUser !== "0" && selectedUser !== "") {
         user_id = selectedUser;
-      } else if (availableTimes.length > 0) {
-        const index = Math.floor(Math.random() * availableTimes.length);
-        user_id = availableTimes?.[index].user?.id;
       }
 
       details.push({ ...d, user_id });
@@ -380,49 +474,94 @@ export default function OrderPage({
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [checked, setChecked] = useState(false);
   const [order, setOrder] = useState<string | null>(null);
+  const prePaymentErrorMessage =
+    "Урьдчилгаа төлбөр үүсгэхэд алдаа гарлаа. Дахин оролдоно уу";
   const onSubmit = async () => {
-    const payload = {
-      branch_id: selected.branch_id,
-      details: formatDetails(),
-      order_date: selected.order_date,
-      start_time: selected.start_time,
-      description: selected.description,
-      method: PaymentMethod.P2P,
-      parallel: selected.parallel,
-    };
-    const res = await create<IOrder>(Api.order, payload);
-    if (!res.success) {
+    if (submitLoading) return false;
+
+    setShowError(true);
+    if (!Object.values(step3Errors).every((value) => !value)) {
+      await go(3);
+      return false;
+    }
+
+      setSubmitLoading(true);
+    try {
+      setInvoice(null);
+      setOrder(null);
+      const artistCheck = await step3Checker();
+      if (!artistCheck) return false;
+
+      const details = formatDetails();
+      if (details.some((detail) => !detail.user_id)) {
+        addToast({
+          title: "Артистаа сонгоод дахин оролдоно уу",
+          color: "warning",
+          timeout: 3000,
+        });
+        await go(3);
+        return false;
+      }
+
+      const payload = {
+        branch_id: selected.branch_id,
+        details,
+        order_date: selected.order_date,
+        start_time: selected.start_time,
+        description: selected.description,
+        pre_method: PaymentMethod.P2P,
+        method: PaymentMethod.P2P,
+        parallel: selected.parallel,
+      };
+      const res = await create<IOrder>(Api.order, payload);
+      if (!res.success) {
+        addToast({
+          title: res.error ?? prePaymentErrorMessage,
+          color: "warning",
+          timeout: 3000,
+        });
+
+        await fetcher(2);
+
+        return false;
+      }
+      const createdInvoice = res.data?.payload?.invoice;
+      const createdOrderId = res.data?.payload?.id;
+
+      if (createdInvoice?.price && createdOrderId) {
+        setInvoice(createdInvoice);
+        setOrder(createdOrderId);
+        return true;
+      }
+
       addToast({
-        title: res.error ?? "Алдаа гарлаа дахин оролдоно уу",
+        title: prePaymentErrorMessage,
         color: "warning",
-         timeout: 3000
+        timeout: 3000,
       });
-
-      fetcher(2);
-
-      return;
+      return false;
+    } finally {
+      setSubmitLoading(false);
     }
-    if (res.data?.payload?.invoice) {
-      setInvoice(res.data.payload.invoice);
-      setOrder(res.data.payload.id);
-    } else {
-      addToast({ title: "Амжилттай.", color: "success",  timeout: 3000 });
-      // reset();
-    }
-    return res.success;
   };
   const router = useRouter();
-  if (invoice != null && order != null && step == 5) {
-    if (invoice.price)
-      return (
-        <div>
-          <PaymentView invoice={invoice} id={order} />
-        </div>
-      );
-    else {
-      addToast({ title: "Амжилттай.", color: "success",  timeout: 3000 });
+  useEffect(() => {
+    if (step === 5 && invoice && order && !invoice.price) {
+      addToast({
+        title: prePaymentErrorMessage,
+        color: "warning",
+        timeout: 3000,
+      });
+      setStep(4);
       router.refresh();
     }
+  }, [invoice, order, router, step]);
+  if (invoice != null && order != null && step == 5 && invoice.price) {
+    return (
+      <div>
+        <PaymentView invoice={invoice} id={order} />
+      </div>
+    );
   }
   const stepValue = (index: number) => {
     const selected_services = selected.details;
@@ -605,6 +744,7 @@ export default function OrderPage({
               users={userMap}
               services={serviceMap}
               cant={cant}
+              errors={step3Errors}
               onChange={setField}
               slots={userService}
             />
@@ -623,7 +763,7 @@ export default function OrderPage({
           <div className="flex w-full justify-between gap-4 mt-6 px-2">
             <Button
               onPress={prev}
-              disabled={step === 1}
+              isDisabled={step === 1 || stepLoading || submitLoading}
               variant="bordered"
               className={
                 "h-12 w-full md:w-28 border-rose-400 text-rose-500 hover:scale-105 transition-all duration-150"
@@ -633,6 +773,8 @@ export default function OrderPage({
             </Button>
             {step < total ? (
               <Button
+                isLoading={stepLoading}
+                isDisabled={stepLoading || submitLoading}
                 className={cn(
                   isStepComplete ? "" : "",
                   button,
@@ -644,6 +786,7 @@ export default function OrderPage({
               </Button>
             ) : (
               <Button
+                isDisabled={stepLoading || submitLoading}
                 onPress={() => onOpen()}
                 className={cn(
                   isStepComplete ? "" : "",
@@ -666,23 +809,11 @@ export default function OrderPage({
               </ModalHeader>
 
               <ModalBody className="space-y-3">
-                {!invoice?.price && (
-                  <p className="text-sm text-muted-foreground">
-                    Энэхүү захиалга урьдчилгаа төлбөргүйгээр баталгаажна.
-                  </p>
-                )}
-
-                {invoice?.price && (
-                  <p className="text-sm text-muted-foreground">
-                    Та захиалгаа баталгаажуулахын тулд{" "}
-                    <span className="font-semibold text-primary">
-                      {money(invoice.price)}₮
-                    </span>{" "}
-                    урьдчилгаа төлбөр төлөх шаардлагатай. Энэ төлбөр буцаан
-                    олгогдохгүйг анхаарна уу. Мөн энэхүү урьдчилгаа нь таны нийт
-                    төлбөрөөс хасагдан тооцогдох болно.
-                  </p>
-                )}
+                <p className="text-sm text-muted-foreground">
+                  Та захиалгаа баталгаажуулахын тулд урьдчилгаа төлбөр төлөх
+                  шаардлагатай. Үргэлжлүүлэх дарсны дараа QPay төлбөрийн хэсэг
+                  нээгдэнэ.
+                </p>
 
                 {/* ✅ Checkbox хэсэг */}
                 <label className="flex items-center gap-2 text-sm">
@@ -724,19 +855,19 @@ export default function OrderPage({
                   color="danger"
                   className="h-8 rounded-sm"
                   variant="light"
+                  isDisabled={submitLoading}
                   onPress={onClose}
                 >
                   Буцах
                 </Button>
                 <Button
                   color="primary"
-                  isDisabled={!checked} // 👈 checkbox шалгаагүй бол disable
+                  isLoading={submitLoading}
+                  isDisabled={!checked || submitLoading}
                   onPress={async () => {
                     await onSubmit().then((d) => {
                       if (d) {
                         setStep(5);
-                      } else {
-                        setStep(1);
                       }
                       onClose();
                     });
@@ -747,6 +878,52 @@ export default function OrderPage({
                   )}
                 >
                   Үргэлжлүүлэх
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isQueueModalOpen} onOpenChange={onQueueModalChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Зэрэг үйлчилгээ боломжгүй байна
+              </ModalHeader>
+              <ModalBody>
+                <p className="text-sm text-muted-foreground">
+                  Тухайн цагт зэрэг үйлчлэх боломжгүй тул дарааллаар
+                  үйлчлүүлэх үү?
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  isDisabled={stepLoading || submitLoading}
+                  onPress={() => {
+                    setCant(false);
+                    setField("start_time", undefined);
+                    onClose();
+                  }}
+                >
+                  Өөр цаг сонгох
+                </Button>
+                <Button
+                  color="primary"
+                  isLoading={stepLoading}
+                  isDisabled={stepLoading || submitLoading}
+                  onPress={async () => {
+                    onClose();
+                    await switchToSequentialFlow();
+                  }}
+                  className={cn(
+                    button,
+                    "text-white border shadow-xl border-white/5 rounded-sm",
+                  )}
+                >
+                  Тийм, дарааллаар
                 </Button>
               </ModalFooter>
             </>

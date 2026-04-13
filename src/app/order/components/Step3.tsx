@@ -9,6 +9,9 @@ import { OrderSlot, ParallelOrderSlot } from "@/models/slot.model";
 
 interface Step3Props {
   showError: boolean;
+  errors?: {
+    user?: string;
+  };
   values: {
     details: IOrderDetail[];
     users: Record<string, string>;
@@ -32,6 +35,7 @@ export default function Step3({
   users,
   slots,
   showError,
+  errors,
   services,
   values,
   cant,
@@ -43,22 +47,25 @@ export default function Step3({
         <div className="mb-2 rounded-md bg-rose-50 border border-rose-100 p-3">
           <p className="text-md mb-1 font-medium text-rose-800">Санамж</p>
           <p className="text-sm text-rose-700">
-            Таны сонгосон цагт 2 артист зэрэг үйлчлэх боломжгүй тул 1 артист
-            дарааллаар үйлчилгээг үзүүлэхийг анхаарна уу.
+            Тухайн цагт зэрэг үйлчилгээ боломжгүй тул таны захиалга
+            дарааллаар үйлчлэгдэхээр тохируулагдлаа.
           </p>
         </div>
       )}
       <div className="space-y-2">
         <p className="font-medium ">Артист сонгох </p>
+        {showError && errors?.user && (
+          <p className="text-sm text-rose-500">{errors.user}</p>
+        )}
       </div>
       {Object.keys(values.users).length === 0 ? (
-        <div className="w-full  border-rose-400/50 flex justify-center items-center border bg-rose-100/50 rounded-sm h-[60px]">
+        <div className="flex h-[64px] w-full items-center justify-center rounded-2xl border border-rose-200 bg-rose-50/70 px-4">
           <p className="text-sm text-gray-500 px-2 py-2 text-center">
             Артист сонгогдоогүй байна.
           </p>
         </div>
       ) : (
-        <div className="flex justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-gray-500">
             Бүх үйлчилгээнд нэг артист сонгогдсон
           </p>
@@ -75,11 +82,12 @@ export default function Step3({
         </div>
       )}
       {!values.parallel && (
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from(new Set(Object.values(slots).flat())).map(
             (artistId, index) => {
               const key = "0";
               const artist = users[artistId];
+              if (!artist) return null;
               const selected = values.users[key] == artistId;
               return (
                 <ArtistCard
@@ -97,7 +105,9 @@ export default function Step3({
           )}{" "}
         </div>
       )}
-      {values.parallel &&
+      {values.parallel && (
+        <div className="space-y-4">
+        {
         Object.entries(slots).map(([serviceId, artists], i) => {
           const service = services[serviceId];
           const key = serviceId ?? "";
@@ -105,15 +115,21 @@ export default function Step3({
           const selectedUser = selectedUserId ? users[selectedUserId] : null;
 
           return (
-            <div className="flex w-full gap-3" key={i}>
-              <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
+            <div
+              className="rounded-3xl border border-rose-100 bg-rose-50/40 p-4 shadow-sm"
+              key={i}
+            >
+              <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-slate-700 ring-1 ring-rose-100">
                 <span>{i + 1}</span>
               </div>
               <div className="w-full">
-                <div className="flex w-full mb-2 justify-between items-center">
-                  <div>
-                    <p className="text-sm">{service.name}</p>
-                    <p className="text-xs text-gray-300">
+                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-base font-semibold text-slate-900">
+                      {service?.name}
+                    </p>
+                    <p className="text-xs text-slate-500">
                       {service.duration && `${service.duration} мин • `}
                       {money(
                         (service?.min_price ?? 0).toString(),
@@ -126,25 +142,21 @@ export default function Step3({
                     </p>
                   </div>
                   {selectedUser && (
-                    <div className="flex gap-3 items-center">
-                      <span>
+                    <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm text-slate-700 ring-1 ring-rose-100">
+                      <span className="text-slate-400">
                         <ArrowRight size={14} />
                       </span>
-                      <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
+                      <span className="flex items-center gap-2">
                         <User2 size={14} color="gray" />
                         {firstLetterUpper(selectedUser.nickname ?? "")}
                       </span>
                     </div>
                   )}
                 </div>
-                <div className="grid grid-cols-6 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {artists.map((artistId, index) => {
-                    const prevKey = Object.keys(values.users).find(
-                      (k) => k != artistId
-                    );
                     const user = users[artistId];
-                    const prevArtistId = prevKey ? values.users[prevKey] : null;
-
+                    if (!user) return null;
                     const selected = values.users[serviceId] == artistId;
                     return (
                       <ArtistCard
@@ -173,9 +185,12 @@ export default function Step3({
                   })}
                 </div>
               </div>
+              </div>
             </div>
           );
         })}
+        </div>
+      )}
       {/* {values.parallel
         ? values.details.map((v, i) => {
             const key = v.service_id ?? "";
