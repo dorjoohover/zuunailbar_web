@@ -36,7 +36,7 @@ import { Invoice } from "@/types";
 import { formatTime, parseDate, toYMD } from "@/lib/functions";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { PaymentMethod } from "@/lib/enum";
+import { PaymentMethod, VOUCHER } from "@/lib/enum";
 import { OrderSlot, Slot } from "@/models/slot.model";
 
 export default function OrderPage({
@@ -52,6 +52,22 @@ export default function OrderPage({
   branch_services: ListType<BranchService>;
   users: ListType<User>;
 }) {
+  const calculateVoucherDiscount = (
+    subtotal: number,
+    type?: number | null,
+    value?: number | null,
+  ) => {
+    const total = Number(subtotal ?? 0);
+    const voucherValue = Number(value ?? 0);
+
+    if (total <= 0 || voucherValue <= 0) return 0;
+
+    if (Number(type) === VOUCHER.Percent) {
+      return Math.min(total, Math.round((total * voucherValue) / 100));
+    }
+
+    return Math.min(total, voucherValue);
+  };
   // selected бүх мэдээллээ энд төвлөрүүлнэ
   const [selected, setSelected] = useState<IOrder>({
     details: [],
@@ -124,6 +140,16 @@ export default function OrderPage({
   );
   const total = 4;
   const [step, setStep] = useState(1);
+  const router = useRouter();
+  const estimatedSubtotal =
+    selected.details?.reduce((sum, detail) => sum + +(detail?.min_price ?? 0), 0) ??
+    0;
+  const estimatedVoucherDiscount = calculateVoucherDiscount(
+    estimatedSubtotal,
+    selected.discount_type,
+    selected.voucher_value,
+  );
+  const finalTotal = Math.max(estimatedSubtotal - estimatedVoucherDiscount, 0);
   const go = async (n: number) => {
     setStep(Math.min(Math.max(1, n), total));
   };
@@ -476,7 +502,7 @@ export default function OrderPage({
   const [order, setOrder] = useState<string | null>(null);
   const prePaymentErrorMessage =
     "Урьдчилгаа төлбөр үүсгэхэд алдаа гарлаа. Дахин оролдоно уу";
-  const onSubmit = async () => {
+  const onSubmit = async (): Promise<"invoice" | "completed" | false> => {
     if (submitLoading) return false;
 
     setShowError(true);
@@ -509,8 +535,9 @@ export default function OrderPage({
         order_date: selected.order_date,
         start_time: selected.start_time,
         description: selected.description,
-        pre_method: PaymentMethod.P2P,
-        method: PaymentMethod.P2P,
+        pre_method: PaymentMethod.QPAY,
+        method: PaymentMethod.QPAY,
+        voucher_id: selected.voucher_id,
         parallel: selected.parallel,
       };
       const res = await create<IOrder>(Api.order, payload);
@@ -531,7 +558,17 @@ export default function OrderPage({
       if (createdInvoice?.price && createdOrderId) {
         setInvoice(createdInvoice);
         setOrder(createdOrderId);
-        return true;
+        return "invoice";
+      }
+
+      if (createdOrderId) {
+        addToast({
+          title: "Захиалга амжилттай баталгаажлаа.",
+          timeout: 3000,
+        });
+        router.push("/my");
+        router.refresh();
+        return "completed";
       }
 
       addToast({
@@ -544,7 +581,6 @@ export default function OrderPage({
       setSubmitLoading(false);
     }
   };
-  const router = useRouter();
   useEffect(() => {
     if (step === 5 && invoice && order && !invoice.price) {
       addToast({
@@ -756,6 +792,8 @@ export default function OrderPage({
               services={data}
               users={users}
               invoice={invoice}
+              token={token}
+              onChange={setField}
             />
           )}
 
@@ -810,9 +848,9 @@ export default function OrderPage({
 
               <ModalBody className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Та захиалгаа баталгаажуулахын тулд урьдчилгаа төлбөр төлөх
-                  шаардлагатай. Үргэлжлүүлэх дарсны дараа QPay төлбөрийн хэсэг
-                  нээгдэнэ.
+                  {finalTotal === 0
+                    ? "Энэ захиалга voucher-аар бүрэн хаагдах тул үргэлжлүүлсний дараа шууд баталгаажна."
+                    : "Та захиалгаа баталгаажуулахын тулд урьдчилгаа төлбөр төлөх шаардлагатай. Үргэлжлүүлэх дарсны дараа QPay төлбөрийн хэсэг нээгдэнэ."}
                 </p>
 
                 {/* ✅ Checkbox хэсэг */}
@@ -865,8 +903,8 @@ export default function OrderPage({
                   isLoading={submitLoading}
                   isDisabled={!checked || submitLoading}
                   onPress={async () => {
-                    await onSubmit().then((d) => {
-                      if (d) {
+                    await onSubmit().then((result) => {
+                      if (result === "invoice") {
                         setStep(5);
                       }
                       onClose();

@@ -1,27 +1,34 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import { find } from "@/app/(api)";
+import { ReviewCard } from "@/components/card";
 import { ListType, mnDate } from "@/lib/const";
 import {
   firstLetterUpper,
   formatTime,
   getDayName,
   money,
-  parseDate,
 } from "@/lib/functions";
-import { Branch, IOrder, IUserService, Service, User } from "@/models";
-import { Button } from "@heroui/button";
-import Image from "next/image";
-import { ReviewCard } from "@/components/card";
+import {
+  Branch,
+  IOrder,
+  Service,
+  User,
+  Voucher,
+} from "@/models";
+import { VoucherStatus, VOUCHER } from "@/lib/enum";
+import { Invoice } from "@/types";
+import { Api } from "@/utils/api";
 import {
   Calendar,
-  LocateIcon,
-  MapPin,
-  User as LUser,
-  Folder,
   Clock,
+  Folder,
+  MapPin,
+  TicketPercent,
+  User as LUser,
   Wallet,
 } from "lucide-react";
-import { Invoice } from "@/types";
 
 interface Step4Props {
   values: Partial<IOrder> & {
@@ -31,7 +38,27 @@ interface Step4Props {
   users: ListType<User>;
   services: ListType<Service>;
   invoice: Invoice | null;
+  token?: string;
+  onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
 }
+
+const calculateVoucherDiscount = (
+  subtotal: number,
+  voucher?: Pick<Voucher, "type" | "value"> | null,
+) => {
+  if (!voucher) return 0;
+
+  const total = Number(subtotal ?? 0);
+  const value = Number(voucher.value ?? 0);
+
+  if (total <= 0 || value <= 0) return 0;
+
+  if (Number(voucher.type) === VOUCHER.Percent) {
+    return Math.min(total, Math.round((total * value) / 100));
+  }
+
+  return Math.min(total, value);
+};
 
 export default function Step4({
   values,
@@ -39,27 +66,85 @@ export default function Step4({
   services,
   users,
   invoice,
+  token,
+  onChange,
 }: Step4Props) {
   const branch = branches.items.filter((a) => a.id == values.branch_id)[0];
+  const [vouchers, setVouchers] = useState<ListType<Voucher>>({
+    count: 0,
+    items: [],
+  });
+  const [voucherLoading, setVoucherLoading] = useState(false);
 
-  const duration = values.details?.reduce(
-    (acc, item) => acc + (item?.duration ?? 0),
-    0
-  );
-  const totalMin = values.details?.reduce(
-    (sum, item) => sum + +(item?.min_price ?? 0),
-    0,
-  ) ?? 0;
-  const totalMax = values.details?.reduce(
-    (sum, item) => sum + +(item?.max_price ?? item?.min_price ?? 0),
-    0,
-  ) ?? 0;
-  const total =
-    totalMin === totalMax
-      ? money(totalMin.toString())
-      : `${money(totalMin.toString())} - ${money(totalMax.toString())}`;
-  const pre = invoice?.price ?? 0;
+  const duration =
+    values.details?.reduce((acc, item) => acc + (item?.duration ?? 0), 0) ?? 0;
+  const subtotal =
+    values.details?.reduce((sum, item) => sum + +(item?.min_price ?? 0), 0) ?? 0;
   const date = values.order_date ?? mnDate();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadVouchers = async () => {
+      if (!token) {
+        setVouchers({ count: 0, items: [] });
+        return;
+      }
+
+      setVoucherLoading(true);
+
+      try {
+        const res = await find<Voucher>(
+          Api.voucher,
+          {
+            limit: -1,
+            voucher_status: VoucherStatus.Available,
+          },
+          "my",
+        );
+
+        if (!cancelled) {
+          setVouchers(res.data);
+        }
+      } finally {
+        if (!cancelled) {
+          setVoucherLoading(false);
+        }
+      }
+    };
+
+    loadVouchers();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  const selectedVoucher = useMemo(
+    () => vouchers.items.find((item) => item.id === values.voucher_id) ?? null,
+    [values.voucher_id, vouchers.items],
+  );
+
+  useEffect(() => {
+    if (voucherLoading || !values.voucher_id) return;
+
+    if (!selectedVoucher) {
+      onChange("voucher_id", null);
+      onChange("voucher_name", undefined);
+      onChange("voucher_value", undefined);
+      onChange("discount_type", undefined);
+    }
+  }, [onChange, selectedVoucher, values.voucher_id, voucherLoading]);
+
+  const discount = calculateVoucherDiscount(
+    subtotal,
+    selectedVoucher ?? {
+      type: values.discount_type as VOUCHER,
+      value: Number(values.voucher_value ?? 0),
+    },
+  );
+  const finalTotal = Math.max(subtotal - discount, 0);
+  const pre = invoice?.price ?? 0;
 
   return (
     <div className="space-y-10 w-full">
@@ -71,9 +156,9 @@ export default function Step4({
           <ReviewCard Icon={MapPin} title="Байршил">
             <div>
               <p className="text-gray-500 text-sm">
-                {firstLetterUpper(branch.name)}
+                {firstLetterUpper(branch?.name ?? "")}
               </p>
-              <p className="text-gray-500 text-xs">{branch.address}</p>
+              <p className="text-gray-500 text-xs">{branch?.address}</p>
             </div>
           </ReviewCard>
           <ReviewCard Icon={Calendar} title="Өдөр | Цаг" bold={true}>
@@ -92,12 +177,8 @@ export default function Step4({
             <div className="w-full">
               {values.details?.map((service, i) => {
                 const min = service.min_price ?? 0;
-                const max = service.max_price ?? 0;
-                const ttl =
-                  min == max || max == 0
-                    ? money(min.toString())
-                    : `${money(min.toString())} - ${money(max.toString())}`;
-                const user_id = values.users?.[service.service_id];
+                const user_id =
+                  values.users?.[service.service_id] ?? values.users?.["0"];
                 const user = users.items.filter((u) => u.id == user_id)?.[0];
                 return (
                   <div
@@ -120,12 +201,96 @@ export default function Step4({
                         </span>
                       )}
                     </div>
-                    {min != 0 && <p>{ttl}₮</p>}
+                    {min != 0 && <p>{money(min.toString())}₮</p>}
                   </div>
                 );
               })}
             </div>
           </ReviewCard>
+          {token && (
+            <ReviewCard Icon={TicketPercent} title="Voucher">
+              <div className="w-full space-y-3">
+                {voucherLoading ? (
+                  <p className="text-sm text-gray-500">
+                    Voucher мэдээлэл уншиж байна...
+                  </p>
+                ) : vouchers.items.length === 0 ? (
+                  <p className="text-sm text-gray-500">
+                    Ашиглах боломжтой voucher алга байна.
+                  </p>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {vouchers.items.map((voucher) => {
+                      const selected = voucher.id === values.voucher_id;
+                      const voucherDiscount = calculateVoucherDiscount(
+                        subtotal,
+                        voucher,
+                      );
+                      const label =
+                        Number(voucher.type) === VOUCHER.Percent
+                          ? `${voucher.value ?? 0}%`
+                          : `${money(voucher.value ?? 0)}₮`;
+
+                      return (
+                        <button
+                          key={voucher.id}
+                          type="button"
+                          className={`rounded-xl border px-3 py-3 text-left transition-all ${
+                            selected
+                              ? "border-rose-400 bg-rose-50 shadow-sm"
+                              : "bg-white hover:border-rose-200"
+                          }`}
+                          onClick={() => {
+                            const cleared = selected;
+                            onChange("voucher_id", cleared ? null : voucher.id);
+                            onChange(
+                              "voucher_name",
+                              cleared ? undefined : voucher.name,
+                            );
+                            onChange(
+                              "voucher_value",
+                              cleared ? undefined : voucher.value,
+                            );
+                            onChange(
+                              "discount_type",
+                              cleared ? undefined : voucher.type,
+                            );
+                          }}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div>
+                              <p className="font-semibold text-sm">
+                                {voucher.name}
+                              </p>
+                              <p className="text-xs text-gray-500">{label}</p>
+                            </div>
+                            {selected && (
+                              <span className="rounded-full bg-rose-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                                Сонгосон
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-2 text-xs text-gray-500">
+                            {voucherDiscount > 0
+                              ? `${money(voucherDiscount)}₮ хасагдана`
+                              : "Хөнгөлөлт тооцогдохгүй"}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {selectedVoucher && (
+                  <div className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                    {selectedVoucher.name} хэрэглэж,
+                    {` ${money(discount)}₮`} хасагдана.
+                    {finalTotal === 0 &&
+                      " Энэ захиалга voucher-аар бүрэн хаагдана."}
+                  </div>
+                )}
+              </div>
+            </ReviewCard>
+          )}
           {values.description && (
             <ReviewCard Icon={Folder} title="Тайлбар">
               <div>
@@ -155,26 +320,19 @@ export default function Step4({
             </div>
           )}
           <div className="flex flex-col items-end">
-            <p className="text-sm text-gray-500">Нийт үнэ</p>
-            <p className="text-lg ">{total}₮</p>
+            <p className="text-sm text-gray-500">Үндсэн үнэ</p>
+            <p className="text-md">{money(subtotal.toString())}₮</p>
+            {discount > 0 && (
+              <>
+                <p className="mt-1 text-sm text-gray-500">Voucher хөнгөлөлт</p>
+                <p className="text-md text-rose-600">-{money(discount)}₮</p>
+              </>
+            )}
+            <p className="mt-1 text-sm text-gray-500">Төлөх дүн</p>
+            <p className="text-lg">{money(finalTotal.toString())}₮</p>
           </div>
         </div>
       </div>
-      {/* 
-      <Image
-        src="/"
-        alt="Qpay: QR code"
-        width={500}
-        height={500}
-        className="object-cover w-full bg-gray-200 aspect-square rounded-xl size-full flex-center"
-      />
-      <div className="flex flex-col items-center justify-center gap-2">
-        <Button className="text-white bg-dark">Шалгах</Button>
-        <Button isLoading className="text-white bg-dark">
-          Шалгаж байна
-        </Button>
-        <Button className="text-white bg-teal-500">Баталгаажлаа</Button>
-      </div> */}
     </div>
   );
 }

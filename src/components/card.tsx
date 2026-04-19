@@ -326,6 +326,8 @@ export function OrderCard({ data }: { data: Order }) {
     description,
     total_amount,
     pre_amount,
+    voucher_name,
+    discount,
   } = data;
   const config = statusConfig[order_status as OrderStatus];
   // Format date
@@ -383,6 +385,13 @@ export function OrderCard({ data }: { data: Order }) {
         <p className="text-sm text-muted-foreground mb-3 pb-3 border-b border-gray-100">
           {description}
         </p>
+      )}
+
+      {voucher_name && (
+        <div className="mb-3 rounded-md border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+          Voucher: {voucher_name}
+          {Number(discount ?? 0) > 0 ? ` (-${money(discount ?? 0)}₮)` : ""}
+        </div>
       )}
 
       {/* Amount */}

@@ -28,10 +28,21 @@ export enum STATUS {
 }
 
 export enum PaymentMethod {
-  P2P = 1,
+  QPAY = 1,
   CASH = 2,
   BANK = 3,
   CARD = 4,
+}
+
+export enum VOUCHER {
+  Percent = 10,
+  Price = 20,
+}
+
+export enum VoucherStatus {
+  Available = 10,
+  Used = 20,
+  Cancelled = 30,
 }
 
 // export enum EmployeeStatus {

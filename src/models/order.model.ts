@@ -18,6 +18,11 @@ export interface IOrder {
   parallel?: boolean;
   method?: PaymentMethod;
   pre_method?: PaymentMethod;
+  voucher_id?: string | null;
+  voucher_name?: string | null;
+  voucher_value?: number | null;
+  discount?: number;
+  discount_type?: number | null;
 }
 
 export interface Order {
@@ -39,6 +44,11 @@ export interface Order {
   created_at?: Date;
   updated_at?: Date;
   details?: IOrderDetail[];
+  voucher_id?: string | null;
+  voucher_name?: string | null;
+  voucher_value?: number | null;
+  discount?: number;
+  discount_type?: number | null;
 }
 
 export interface IOrderDetail {
@@ -47,6 +57,8 @@ export interface IOrderDetail {
   service_id: string;
   max_price?: number;
   min_price?: number;
+  price?: number;
+  original_price?: number;
   service_name?: string;
   user_id?: string;
   duration?: number;

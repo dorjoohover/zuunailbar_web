@@ -44,7 +44,6 @@ export const MyOrderPage = ({
     setSelectedOrder(data.items.filter((d) => d.id == id)[0]);
     onOpen();
   };
-  console.log(data)
   return (
     <div className="max-w-6xl mt-14 mx-auto px-4 md:px-6 py-6 md:py-8">
       <div className="mb-6">
@@ -101,6 +100,7 @@ export const MyOrderPage = ({
             const pre = selectedOrder?.pre_amount
               ? `${money(selectedOrder.pre_amount)}₮`
               : "Тооцогдоогүй";
+            const voucherDiscount = Number(selectedOrder?.discount ?? 0);
             return (
               <>
                 <ModalHeader className="flex flex-col gap-1">
@@ -192,6 +192,20 @@ export const MyOrderPage = ({
                           </p>
                           <span>{pre}</span>
                         </div>
+                        {selectedOrder?.voucher_name && (
+                          <div className="mb-2">
+                            <p className="text-sm text-muted-foreground flex gap-2 items-center ">
+                              <Wallet className="text-primary" size={20} />
+                              Voucher
+                            </p>
+                            <span>
+                              {selectedOrder.voucher_name}
+                              {voucherDiscount > 0
+                                ? ` (-${money(voucherDiscount)}₮)`
+                                : ""}
+                            </span>
+                          </div>
+                        )}
                         <div className="mb-2">
                           <p className="text-sm text-muted-foreground flex gap-2 items-center ">
                             <Calendar1 className="text-primary" size={20} />
