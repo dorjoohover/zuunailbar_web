@@ -18,7 +18,7 @@ import { Clock, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 
 export const AlertDialog = ({
   isOpen,
@@ -66,17 +66,23 @@ export const AlertDialog = ({
 export const PaymentView = ({
   invoice,
   id,
+  redirectTo = "/",
+  cancelRedirectTo = redirectTo,
 }: {
   invoice: Invoice;
   id: string;
+  redirectTo?: string;
+  cancelRedirectTo?: string;
 }) => {
   const qrImage = invoice.qr_image?.trim();
   const paymentLinks = invoice.urls ?? [];
-  const end = mnDate(invoice.created);
+  const end = mnDate(new Date(invoice.created));
   end.setMinutes(end.getMinutes() + 10); // 10 минут нэмэх
   const endTime = end.getTime();
   const time = mnDate().getTime();
   const [timeLeft, setTimeLeft] = useState(endTime - time);
+  const expiryHandledRef = useRef(false);
+  const checkInFlightRef = useRef(false);
 
   let diffMinutes = Math.floor(timeLeft / (1000 * 60)).toString();
   let diffSeconds = Math.floor((timeLeft % (1000 * 60)) / 1000).toString();
@@ -85,38 +91,86 @@ export const PaymentView = ({
 
   const total = 10 * 60 * 1000;
   const progress = Math.ceil(100 - ((total - timeLeft) / total) * 100);
+  const [status, setStatus] = useState(invoice.status);
+  const router = useRouter();
+  const checkPayment = async (showResult = true) => {
+    if (checkInFlightRef.current) return null;
+    checkInFlightRef.current = true;
+    try {
+      const res = await find(Api.order, {}, `check/${invoice.invoice_id}/${id}`);
+      if (res.error) {
+        if (showResult) {
+          addToast({
+            title: "Төлбөрийн төлөв шалгаж чадсангүй. Түр хүлээгээд дахин оролдоно уу.",
+            timeout: 3000,
+            color: "warning",
+          });
+        }
+        return null;
+      }
+      const data = res.data as any;
+      if (data?.paid) {
+        setStatus(data.status);
+        router.push(redirectTo);
+        if (showResult) {
+          addToast({
+            title: "Амжилттай төлөгдлөө.",
+            timeout: 3000,
+          });
+        }
+        return true;
+      }
+      if (showResult) {
+        addToast({
+          title: "Төлбөр төлөгдөөгүй байна.",
+          timeout: 3000,
+        });
+      }
+      return false;
+    } finally {
+      checkInFlightRef.current = false;
+    }
+  };
+  const cancel = async () => {
+    const res = await find(Api.order, {}, `cancel/${id}`);
+    if (res.error) {
+      addToast({
+        title: res.error,
+      });
+      return;
+    }
+    addToast({
+      title: `Захиалга амжилттай цуцлагдлаа.`,
+    });
+    router.push(cancelRedirectTo);
+  };
   useEffect(() => {
     const interval = setInterval(() => {
       const now = mnDate();
-      const diff = end.getTime() - now.getTime();
-      if (diff <= 0) cancel();
-      if (+diffSeconds % 15 == 0) checkPayment();
+      const diff = endTime - now.getTime();
+      const secondsLeft = Math.max(0, Math.floor(diff / 1000));
+
+      if (diff <= 0) {
+        setTimeLeft(0);
+        if (!expiryHandledRef.current) {
+          expiryHandledRef.current = true;
+          void checkPayment(false).then((paid) => {
+            if (paid === null) {
+              expiryHandledRef.current = false;
+            } else if (paid === false) {
+              void cancel();
+            }
+          });
+        }
+        return;
+      }
+
+      if (secondsLeft % 15 == 0) void checkPayment(false);
       setTimeLeft(diff > 0 ? diff : 0);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [end]);
-  const [status, setStatus] = useState(invoice.status);
-  const router = useRouter();
-  const checkPayment = async () => {
-    const res = await find(Api.order, {}, `check/${invoice.invoice_id}/${id}`);
-    const data = res.data as any;
-    if (data.paid) {
-      setStatus(data.status);
-      router.push("/");
-    }
-    addToast({
-      title: `${data.paid ? "Амжилттай төлөгдлөө." : "Төлбөр төлөгдөөгүй байна."}`,
-      timeout: 3000,
-    });
-  };
-  const cancel = async () => {
-    const res = await find(Api.order, {}, `cancel/${id}`);
-    addToast({
-      title: `Захиалга амжилттай цуцлагдлаа.`,
-    });
-    router.push("/");
-  };
+  }, [endTime]);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   return (
@@ -170,7 +224,9 @@ export const PaymentView = ({
 
       <div className="flex flex-col items-center rounded-md bg-white py-4 px-3 border border-gray-300">
         <p className="text-sm">Урьдчилгаа төлбөр</p>
-        <p className="text-xl mb-2">{money(invoice.price.toString())}₮</p>
+        <p className="text-xl mb-2">
+          {money(String(invoice.price ?? 0))}₮
+        </p>
         <div className="flex items-center justify-center">
           {qrImage ? (
             <Image
@@ -226,7 +282,7 @@ export const PaymentView = ({
 
         <button
           className="my-4 cursor-pointer mx-auto w-full bg-gray-100 border border-gray-300 rounded-md py-2"
-          onClick={checkPayment}
+          onClick={() => void checkPayment()}
         >
           Шалгах
         </button>

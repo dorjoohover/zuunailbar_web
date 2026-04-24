@@ -19,5 +19,5 @@ export type Invoice = {
   qr_image: string;
   status: OrderStatus;
   urls: Url[];
-  created: Date;
+  created: Date | string;
 };

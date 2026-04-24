@@ -389,7 +389,7 @@ export function OrderCard({ data }: { data: Order }) {
 
       {voucher_name && (
         <div className="mb-3 rounded-md border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-700">
-          Voucher: {voucher_name}
+          Урамшуулал: {voucher_name}
           {Number(discount ?? 0) > 0 ? ` (-${money(discount ?? 0)}₮)` : ""}
         </div>
       )}

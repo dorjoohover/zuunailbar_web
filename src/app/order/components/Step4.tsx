@@ -30,6 +30,8 @@ import {
   Wallet,
 } from "lucide-react";
 
+const WEB_VOUCHER_ENABLED = false;
+
 interface Step4Props {
   values: Partial<IOrder> & {
     times?: string;
@@ -86,7 +88,7 @@ export default function Step4({
     let cancelled = false;
 
     const loadVouchers = async () => {
-      if (!token) {
+      if (!WEB_VOUCHER_ENABLED || !token) {
         setVouchers({ count: 0, items: [] });
         return;
       }
@@ -120,6 +122,28 @@ export default function Step4({
     };
   }, [token]);
 
+  useEffect(() => {
+    if (WEB_VOUCHER_ENABLED) return;
+
+    if (
+      values.voucher_id ||
+      values.voucher_name ||
+      values.voucher_value ||
+      values.discount_type
+    ) {
+      onChange("voucher_id", null);
+      onChange("voucher_name", undefined);
+      onChange("voucher_value", undefined);
+      onChange("discount_type", undefined);
+    }
+  }, [
+    onChange,
+    values.discount_type,
+    values.voucher_id,
+    values.voucher_name,
+    values.voucher_value,
+  ]);
+
   const selectedVoucher = useMemo(
     () => vouchers.items.find((item) => item.id === values.voucher_id) ?? null,
     [values.voucher_id, vouchers.items],
@@ -136,13 +160,15 @@ export default function Step4({
     }
   }, [onChange, selectedVoucher, values.voucher_id, voucherLoading]);
 
-  const discount = calculateVoucherDiscount(
-    subtotal,
-    selectedVoucher ?? {
-      type: values.discount_type as VOUCHER,
-      value: Number(values.voucher_value ?? 0),
-    },
-  );
+  const discount = WEB_VOUCHER_ENABLED
+    ? calculateVoucherDiscount(
+        subtotal,
+        selectedVoucher ?? {
+          type: values.discount_type as VOUCHER,
+          value: Number(values.voucher_value ?? 0),
+        },
+      )
+    : 0;
   const finalTotal = Math.max(subtotal - discount, 0);
   const pre = invoice?.price ?? 0;
 
@@ -207,16 +233,16 @@ export default function Step4({
               })}
             </div>
           </ReviewCard>
-          {token && (
-            <ReviewCard Icon={TicketPercent} title="Voucher">
+          {WEB_VOUCHER_ENABLED && token && (
+            <ReviewCard Icon={TicketPercent} title="Урамшуулал">
               <div className="w-full space-y-3">
                 {voucherLoading ? (
                   <p className="text-sm text-gray-500">
-                    Voucher мэдээлэл уншиж байна...
+                    Урамшууллын мэдээлэл уншиж байна...
                   </p>
                 ) : vouchers.items.length === 0 ? (
                   <p className="text-sm text-gray-500">
-                    Ашиглах боломжтой voucher алга байна.
+                    Ашиглах боломжтой урамшуулал алга байна.
                   </p>
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-2">
@@ -285,7 +311,7 @@ export default function Step4({
                     {selectedVoucher.name} хэрэглэж,
                     {` ${money(discount)}₮`} хасагдана.
                     {finalTotal === 0 &&
-                      " Энэ захиалга voucher-аар бүрэн хаагдана."}
+                      " Энэ захиалга урамшууллаар бүрэн хаагдана."}
                   </div>
                 )}
               </div>
@@ -324,7 +350,7 @@ export default function Step4({
             <p className="text-md">{money(subtotal.toString())}₮</p>
             {discount > 0 && (
               <>
-                <p className="mt-1 text-sm text-gray-500">Voucher хөнгөлөлт</p>
+                <p className="mt-1 text-sm text-gray-500">Урамшууллын хөнгөлөлт</p>
                 <p className="text-md text-rose-600">-{money(discount)}₮</p>
               </>
             )}

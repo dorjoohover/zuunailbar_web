@@ -5,7 +5,7 @@ import { IOrder, IOrderDetail, Service, User } from "@/models";
 import { MapType } from "@/lib/const";
 import { firstLetterUpper, money } from "@/lib/functions";
 import { ArtistCard } from "@/components/card";
-import { OrderSlot, ParallelOrderSlot } from "@/models/slot.model";
+import { OrderSlot } from "@/models/slot.model";
 
 interface Step3Props {
   showError: boolean;
@@ -41,6 +41,11 @@ export default function Step3({
   cant,
   // clearError,
 }: Step3Props) {
+  const selectedArtistCount = Object.values(values.users ?? {}).filter(
+    Boolean,
+  ).length;
+  const serviceArtistEntries = Object.entries(slots);
+
   return (
     <div className="w-full space-y-6">
       {cant && (
@@ -58,7 +63,7 @@ export default function Step3({
           <p className="text-sm text-rose-500">{errors.user}</p>
         )}
       </div>
-      {Object.keys(values.users).length === 0 ? (
+      {selectedArtistCount === 0 ? (
         <div className="flex h-[64px] w-full items-center justify-center rounded-2xl border border-rose-200 bg-rose-50/70 px-4">
           <p className="text-sm text-gray-500 px-2 py-2 text-center">
             Артист сонгогдоогүй байна.
@@ -67,7 +72,9 @@ export default function Step3({
       ) : (
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-gray-500">
-            Бүх үйлчилгээнд нэг артист сонгогдсон
+            {values.parallel
+              ? "Зэрэг үйлчилгээ бүрт өөр artist сонгоно."
+              : `Сонгосон artist: ${selectedArtistCount}/${values.details.length}`}
           </p>
           <Button
             onClick={() => onChange("users", {})}
@@ -81,34 +88,8 @@ export default function Step3({
           </Button>
         </div>
       )}
-      {!values.parallel && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {Array.from(new Set(Object.values(slots).flat())).map(
-            (artistId, index) => {
-              const key = "0";
-              const artist = users[artistId];
-              if (!artist) return null;
-              const selected = values.users[key] == artistId;
-              return (
-                <ArtistCard
-                  data={artist}
-                  onClick={(id: string) => {
-                    if (!selected) {
-                      onChange("users", { ...values.users, [key]: id });
-                    }
-                  }}
-                  selected={selected}
-                  key={index}
-                />
-              );
-            }
-          )}{" "}
-        </div>
-      )}
-      {values.parallel && (
-        <div className="space-y-4">
-        {
-        Object.entries(slots).map(([serviceId, artists], i) => {
+      <div className="space-y-4">
+        {serviceArtistEntries.map(([serviceId, artists], i) => {
           const service = services[serviceId];
           const key = serviceId ?? "";
           const selectedUserId = values.users[key];
@@ -120,77 +101,76 @@ export default function Step3({
               key={i}
             >
               <div className="flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-slate-700 ring-1 ring-rose-100">
-                <span>{i + 1}</span>
-              </div>
-              <div className="w-full">
-                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <p className="text-base font-semibold text-slate-900">
-                      {service?.name}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {service.duration && `${service.duration} мин • `}
-                      {money(
-                        (service?.min_price ?? 0).toString(),
-                        "",
-                        1,
-                        service.max_price ? 2 : undefined
-                      )}
-                      {service.max_price &&
-                        ` - ${money(service.max_price.toString(), "", 1, 2)}`}
-                    </p>
-                  </div>
-                  {selectedUser && (
-                    <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm text-slate-700 ring-1 ring-rose-100">
-                      <span className="text-slate-400">
-                        <ArrowRight size={14} />
-                      </span>
-                      <span className="flex items-center gap-2">
-                        <User2 size={14} color="gray" />
-                        {firstLetterUpper(selectedUser.nickname ?? "")}
-                      </span>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-slate-700 ring-1 ring-rose-100">
+                  <span>{i + 1}</span>
+                </div>
+                <div className="w-full">
+                  <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold text-slate-900">
+                        {service?.name}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {service?.duration && `${service.duration} мин • `}
+                        {money(
+                          (service?.min_price ?? 0).toString(),
+                          "",
+                          1,
+                          service?.max_price ? 2 : undefined,
+                        )}
+                        {service?.max_price &&
+                          ` - ${money(service.max_price.toString(), "", 1, 2)}`}
+                      </p>
                     </div>
-                  )}
+                    {selectedUser && (
+                      <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm text-slate-700 ring-1 ring-rose-100">
+                        <span className="text-slate-400">
+                          <ArrowRight size={14} />
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <User2 size={14} color="gray" />
+                          {firstLetterUpper(selectedUser.nickname ?? "")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {artists.map((artistId, index) => {
+                      const user = users[artistId];
+                      if (!user) return null;
+                      const selected = values.users[serviceId] == artistId;
+                      const usedInAnotherService =
+                        values.parallel &&
+                        Object.entries(values.users).some(
+                          ([selectedService, selectedArtist]) =>
+                            selectedService !== key &&
+                            selectedArtist === artistId,
+                        );
+                      return (
+                        <ArtistCard
+                          mini={true}
+                          data={user}
+                          onClick={(id: string) => {
+                            if (!selected && !usedInAnotherService) {
+                              onChange("users", {
+                                ...values.users,
+                                [key]: id,
+                              });
+                            }
+                          }}
+                          selected={selected}
+                          disabled={usedInAnotherService && !selected}
+                          key={index}
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {artists.map((artistId, index) => {
-                    const user = users[artistId];
-                    if (!user) return null;
-                    const selected = values.users[serviceId] == artistId;
-                    return (
-                      <ArtistCard
-                        mini={true}
-                        data={user}
-                        onClick={(id: string) => {
-                          if (!selected) {
-                            const current = Object.entries(values.users).some(
-                              ([k, v]) => k != key && v == id
-                            );
-                            current
-                              ? onChange("users", {
-                                  [key]: id,
-                                })
-                              : onChange("users", {
-                                  ...values.users,
-                                  [key]: id,
-                                });
-                          }
-                        }}
-                        selected={selected}
-                        disabled={false}
-                        key={index}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
               </div>
             </div>
           );
         })}
-        </div>
-      )}
+      </div>
       {/* {values.parallel
         ? values.details.map((v, i) => {
             const key = v.service_id ?? "";

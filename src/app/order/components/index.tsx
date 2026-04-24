@@ -39,6 +39,37 @@ import { useRouter } from "next/navigation";
 import { PaymentMethod, VOUCHER } from "@/lib/enum";
 import { OrderSlot, Slot } from "@/models/slot.model";
 
+const WEB_VOUCHER_ENABLED = false;
+
+const getUniqueSlots = (daySlots: Slot[] = []) =>
+  Array.from(
+    new Map(
+      daySlots
+        .map((slot) => {
+          const time = slot.start_time?.toString().slice(0, 5);
+          return time ? [time, slot] : null;
+        })
+        .filter(Boolean) as [string, Slot][],
+    ).values(),
+  ).sort((a, b) => (a.start_time as any).localeCompare(b.start_time));
+
+const hasSelectableSlotForDate = (dateKey: string, daySlots: Slot[] = []) => {
+  const uniqueSlots = getUniqueSlots(daySlots);
+  if (!uniqueSlots.length) return false;
+
+  const now = new Date();
+  const isToday = dateKey === toYMD(now);
+
+  return uniqueSlots.some((slot) => {
+    const time = slot.start_time?.toString().slice(0, 5);
+    if (!time) return false;
+    if (!isToday) return true;
+
+    const [h, m] = time.split(":").map(Number);
+    return now.getHours() < h || (now.getHours() === h && now.getMinutes() < m);
+  });
+};
+
 export default function OrderPage({
   data,
   branches,
@@ -92,22 +123,25 @@ export default function OrderPage({
   const [stepLoading, setStepLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   function setField<K extends keyof IOrder>(key: K, value: IOrder[K]) {
-    if (key != "parallel") {
-      let index = itemsQueue.indexOf(key);
-      index = index < 0 ? 0 : index;
+    if (key !== "parallel") {
+      const index = itemsQueue.indexOf(key);
+
       setSelected((prev) => {
         const updated = { ...prev, [key]: value };
 
-        for (let i = index + 1; i < itemsQueue.length; i++) {
-          const nextKey = itemsQueue[i];
-          updated[nextKey] = undefined as any;
+        if (index >= 0) {
+          for (let i = index + 1; i < itemsQueue.length; i++) {
+            const nextKey = itemsQueue[i];
+            updated[nextKey] = undefined as any;
+          }
         }
 
         return updated;
       });
-    } else {
-      setSelected((prev) => ({ ...prev, [key]: value }));
+      return;
     }
+
+    setSelected((prev) => ({ ...prev, [key]: value }));
   }
 
   const step1Errors = useMemo(
@@ -132,11 +166,19 @@ export default function OrderPage({
   const step3Errors = useMemo(
     () => ({
       user:
-        selected.users && Object.values(selected.users).some((value) => !!value)
+        selected.details?.length &&
+        selected.details.every((detail) => {
+          const serviceId = detail.service_id;
+          return Boolean(
+            detail.user_id ||
+              selected.users?.[serviceId] ||
+              selected.users?.["0"],
+          );
+        })
           ? undefined
           : "Артистаа сонгоно уу!",
     }),
-    [selected.users],
+    [selected.details, selected.users],
   );
   const total = 4;
   const [step, setStep] = useState(1);
@@ -146,8 +188,8 @@ export default function OrderPage({
     0;
   const estimatedVoucherDiscount = calculateVoucherDiscount(
     estimatedSubtotal,
-    selected.discount_type,
-    selected.voucher_value,
+    WEB_VOUCHER_ENABLED ? selected.discount_type : undefined,
+    WEB_VOUCHER_ENABLED ? selected.voucher_value : undefined,
   );
   const finalTotal = Math.max(estimatedSubtotal - estimatedVoucherDiscount, 0);
   const go = async (n: number) => {
@@ -201,6 +243,7 @@ export default function OrderPage({
       branch_id: selected.branch_id,
       services: selected.details?.map((s) => s.service_id),
       parallel,
+      multi_artist_queue: parallel ? undefined : true,
       date: options?.date ? toYMD(new Date(options.date)) : undefined,
     };
     const res = await find<Slot>(Api.order, body, "slots");
@@ -232,17 +275,17 @@ export default function OrderPage({
       },
       {} as Record<string, Slot[]>,
     );
-    let date;
-
-    const keys = Object.keys(data);
-
-    for (const k of keys) {
-      const value = data[k];
-      if (value?.length > 0) {
-        date = k;
-        break;
-      }
-    }
+    const keys = Object.keys(data).sort((a, b) => a.localeCompare(b));
+    const baseDate =
+      options?.date ??
+      selected.order_date ??
+      new Date();
+    const startKey = toYMD(new Date(baseDate));
+    const date =
+      keys.find(
+        (key) =>
+          key >= startKey && hasSelectableSlotForDate(key, data[key] ?? []),
+      ) ?? keys.find((key) => hasSelectableSlotForDate(key, data[key] ?? []));
 
     if (options?.updateState !== false) {
       setAvailableSlots(data);
@@ -290,9 +333,13 @@ export default function OrderPage({
     const dayKey = toYMD(new Date(selected.order_date as Date));
     const slots = (slotSource ?? availableSlots)[dayKey] ?? [];
 
+    const shouldFilterByStartSlot =
+      selected.parallel === true || (selected.details?.length ?? 0) <= 1;
     const artistIds = slots
       .filter(
-        (s) => s.start_time?.toString().slice(0, 5) === selected.start_time,
+        (s) =>
+          !shouldFilterByStartSlot ||
+          s.start_time?.toString().slice(0, 5) === selected.start_time,
       )
       .map((s) => s.artist_id);
 
@@ -481,8 +528,21 @@ export default function OrderPage({
       const service = d.service_id;
       let user_id = d.user_id;
 
+      const {
+        category_id,
+        max_price,
+        min_price,
+        original_price,
+        pre,
+        user,
+        ...detailPayload
+      } = d as IOrderDetail & {
+        category_id?: string;
+        pre?: number;
+      };
+
       if (user_id) {
-        details.push({ ...d, user_id });
+        details.push({ ...detailPayload, user_id });
         return;
       }
 
@@ -491,7 +551,7 @@ export default function OrderPage({
         user_id = selectedUser;
       }
 
-      details.push({ ...d, user_id });
+      details.push({ ...detailPayload, user_id });
     });
 
     return details;
@@ -537,7 +597,7 @@ export default function OrderPage({
         description: selected.description,
         pre_method: PaymentMethod.QPAY,
         method: PaymentMethod.QPAY,
-        voucher_id: selected.voucher_id,
+        voucher_id: WEB_VOUCHER_ENABLED ? selected.voucher_id : undefined,
         parallel: selected.parallel,
       };
       const res = await create<IOrder>(Api.order, payload);
@@ -555,8 +615,13 @@ export default function OrderPage({
       const createdInvoice = res.data?.payload?.invoice;
       const createdOrderId = res.data?.payload?.id;
 
-      if (createdInvoice?.price && createdOrderId) {
-        setInvoice(createdInvoice);
+      if (createdInvoice?.invoice_id && createdOrderId) {
+        setInvoice({
+          ...createdInvoice,
+          price: Number(createdInvoice.price ?? 0),
+          created: createdInvoice.created ?? new Date(),
+          urls: createdInvoice.urls ?? [],
+        });
         setOrder(createdOrderId);
         return "invoice";
       }
@@ -582,7 +647,7 @@ export default function OrderPage({
     }
   };
   useEffect(() => {
-    if (step === 5 && invoice && order && !invoice.price) {
+    if (step === 5 && invoice && order && !invoice.invoice_id) {
       addToast({
         title: prePaymentErrorMessage,
         color: "warning",
@@ -592,7 +657,7 @@ export default function OrderPage({
       router.refresh();
     }
   }, [invoice, order, router, step]);
-  if (invoice != null && order != null && step == 5 && invoice.price) {
+  if (invoice != null && order != null && step == 5 && invoice.invoice_id) {
     return (
       <div>
         <PaymentView invoice={invoice} id={order} />
@@ -849,7 +914,7 @@ export default function OrderPage({
               <ModalBody className="space-y-3">
                 <p className="text-sm text-muted-foreground">
                   {finalTotal === 0
-                    ? "Энэ захиалга voucher-аар бүрэн хаагдах тул үргэлжлүүлсний дараа шууд баталгаажна."
+                    ? "Энэ захиалга урамшууллаар бүрэн хаагдах тул үргэлжлүүлсний дараа шууд баталгаажна."
                     : "Та захиалгаа баталгаажуулахын тулд урьдчилгаа төлбөр төлөх шаардлагатай. Үргэлжлүүлэх дарсны дараа QPay төлбөрийн хэсэг нээгдэнэ."}
                 </p>
 

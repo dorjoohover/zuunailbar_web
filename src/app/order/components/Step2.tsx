@@ -47,6 +47,52 @@ export default function Step2({
     values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null,
   );
 
+  const getUniqueSlots = (daySlots: Slot[] = []) =>
+    Array.from(
+      new Map(
+        daySlots
+          .map((slot) => {
+            const time = slot.start_time?.toString().slice(0, 5);
+            return time ? [time, slot] : null;
+          })
+          .filter(Boolean) as [string, Slot][],
+      ).values(),
+    ).sort((a, b) => (a.start_time as any).localeCompare(b.start_time));
+
+  const isFutureSlotForDate = (date: Date, slot: Slot) => {
+    const time = slot.start_time?.toString().slice(0, 5);
+    if (!time) return false;
+
+    const now = new Date();
+    if (!isSameDay(date, now)) return true;
+
+    const [h, m] = time.split(":").map(Number);
+    return now.getHours() < h || (now.getHours() === h && now.getMinutes() < m);
+  };
+
+  const getSelectableSlotsForKey = (dateKey?: string) => {
+    if (!dateKey) return [];
+
+    const selectedDate = new Date(`${dateKey}T00:00:00`);
+    return getUniqueSlots(slots[dateKey] ?? []).filter((slot) =>
+      isFutureSlotForDate(selectedDate, slot),
+    );
+  };
+
+  const getNextAvailableDateKey = (baseDate?: Date) => {
+    const sortedKeys = Object.keys(slots).sort((a, b) => a.localeCompare(b));
+    if (!sortedKeys.length) return undefined;
+
+    const startKey = toYMD(baseDate ?? today);
+    return (
+      sortedKeys.find(
+        (key) =>
+          key >= startKey && getSelectableSlotsForKey(key).length > 0,
+      ) ??
+      sortedKeys.find((key) => getSelectableSlotsForKey(key).length > 0)
+    );
+  };
+
   useEffect(() => {
     setFocusedDate(values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null);
   }, [values.date]);
@@ -61,7 +107,7 @@ export default function Step2({
     )
       return false;
 
-    return slots[toYMD(date) as any] !== undefined;
+    return getSelectableSlotsForKey(toYMD(date)).length > 0;
   };
   const selectOrderDate = (value: DateValue) => {
     onChange("order_date", selectDate(value));
@@ -108,41 +154,24 @@ export default function Step2({
     : values.details?.reduce((acc, item) => acc + (item?.duration ?? 0), 0);
   const dayKey = values.date && (toYMD(values.date as any) as any);
 
-  const uniqueSlots = slots[dayKey]
-    ? Array.from(
-        new Map(
-          slots[dayKey].map((slot) => [
-            slot.start_time,
-            slot, // start_time ижил бол эхнийх нь үлдэнэ
-          ]),
-        ).values(),
-      ).sort((a, b) => (a.start_time as any).localeCompare(b.start_time))
-    : [];
+  const uniqueSlots = getSelectableSlotsForKey(dayKey);
+
   useEffect(() => {
-    if (!values.date || uniqueSlots.length === 0) return;
+    const selectedDate = values.date
+      ? new Date(values.date as unknown as string)
+      : today;
+    const selectedKey = values.date ? toYMD(selectedDate) : undefined;
 
-    const selectedDate = new Date(values.date as unknown as string);
-    const now = new Date();
-    const isToday = isSameDay(selectedDate, now);
+    if (selectedKey && getSelectableSlotsForKey(selectedKey).length > 0) return;
 
-    if (!isToday) return;
+    const nextKey = getNextAvailableDateKey(selectedDate);
+    if (!nextKey || nextKey === selectedKey) return;
 
-    const hasFutureSlot = uniqueSlots.some((slot) => {
-      const time = slot.start_time?.toString().slice(0, 5);
-      const [h, m] = time.split(":").map(Number);
-
-      return (
-        now.getHours() < h || (now.getHours() === h && now.getMinutes() < m)
-      );
-    });
-
-    if (!hasFutureSlot) {
-      const nextDay = new Date(selectedDate);
-      nextDay.setDate(nextDay.getDate() + 1);
-
-      onChange("order_date", nextDay);
-    }
-  }, [values.date, uniqueSlots]);
+    const nextDate = new Date(`${nextKey}T00:00:00`);
+    setFocusedDate(fromDate(nextDate, "Asia/Ulaanbaatar"));
+    onChange("order_date", nextDate);
+    onChange("start_time", undefined);
+  }, [values.date, slots]);
   function hasArtist(
  
   artistId: string
