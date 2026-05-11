@@ -122,13 +122,13 @@ export function NavbarDemo({ token }: { token?: string }) {
   ) : user ? (
     <UserMenu user={user} />
   ) : (
-    <AuthModal />
+    <AuthModal token={token} />
   );
 
   const mobileAuthContent = isCheckingUser ? null : user ? (
     <Logout />
   ) : (
-    <AuthModal />
+    <AuthModal token={token} />
   );
 
   return (

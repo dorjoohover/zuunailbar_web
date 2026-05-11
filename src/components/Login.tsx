@@ -40,7 +40,7 @@ function useAutoFocus(condition: boolean, ref: any) {
   }, [condition, ref]);
 }
 
-export function AuthModal() {
+export function AuthModal({ token }: { token?: string } = {}) {
   const [tab, setTab] = useState<"login" | "register">("login");
   const [forget, setForget] = useState(false);
   const [phone, setPhone] = useState("");
@@ -57,6 +57,7 @@ export function AuthModal() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const router = useRouter();
   const pathname = usePathname();
+  const isAuthRequiredPath = pathname.includes("/order");
 
   // ----------------- REFS -----------------
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -136,8 +137,13 @@ export function AuthModal() {
         timeout: 3000,
       });
     }
+
+    const viaMail = data === "mail";
+
     addToast({
-      title: "4 оронтой кодыг имейлээр илгээлээ",
+      title: viaMail
+        ? "4 оронтой кодыг имэйлээр илгээлээ"
+        : "4 оронтой кодыг мессежээр илгээлээ",
       size: "lg",
       color: "success",
       timeout: 3000,
@@ -219,6 +225,15 @@ export function AuthModal() {
         color: "danger",
         timeout: 3000,
       });
+    if (!data) {
+      return addToast({
+        title:
+          "Нууц үг шинэчлэгдсэнгүй. Баталгаажуулах код болон бүртгэлийн мэдээллээ шалгаад дахин оролдоно уу.",
+        size: "lg",
+        color: "danger",
+        timeout: 4000,
+      });
+    }
     addToast({
       title: "Нууц үг амжилттай шинэчлэгдлээ",
       size: "lg",
@@ -240,9 +255,15 @@ export function AuthModal() {
     window.location.replace(window.location.href);
   };
 
+  // Auth-шаардсан хуудсанд (/order гэх мэт) нэвтрээгүй зочин ороход modal-ыг автоматаар нээх.
+  // Нэвтэрсэн хэрэглэгчид modal харагдахгүй, давтан loop хийхгүй.
   useEffect(() => {
-    if (pathname.includes("/order")) onOpen();
-  }, [pathname]);
+    if (token) {
+      if (isOpen) onClose();
+      return;
+    }
+    if (isAuthRequiredPath && !isOpen) onOpen();
+  }, [isAuthRequiredPath, token]);
 
   // ----------------- SUBMIT HANDLER -----------------
   const handleSubmit = (e: React.FormEvent) => {
@@ -273,13 +294,17 @@ export function AuthModal() {
 
       <Modal
         placement="top"
-        isOpen={pathname.includes("/order") ? true : isOpen}
+        isOpen={isOpen}
         onOpenChange={onOpenChange}
         onClose={() => {
           setForget(false);
           setTab("login");
           onClose();
-          router.push("/");
+          // Auth-шаардсан хуудсанд modal хаавал нүүр рүү буцаах (захиалга үргэлжлүүлэх боломжгүй болохоор).
+          // Бусад хуудаст байгаа бол modal-ыг л хааж л болно.
+          if (isAuthRequiredPath && !token) {
+            router.push("/");
+          }
         }}
       >
         <ModalContent className="p-4">

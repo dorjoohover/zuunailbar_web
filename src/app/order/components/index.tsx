@@ -246,7 +246,12 @@ export default function OrderPage({
       multi_artist_queue: parallel ? undefined : true,
       date: options?.date ? toYMD(new Date(options.date)) : undefined,
     };
-    const res = await find<Slot>(Api.order, body, "slots");
+    // Token байгаа бол authed slots, эс бөгөөс public/slots ашиглах нь зочин хэрэглэгчид нэвтрэхгүйгээр алхам 2-ыг үзэх боломжтой болгоно.
+    const res = await find<Slot>(
+      Api.order,
+      body,
+      token ? "slots" : "public/slots",
+    );
     const slotItems = Array.isArray(res.data)
       ? res.data
       : Array.isArray((res.data as { items?: Slot[] })?.items)
