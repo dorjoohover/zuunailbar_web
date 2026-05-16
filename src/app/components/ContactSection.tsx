@@ -20,9 +20,9 @@ export default function ContactSection() {
         <div className="col-span-2  space-y-5 col-center sm:block">
           <h1 className="mb-3 text-gray-500">Холбоо барих</h1>
           <h1 className={cn(text, 'font-semibold')}>
-            (976) 8608 0708
+            (976) 9095 0605
           </h1>
-          <Link href={"tel:+97686080708"} className={cn(button, 'flex w-auto max-w-[150px] rounded-md justify-between items-center text-lg gap-1')}>
+          <Link href={"tel:+97690950605"} className={cn(button, 'flex w-auto max-w-[150px] rounded-md justify-between items-center text-lg gap-1')}>
             Холбогдох
             <ChevronRight className="text-white " size={20} />
           </Link>

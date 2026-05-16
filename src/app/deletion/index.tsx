@@ -455,7 +455,7 @@ function ContactCard() {
         value="zunailbar.mn"
         link
       />
-      <Item icon={<Phone size={20} />} label="Утас" value="+976 86080708" />
+      <Item icon={<Phone size={20} />} label="Утас" value="+976 90950605" />
       <Item
         icon={<Clock size={20} />}
         label="Ажлын цаг"
