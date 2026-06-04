@@ -210,6 +210,29 @@ export const orderSteps = [
   },
 ];
 
+export enum BookingMode {
+  TIME = "time",
+  ARTIST = "artist",
+}
+
+// Алхамуудын нэр захиалгын төрлөөс хамаарна
+export const getOrderSteps = (mode: BookingMode) => {
+  if (mode === BookingMode.ARTIST) {
+    return [
+      { name: "Үйлчилгээ сонгох" },
+      { name: "Артист сонгох" },
+      { name: "Огноо ба цаг сонгох" },
+      { name: "Баталгаажуулах" },
+    ];
+  }
+  return [
+    { name: "Үйлчилгээ сонгох" },
+    { name: "Огноо ба цаг сонгох" },
+    { name: "Артист сонгох" },
+    { name: "Баталгаажуулах" },
+  ];
+};
+
 export enum OrderStatus {
   // uridchilgaa toloogui
   // uridchilgaa tolson

@@ -16,7 +16,7 @@ import {
 } from "@heroui/modal";
 import { Select, SelectItem } from "@heroui/select";
 import { addToast } from "@heroui/toast";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 interface Step1Props {
   branches: ListType<Branch>;
@@ -26,6 +26,7 @@ interface Step1Props {
   values: { branch?: string; services?: string[] };
   showError: boolean;
   branch_services: ListType<BranchService>;
+  children: ReactNode;
 }
 
 export default function Step1({
@@ -36,6 +37,7 @@ export default function Step1({
   branch_services,
   errors,
   showError,
+  children,
 }: Step1Props) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [chosen, setChosen] = useState<
@@ -70,7 +72,6 @@ export default function Step1({
           );
         })}
       </div>
-
       {values.branch ? (
         <div className=" w-full">
           <div className="mb-2 rounded-md bg-rose-50 border border-rose-100 p-3">
@@ -80,6 +81,8 @@ export default function Step1({
               салгалтын цаг багтсан тул тусад нь сонгох шаардлагагүй.
             </p>
           </div>
+          {children}
+
           <p className="font-medium mb-2">Үйлчилгээ сонгох</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 w-full gap-4">
             {filteredServices.map((service, i) => {
@@ -106,15 +109,16 @@ export default function Step1({
                         max_price: value.max_price,
                         min_price: value.min_price,
                         pre: value.pre,
-                        category_id:
-                          services.items.filter((s) => s.id == v)[0]?.category_id,
+                        category_id: services.items.filter((s) => s.id == v)[0]
+                          ?.category_id,
                       };
                     });
                     const categoryIds = updatedDetail.map((a) => a.category_id);
                     const allSame = new Set(categoryIds).size === 1;
                     if (updatedDetail.length > 1 && allSame) {
                       addToast({
-                        title: "Ижил төрлийн үйлчилгээ зэрэг авах боломжгүй", timeout: 3000
+                        title: "Ижил төрлийн үйлчилгээ зэрэг авах боломжгүй",
+                        timeout: 3000,
                       });
                       return;
                     }
@@ -123,7 +127,8 @@ export default function Step1({
                     }
                     if (updatedDetail.length > 2) {
                       addToast({
-                        title: "Хамгийн ихдээ 2 үйлчилгээ сонгоно уу.", timeout: 3000
+                        title: "Хамгийн ихдээ 2 үйлчилгээ сонгоно уу.",
+                        timeout: 3000,
                       });
                       return;
                     }
@@ -149,6 +154,7 @@ export default function Step1({
           <p className="text-sm text-gray-500">Салбараа сонгоно уу</p>
         </div>
       )}
+
       {errors.service && showError && errors.branch == undefined && (
         <p className="mt-1 text-sm text-red-600">{errors.service}</p>
       )}

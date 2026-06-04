@@ -21,7 +21,7 @@ import { Api } from "@/utils/api";
 
 import { CircularProgress, Progress } from "@heroui/progress";
 import { addToast } from "@heroui/toast";
-import { orderSteps } from "@/lib/constants";
+import { BookingMode, getOrderSteps, orderSteps } from "@/lib/constants";
 import Step4 from "./Step4";
 import {
   Modal,
@@ -99,11 +99,30 @@ export default function OrderPage({
 
     return Math.min(total, voucherValue);
   };
+  // Захиалгын төрөл — цаг түрүүлж сонгох уу эсвэл артист түрүүлж сонгох уу
+  const [bookingMode, setBookingMode] = useState<BookingMode>(BookingMode.TIME);
   // selected бүх мэдээллээ энд төвлөрүүлнэ
   const [selected, setSelected] = useState<IOrder>({
     details: [],
     parallel: false,
   });
+
+  // Mode солих үед time, artist сонголтыг арилгана. Branch болон service-г үлдээнэ
+  const switchBookingMode = (mode: BookingMode) => {
+    if (mode === bookingMode) return;
+    setBookingMode(mode);
+    setSelected((prev) => ({
+      ...prev,
+      order_date: undefined,
+      start_time: undefined,
+      users: undefined,
+    }));
+    setAvailableSlots({});
+    setUserService({});
+    setCant(undefined);
+    setShowError(false);
+    setStep(1);
+  };
 
   const userMap = arrayToMap<User>(users.items);
   const serviceMap = arrayToMap<Service>(data.items);
@@ -184,8 +203,10 @@ export default function OrderPage({
   const [step, setStep] = useState(1);
   const router = useRouter();
   const estimatedSubtotal =
-    selected.details?.reduce((sum, detail) => sum + +(detail?.min_price ?? 0), 0) ??
-    0;
+    selected.details?.reduce(
+      (sum, detail) => sum + +(detail?.min_price ?? 0),
+      0,
+    ) ?? 0;
   const estimatedVoucherDiscount = calculateVoucherDiscount(
     estimatedSubtotal,
     WEB_VOUCHER_ENABLED ? selected.discount_type : undefined,
@@ -207,14 +228,21 @@ export default function OrderPage({
     onOpen: onQueueModalOpen,
     onOpenChange: onQueueModalChange,
   } = useDisclosure();
-  const activeErrors =
-    step === 1
-      ? step1Errors
-      : step === 2
-        ? step2Errors
-        : step === 3
-          ? step3Errors
-          : ({} as Record<string, string | undefined>);
+  // Mode-аас хамаараад одоогийн алхамд тохирох error-уудыг сонгоно
+  const getErrorsForStep = (s: number) => {
+    if (s === 1) return step1Errors;
+    if (bookingMode === BookingMode.ARTIST) {
+      // Artist эхэлж — Step2 = Artist, Step3 = Time
+      if (s === 2) return step3Errors;
+      if (s === 3) return step2Errors;
+    } else {
+      // Time эхэлж — Step2 = Time, Step3 = Artist
+      if (s === 2) return step2Errors;
+      if (s === 3) return step3Errors;
+    }
+    return {} as Record<string, string | undefined>;
+  };
+  const activeErrors = getErrorsForStep(step);
   const isStepComplete = useMemo(
     () => Object.values(activeErrors).every((v) => !v),
     [activeErrors],
@@ -281,10 +309,7 @@ export default function OrderPage({
       {} as Record<string, Slot[]>,
     );
     const keys = Object.keys(data).sort((a, b) => a.localeCompare(b));
-    const baseDate =
-      options?.date ??
-      selected.order_date ??
-      new Date();
+    const baseDate = options?.date ?? selected.order_date ?? new Date();
     const startKey = toYMD(new Date(baseDate));
     const date =
       keys.find(
@@ -503,18 +528,62 @@ export default function OrderPage({
     }
   };
 
+  // Book by Artist mode-д Artist жагсаалтыг цаггүйгээр татна
+  const fetchArtistsForServices = async () => {
+    const userServices = await create(
+      Api.user_service,
+      {
+        branch_id: selected.branch_id,
+        services:
+          (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
+      },
+      "client",
+    );
+    if (userServices.error) {
+      addToast({
+        title: userServices.error ?? "Алдаа гарлаа",
+        color: "warning",
+        timeout: 3000,
+      });
+      return null;
+    }
+    const data: OrderSlot = userServices.data.payload;
+    if (!data || isEmpty(data)) {
+      addToast({
+        title: "Энэ үйлчилгээг хийх боломжтой артист одоогоор алга байна.",
+        timeout: 3000,
+      });
+      return null;
+    }
+    setUserService(data);
+    return data;
+  };
+
   const fetcher = async (currentStep: number) => {
     setStepLoading(true);
     try {
       if (currentStep == 1) {
         setField("users", undefined);
       }
-      if (currentStep == 2) {
-        await getSlots(selected.parallel);
-      }
-      if (currentStep == 3) {
-        const canProceed = await step3Checker();
-        if (!canProceed) return;
+      if (bookingMode === BookingMode.ARTIST) {
+        // Artist эхэлж: Step2=Artist, Step3=Time
+        if (currentStep == 2) {
+          const artists = await fetchArtistsForServices();
+          if (!artists) return;
+        }
+        if (currentStep == 3) {
+          const slotData = await getSlots(selected.parallel);
+          if (!slotData) return;
+        }
+      } else {
+        // Time эхэлж (одоогийн зан төлөв): Step2=Time, Step3=Artist
+        if (currentStep == 2) {
+          await getSlots(selected.parallel);
+        }
+        if (currentStep == 3) {
+          const canProceed = await step3Checker();
+          if (!canProceed) return;
+        }
       }
       await go(currentStep);
     } finally {
@@ -576,7 +645,7 @@ export default function OrderPage({
       return false;
     }
 
-      setSubmitLoading(true);
+    setSubmitLoading(true);
     try {
       setInvoice(null);
       setOrder(null);
@@ -669,46 +738,64 @@ export default function OrderPage({
       </div>
     );
   }
-  const stepValue = (index: number) => {
+  // Алхам бүрийн сонгогдсон утга
+  const serviceValue = () => {
     const selected_services = selected.details;
-    if (index == 0) {
-      if (!selected_services) return undefined;
-      let value =
-        selected_services?.length > 1
-          ? "2 Үйлчилгээ"
-          : selected_services?.length > 0
-            ? selected_services?.[0]?.service_name
-            : undefined;
-      return value;
-    }
-    if (index == 2) {
-      const selected_users = selected.users
-        ? Object.values(selected.users).filter((a) => a != undefined)
-        : [];
+    if (!selected_services) return undefined;
+    return selected_services?.length > 1
+      ? "2 Үйлчилгээ"
+      : selected_services?.length > 0
+        ? selected_services?.[0]?.service_name
+        : undefined;
+  };
+  const artistValue = () => {
+    const selected_users = selected.users
+      ? Object.values(selected.users).filter((a) => a != undefined)
+      : [];
+    if (selected_users.length === 0) return undefined;
+    const matchedUsers = users.items.filter((u) =>
+      selected_users.includes(u.id),
+    );
+    const uniqueUserIds = Array.from(new Set(matchedUsers.map((u) => u.id)));
+    if (uniqueUserIds.length > 1) return "2 Артист";
+    return matchedUsers[0]?.nickname;
+  };
+  const timeValue = () => {
+    const date = selected.order_date;
+    const time = selected.start_time;
+    if (!date || !time) return undefined;
+    return `${parseDate(date, false)} ${formatTime(time)}`;
+  };
 
-      if (selected_users.length === 0) {
-        return undefined;
-      }
-      const matchedUsers = users.items.filter((u) =>
-        selected_users.includes(u.id),
-      );
-
-      const uniqueUserIds = Array.from(new Set(matchedUsers.map((u) => u.id)));
-
-      if (uniqueUserIds.length > 1) {
-        return "2 Артист";
-      }
-
-      return matchedUsers[0]?.nickname;
-    }
-    if (index == 1) {
-      const date = selected.order_date;
-      const time = selected.start_time;
-      if (!date || !time) return undefined;
-      return `${parseDate(date, false)} ${formatTime(time)}`;
+  const stepValue = (index: number) => {
+    if (index == 0) return serviceValue();
+    if (bookingMode === BookingMode.ARTIST) {
+      // Artist эхэлж: 1=Service, 2=Artist, 3=Time
+      if (index == 1) return artistValue();
+      if (index == 2) return timeValue();
+    } else {
+      // Time эхэлж: 1=Service, 2=Time, 3=Artist
+      if (index == 1) return timeValue();
+      if (index == 2) return artistValue();
     }
     return undefined;
   };
+
+  // Одоогийн mode-той тохирох step нэрс
+  const currentOrderSteps = getOrderSteps(bookingMode);
+
+  // Book by Artist mode-д, сонгогдсон артистын слотыг шүүж харуулна
+  const filteredSlotsByArtist = useMemo(() => {
+    if (bookingMode !== BookingMode.ARTIST) return availableSlots;
+    const userIds = Object.values(selected.users ?? {}).filter(Boolean);
+    if (userIds.length === 0) return availableSlots;
+    const out: Record<string, Slot[]> = {};
+    for (const [k, list] of Object.entries(availableSlots)) {
+      const filtered = list.filter((s) => userIds.includes(s.artist_id));
+      if (filtered.length > 0) out[k] = filtered;
+    }
+    return out;
+  }, [availableSlots, bookingMode, selected.users]);
 
   const canJump = (s: number) => {
     if (s == 1) return true;
@@ -728,6 +815,8 @@ export default function OrderPage({
   return (
     <div className="relative py-10">
       <div className="flex flex-col justify-center max-w-3xl p-6 py-12 md:py-18 xl:py-24 mx-auto space-y-6 ">
+        {/* Booking mode toggle — цаг түрүүлж сонгох уу эсвэл артист */}
+
         {/* Step indicator */}
         <div className="hidden sm:block">
           <Progress
@@ -744,7 +833,7 @@ export default function OrderPage({
           />
           <div className="relative flex justify-between w-full mt-2">
             {/* <div className="absolute top-[50%] -translate-y-[50%]  left-[50%] -translate-x-[50%] w-3/4 border-[0.5px] border-gray-400 h-[1px] border-dashed"></div> */}
-            {orderSteps.map((s, i) => {
+            {currentOrderSteps.map((s, i) => {
               const value = stepValue(i);
               const current = i == step - 1;
               return (
@@ -785,7 +874,7 @@ export default function OrderPage({
             />
             <div>
               <p className="font-bold text-medium">Алхам {step}</p>
-              <p>{orderSteps[step - 1].name}</p>
+              <p>{currentOrderSteps[step - 1].name}</p>
             </div>
           </div>
         </div>
@@ -809,6 +898,46 @@ export default function OrderPage({
                     (d) => d.service_id,
                   ) ?? [],
               }}
+              children={
+                <div className="flex w-full my-3 justify-center ">
+                  <div
+                    role="tablist"
+                    aria-label="Захиалгын төрөл"
+                    className="inline-flex w-full items-center gap-1 rounded-xl border border-rose-200 bg-rose-50/40 p-1 shadow-sm"
+                  >
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={bookingMode === BookingMode.TIME}
+                      onClick={() => switchBookingMode(BookingMode.TIME)}
+                      disabled={stepLoading || submitLoading}
+                      className={cn(
+                        "px-4 py-1.5 rounded-xl flex-1 text-sm font-medium transition-all duration-200",
+                        bookingMode === BookingMode.TIME
+                          ? "bg-white text-rose-600 shadow"
+                          : "text-slate-500 hover:text-rose-500",
+                      )}
+                    >
+                      Цагаар захиалах
+                    </button>
+                    <button
+                      type="button"
+                      role="tab"
+                      aria-selected={bookingMode === BookingMode.ARTIST}
+                      onClick={() => switchBookingMode(BookingMode.ARTIST)}
+                      disabled={stepLoading || submitLoading}
+                      className={cn(
+                        "px-4 py-1.5 rounded-xl text-sm flex-1 font-medium transition-all duration-200",
+                        bookingMode === BookingMode.ARTIST
+                          ? "bg-white text-rose-600 shadow"
+                          : "text-slate-500 hover:text-rose-500",
+                      )}
+                    >
+                      Артистаар захиалах
+                    </button>
+                  </div>
+                </div>
+              }
               showError={showError}
               branches={branches}
               services={data}
@@ -817,44 +946,89 @@ export default function OrderPage({
             />
           )}
 
-          {/* Step Components */}
+          {/* Step Components — mode-той тохирох component-ыг харуулна */}
 
-          {step === 2 && availableSlots != null && (
-            <Step2
-              values={{
-                date: selected.order_date,
-                time: selected.start_time,
-                details: selected.details ?? [],
-                description: selected.description,
-                parallel: selected.parallel,
-                // users: selected.users,
-              }}
-              loading={false}
-              slots={availableSlots}
-              userService={userService}
-              errors={step2Errors}
-              onChange={setField}
-              showError={showError}
-            />
-          )}
-          {step === 3 && userService != null && (
-            <Step3
-              showError={showError}
-              values={{
-                details: selected.details ?? [],
-                users: selected.users ?? {},
-                parallel: selected.parallel ?? false,
-                order_date: selected.order_date,
-                start_time: selected.start_time,
-              }}
-              users={userMap}
-              services={serviceMap}
-              cant={cant}
-              errors={step3Errors}
-              onChange={setField}
-              slots={userService}
-            />
-          )}
+          {/* Step2: Time эхэлж бол Time component, Artist эхэлж бол Artist component */}
+          {step === 2 &&
+            bookingMode === BookingMode.TIME &&
+            availableSlots != null && (
+              <Step2
+                values={{
+                  date: selected.order_date,
+                  time: selected.start_time,
+                  details: selected.details ?? [],
+                  description: selected.description,
+                  parallel: selected.parallel,
+                }}
+                loading={false}
+                slots={availableSlots}
+                userService={userService}
+                errors={step2Errors}
+                onChange={setField}
+                showError={showError}
+              />
+            )}
+          {step === 2 &&
+            bookingMode === BookingMode.ARTIST &&
+            userService != null && (
+              <Step3
+                showError={showError}
+                values={{
+                  details: selected.details ?? [],
+                  users: selected.users ?? {},
+                  parallel: selected.parallel ?? false,
+                  order_date: selected.order_date,
+                  start_time: selected.start_time,
+                }}
+                users={userMap}
+                services={serviceMap}
+                cant={cant}
+                errors={step3Errors}
+                onChange={setField}
+                slots={userService}
+              />
+            )}
+
+          {/* Step3: Time эхэлж бол Artist component, Artist эхэлж бол Time component */}
+          {step === 3 &&
+            bookingMode === BookingMode.TIME &&
+            userService != null && (
+              <Step3
+                showError={showError}
+                values={{
+                  details: selected.details ?? [],
+                  users: selected.users ?? {},
+                  parallel: selected.parallel ?? false,
+                  order_date: selected.order_date,
+                  start_time: selected.start_time,
+                }}
+                users={userMap}
+                services={serviceMap}
+                cant={cant}
+                errors={step3Errors}
+                onChange={setField}
+                slots={userService}
+              />
+            )}
+          {step === 3 &&
+            bookingMode === BookingMode.ARTIST &&
+            availableSlots != null && (
+              <Step2
+                values={{
+                  date: selected.order_date,
+                  time: selected.start_time,
+                  details: selected.details ?? [],
+                  description: selected.description,
+                  parallel: selected.parallel,
+                }}
+                loading={false}
+                slots={filteredSlotsByArtist}
+                userService={userService}
+                errors={step2Errors}
+                onChange={setField}
+                showError={showError}
+              />
+            )}
           {step === 4 && (
             <Step4
               values={selected}
@@ -1001,8 +1175,8 @@ export default function OrderPage({
               </ModalHeader>
               <ModalBody>
                 <p className="text-sm text-muted-foreground">
-                  Тухайн цагт зэрэг үйлчлэх боломжгүй тул дарааллаар
-                  үйлчлүүлэх үү?
+                  Тухайн цагт зэрэг үйлчлэх боломжгүй тул дарааллаар үйлчлүүлэх
+                  үү?
                 </p>
               </ModalBody>
               <ModalFooter>
