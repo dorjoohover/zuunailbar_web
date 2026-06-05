@@ -167,11 +167,15 @@ export default function Step2({
     const nextKey = getNextAvailableDateKey(selectedDate);
     if (!nextKey || nextKey === selectedKey) return;
 
+    // nextDate нь аль хэлэгдсэн values.date-тай ижил бол давтан setState хийхгүй
     const nextDate = new Date(`${nextKey}T00:00:00`);
+    if (selectedKey === nextKey) return;
+
     setFocusedDate(fromDate(nextDate, "Asia/Ulaanbaatar"));
     onChange("order_date", nextDate);
     onChange("start_time", undefined);
-  }, [values.date, slots]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toYMD(values.date ? new Date(values.date as unknown as string) : today), slots]);
   function hasArtist(
  
   artistId: string

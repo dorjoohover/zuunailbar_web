@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@heroui/button";
@@ -131,37 +131,40 @@ export default function OrderPage({
   const [availableSlots, setAvailableSlots] = useState<Record<string, Slot[]>>(
     {},
   );
-  const itemsQueue: (keyof IOrder)[] = [
-    "branch_id",
-    "details",
-    "order_date",
-    "start_time",
-    "users",
-  ];
   const [showError, setShowError] = useState(false);
   const [stepLoading, setStepLoading] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-  function setField<K extends keyof IOrder>(key: K, value: IOrder[K]) {
-    if (key !== "parallel") {
-      const index = itemsQueue.indexOf(key);
 
-      setSelected((prev) => {
-        const updated = { ...prev, [key]: value };
+  // bookingMode-г ref-т хадгалж, setField closure дотор ашиглана
+  const bookingModeRef = useRef(bookingMode);
+  useEffect(() => {
+    bookingModeRef.current = bookingMode;
+  }, [bookingMode]);
 
-        if (index >= 0) {
-          for (let i = index + 1; i < itemsQueue.length; i++) {
-            const nextKey = itemsQueue[i];
-            updated[nextKey] = undefined as any;
-          }
-        }
-
-        return updated;
-      });
+  const setField = useCallback((key: keyof IOrder, value: IOrder[keyof IOrder]) => {
+    if (key === "parallel") {
+      setSelected((prev) => ({ ...prev, [key]: value } as IOrder));
       return;
     }
 
-    setSelected((prev) => ({ ...prev, [key]: value }));
-  }
+    // TIME mode: branch → details → order_date → start_time → users
+    // ARTIST mode: branch → details → users → order_date → start_time
+    // Cascade: key-н дараа буй зүйлсийг арилгана
+    const timeQueue: (keyof IOrder)[] = ["branch_id", "details", "order_date", "start_time", "users"];
+    const artistQueue: (keyof IOrder)[] = ["branch_id", "details", "users", "order_date", "start_time"];
+    const queue = bookingModeRef.current === BookingMode.ARTIST ? artistQueue : timeQueue;
+
+    const index = queue.indexOf(key);
+    setSelected((prev) => {
+      const updated = { ...prev, [key]: value } as IOrder;
+      if (index >= 0) {
+        for (let i = index + 1; i < queue.length; i++) {
+          updated[queue[i]] = undefined as any;
+        }
+      }
+      return updated;
+    });
+  }, []);
 
   const step1Errors = useMemo(
     () => ({
@@ -419,6 +422,9 @@ export default function OrderPage({
       return artists.includes(selectedArtist);
     });
   const isEmpty = (obj: object) => Object.keys(obj).length === 0;
+  // Mode-д тохирох алхам: цагийн алхам болон артистын алхам
+  const timeStep = bookingMode === BookingMode.ARTIST ? 3 : 2;
+  const artistStep = bookingMode === BookingMode.ARTIST ? 2 : 3;
   const step3Checker = async () => {
     const refreshedSlots = await getSlots(selected.parallel, {
       date: selected.order_date,
@@ -434,13 +440,13 @@ export default function OrderPage({
         timeout: 3000,
       });
       setField("start_time", undefined);
-      await go(2);
+      await go(timeStep);
       return false;
     }
 
     let result = await getArtists(refreshedSlots);
     if (result == null) {
-      await go(2);
+      await go(timeStep);
       return false;
     }
     if (result == null || isEmpty(result)) {
@@ -450,7 +456,7 @@ export default function OrderPage({
         timeout: 3000,
       });
       setField("start_time", undefined);
-      await go(2);
+      await go(timeStep);
       return false;
     }
 
@@ -473,7 +479,7 @@ export default function OrderPage({
       });
       setField("users", undefined);
       setUserService(result);
-      await go(3);
+      await go(artistStep);
       return false;
     }
 
@@ -501,7 +507,7 @@ export default function OrderPage({
           timeout: 3000,
         });
         setField("start_time", undefined);
-        await go(2);
+        await go(timeStep);
         return;
       }
 
@@ -513,7 +519,7 @@ export default function OrderPage({
           timeout: 3000,
         });
         setField("start_time", undefined);
-        await go(2);
+        await go(timeStep);
         return;
       }
 
@@ -522,7 +528,7 @@ export default function OrderPage({
         updateSelectedDate: false,
         suppressEmptyToast: true,
       });
-      await go(3);
+      await go(artistStep);
     } finally {
       setStepLoading(false);
     }
@@ -641,7 +647,7 @@ export default function OrderPage({
 
     setShowError(true);
     if (!Object.values(step3Errors).every((value) => !value)) {
-      await go(3);
+      await go(artistStep);
       return false;
     }
 
@@ -659,7 +665,7 @@ export default function OrderPage({
           color: "warning",
           timeout: 3000,
         });
-        await go(3);
+        await go(artistStep);
         return false;
       }
 
@@ -682,7 +688,7 @@ export default function OrderPage({
           timeout: 3000,
         });
 
-        await fetcher(2);
+        await fetcher(timeStep);
 
         return false;
       }
@@ -731,13 +737,6 @@ export default function OrderPage({
       router.refresh();
     }
   }, [invoice, order, router, step]);
-  if (invoice != null && order != null && step == 5 && invoice.invoice_id) {
-    return (
-      <div>
-        <PaymentView invoice={invoice} id={order} />
-      </div>
-    );
-  }
   // Алхам бүрийн сонгогдсон утга
   const serviceValue = () => {
     const selected_services = selected.details;
@@ -796,6 +795,15 @@ export default function OrderPage({
     }
     return out;
   }, [availableSlots, bookingMode, selected.users]);
+
+  // Бүх hook-уудыг дуусгасны дараа conditional render хийнэ
+  if (invoice != null && order != null && step == 5 && invoice.invoice_id) {
+    return (
+      <div>
+        <PaymentView invoice={invoice} id={order} />
+      </div>
+    );
+  }
 
   const canJump = (s: number) => {
     if (s == 1) return true;

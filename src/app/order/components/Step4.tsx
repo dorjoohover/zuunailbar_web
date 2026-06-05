@@ -136,13 +136,8 @@ export default function Step4({
       onChange("voucher_value", undefined);
       onChange("discount_type", undefined);
     }
-  }, [
-    onChange,
-    values.discount_type,
-    values.voucher_id,
-    values.voucher_name,
-    values.voucher_value,
-  ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values.discount_type, values.voucher_id, values.voucher_name, values.voucher_value]);
 
   const selectedVoucher = useMemo(
     () => vouchers.items.find((item) => item.id === values.voucher_id) ?? null,
@@ -158,7 +153,8 @@ export default function Step4({
       onChange("voucher_value", undefined);
       onChange("discount_type", undefined);
     }
-  }, [onChange, selectedVoucher, values.voucher_id, voucherLoading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedVoucher, values.voucher_id, voucherLoading]);
 
   const discount = WEB_VOUCHER_ENABLED
     ? calculateVoucherDiscount(

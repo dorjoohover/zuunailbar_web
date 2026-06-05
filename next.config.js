@@ -10,7 +10,11 @@ const nextConfig = {
   images: {
     remotePatterns: [
       new URL("https://s3.qpay.mn/**"),
-      new URL("https://qpay.mn/**"),
+      {
+        protocol: 'https',
+        hostname: 'qpay.mn',
+        pathname: '/q/logo/**',
+      },
     ],
   },
 };
