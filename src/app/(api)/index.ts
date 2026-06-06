@@ -181,7 +181,7 @@ export const create = async <T>(
 
     const data = await res.json();
     if (!res.ok) {
-      return { error: (data as Error).message, success: false };
+      return { error: data?.message ?? (data as Error).message, success: false, statusCode: res.status };
     }
 
     return {

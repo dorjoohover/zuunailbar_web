@@ -36,13 +36,14 @@ export default function Template({
         });
         const data = await res.json();
         if (!res.ok) {
-          // deleteCookie();
+          if (res.status === 401 || res.status === 403) {
+            deleteCookie();
+          }
         } else {
           data.payload.user.role > ROLE.ADMIN ? deleteCookie() : null;
         }
       } catch (error) {
         console.log("error", error);
-        // deleteCookie();
       }
     }
   };

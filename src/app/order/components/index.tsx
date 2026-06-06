@@ -682,6 +682,10 @@ export default function OrderPage({
       };
       const res = await create<IOrder>(Api.order, payload);
       if (!res.success) {
+        if ((res as any).statusCode === 403 || (res as any).statusCode === 401) {
+          await fetch("/api/logout").then(() => router.push("/login"));
+          return false;
+        }
         addToast({
           title: res.error ?? prePaymentErrorMessage,
           color: "warning",
