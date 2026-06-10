@@ -124,7 +124,7 @@ export default function OrderPage({
     setStep(1);
   };
 
-  const userMap = arrayToMap<User>(users.items);
+  const userMap = arrayToMap<User>(users.items.filter((u) => u.user_status === 10));
   const serviceMap = arrayToMap<Service>(data.items);
   // zasna
   const [userService, setUserService] = useState<OrderSlot>({});
