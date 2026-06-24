@@ -214,7 +214,7 @@ export default function Step4({
                     className="bg-gray-100 my-2 px-2 py-3 rounded-md flex flex-col sm:flex-row justify-between items-start sm:items-center"
                     key={i}
                   >
-                    <div className="flex flex-col md:flex-row">
+                    <div className="flex flex-col">
                       <div className="flex items-center justify-start gap-2">
                         <p className="text-sm">
                           {firstLetterUpper(service.service_name ?? "")}
@@ -224,7 +224,7 @@ export default function Step4({
                         </span>
                       </div>
                       {user && (
-                        <>
+                        <div className="flex items-center gap-2 mt-1">
                           <span className="text-gray-500 flex items-center gap-1 text-xs">
                             <LUser size={12} color="#6B7280" />
                             {firstLetterUpper(user?.nickname ?? "")}
@@ -235,7 +235,7 @@ export default function Step4({
                               {user.experience} жил туршлагатай
                             </span>
                           )}
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>
