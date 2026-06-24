@@ -74,7 +74,7 @@ export default function Step3({
           <p className="text-sm text-gray-500">
             {values.parallel
               ? "Зэрэг үйлчилгээ бүрт өөр artist сонгоно."
-              : `Сонгосон artist: ${selectedArtistCount}/${values.details.length}`}
+              : `Сонгосон артист: ${selectedArtistCount}/${values.details.length}`}
           </p>
           <Button
             onClick={() => onChange("users", {})}
