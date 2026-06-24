@@ -10,13 +10,7 @@ import {
   getDayName,
   money,
 } from "@/lib/functions";
-import {
-  Branch,
-  IOrder,
-  Service,
-  User,
-  Voucher,
-} from "@/models";
+import { Branch, IOrder, Service, User, Voucher } from "@/models";
 import { VoucherStatus, VOUCHER } from "@/lib/enum";
 import { Invoice } from "@/types";
 import { Api } from "@/utils/api";
@@ -28,6 +22,7 @@ import {
   TicketPercent,
   User as LUser,
   Wallet,
+  Star,
 } from "lucide-react";
 
 const WEB_VOUCHER_ENABLED = false;
@@ -80,8 +75,15 @@ export default function Step4({
 
   const duration =
     values.details?.reduce((acc, item) => acc + (item?.duration ?? 0), 0) ?? 0;
-  const subtotal =
-    values.details?.reduce((sum, item) => sum + +(item?.min_price ?? 0), 0) ?? 0;
+  const minSubtotal =
+    values.details?.reduce((sum, item) => sum + +(item?.min_price ?? 0), 0) ??
+    0;
+  const maxSubtotal =
+    values.details?.reduce(
+      (sum, item) => sum + +(item?.max_price ?? item?.min_price ?? 0),
+      0,
+    ) ?? 0;
+  const subtotal = minSubtotal;
   const date = values.order_date ?? mnDate();
 
   useEffect(() => {
@@ -136,8 +138,13 @@ export default function Step4({
       onChange("voucher_value", undefined);
       onChange("discount_type", undefined);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values.discount_type, values.voucher_id, values.voucher_name, values.voucher_value]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    values.discount_type,
+    values.voucher_id,
+    values.voucher_name,
+    values.voucher_value,
+  ]);
 
   const selectedVoucher = useMemo(
     () => vouchers.items.find((item) => item.id === values.voucher_id) ?? null,
@@ -153,7 +160,7 @@ export default function Step4({
       onChange("voucher_value", undefined);
       onChange("discount_type", undefined);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedVoucher, values.voucher_id, voucherLoading]);
 
   const discount = WEB_VOUCHER_ENABLED
@@ -175,7 +182,7 @@ export default function Step4({
       </h2>
       <div className="border border-gray-300 rounded-lg py-2 px-4">
         <div className="grid grid-cols-1 space-y-2">
-          <ReviewCard Icon={MapPin} title="Байршил">
+          <ReviewCard Icon={MapPin} title="Байршил" bold={true}>
             <div>
               <p className="text-gray-500 text-sm">
                 {firstLetterUpper(branch?.name ?? "")}
@@ -185,12 +192,12 @@ export default function Step4({
           </ReviewCard>
           <ReviewCard Icon={Calendar} title="Өдөр | Цаг" bold={true}>
             <div>
-              <p className="text-gray-500 text-sm">
+              <p className="text-rose-500/90 font-semibold text-md">
                 {getDayName(date.getDay() == 0 ? 7 : date.getDay())},{" "}
                 {date.getMonth() + 1}-р сарын {date.getDate()},{" "}
                 {date.getFullYear()}
               </p>
-              <p className="text-gray-500 text-xs">
+              <p className="text-rose-500/90 font-semibold text-sm">
                 {formatTime(values.start_time!)}
               </p>
             </div>
@@ -217,13 +224,20 @@ export default function Step4({
                         </span>
                       </div>
                       {user && (
-                        <span className="text-gray-500 flex items-center gap-1 text-xs">
-                          <LUser size={12} color="#6B7280" />
-                          {firstLetterUpper(user?.nickname ?? "")}
-                        </span>
+                        <>
+                          <span className="text-gray-500 flex items-center gap-1 text-xs">
+                            <LUser size={12} color="#6B7280" />
+                            {firstLetterUpper(user?.nickname ?? "")}
+                          </span>
+                          {user?.experience && user.experience > 0 && (
+                            <span className="text-gray-500 flex items-center gap-1 text-xs">
+                              <Star size={12} color="#6B7280" />
+                              {user.experience} жил туршлагатай
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
-                    {min != 0 && <p>{money(min.toString())}₮</p>}
                   </div>
                 );
               })}
@@ -323,16 +337,8 @@ export default function Step4({
             </ReviewCard>
           )}
         </div>
-        <div className="flex pt-8 justify-between">
-          {pre && pre > 0 ? (
-            <div>
-              <div className="flex items-center gap-2">
-                <Wallet size={14} color="#6B7280" />
-                <p className="text-sm text-gray-500">Урьдчилгаа</p>
-              </div>
-              <p className="text-md">{money(pre.toString())}₮</p>
-            </div>
-          ) : (
+        <div className="pt-8 space-y-3">
+          <div className="flex justify-between">
             <div>
               <div className="flex items-center gap-2">
                 <Clock size={14} color="#6B7280" />
@@ -340,19 +346,33 @@ export default function Step4({
               </div>
               <p className="text-md">{duration} мин</p>
             </div>
-          )}
-          <div className="flex flex-col items-end">
-            <p className="text-sm text-gray-500">Үндсэн үнэ</p>
-            <p className="text-md">{money(subtotal.toString())}₮</p>
-            {discount > 0 && (
-              <>
-                <p className="mt-1 text-sm text-gray-500">Урамшууллын хөнгөлөлт</p>
-                <p className="text-md text-rose-600">-{money(discount)}₮</p>
-              </>
-            )}
-            <p className="mt-1 text-sm text-gray-500">Төлөх дүн</p>
-            <p className="text-lg">{money(finalTotal.toString())}₮</p>
+            <div className="flex flex-col items-end">
+              <p className="text-sm text-gray-500">Үндсэн үнэ</p>
+              <p className="text-md">
+                {maxSubtotal > minSubtotal
+                  ? `${money(minSubtotal.toString())}-${money(maxSubtotal.toString())}`
+                  : money(minSubtotal.toString())}
+                ₮
+              </p>
+              {discount > 0 && (
+                <>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Урамшууллын хөнгөлөлт
+                  </p>
+                  <p className="text-md text-rose-600">-{money(discount)}₮</p>
+                </>
+              )}
+            </div>
           </div>
+          {pre > 0 && (
+            <div className="flex justify-between items-center border-t pt-3">
+              <div className="flex items-center gap-2">
+                <Wallet size={14} color="#6B7280" />
+                <p className="text-sm text-gray-500">Урьдчилгаа төлбөр</p>
+              </div>
+              <p className="text-md font-medium">{money(pre.toString())}₮</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

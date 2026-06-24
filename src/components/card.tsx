@@ -263,12 +263,12 @@ export const ReviewCard = ({
   children: ReactNode;
 }) => {
   return (
-    <div className="border-b  border-gray-300 py-3 flex w-full items-start justify-start gap-3">
+    <div className="border-b  border-gray-300 border-b-2 py-3 flex w-full items-start justify-start gap-3">
       <span className="w-[35px] h-[35px] rounded-full flex items-center justify-center bg-gray-200">
         <Icon size={18} color="#242526" />
       </span>
       <div className="w-full">
-        <p className={`text-md ${bold && "font-bolder"}`}>{title}</p>
+        <p className={`text-md ${bold && "font-bold"}`}>{title}</p>
         {children}
       </div>
     </div>

@@ -155,6 +155,9 @@ export default function Step2({
   const dayKey = values.date && (toYMD(values.date as any) as any);
 
   const uniqueSlots = getSelectableSlotsForKey(dayKey);
+  const hasAnySlots = Object.keys(slots).some(
+    (key) => getSelectableSlotsForKey(key).length > 0,
+  );
 
   useEffect(() => {
     const selectedDate = values.date
@@ -298,7 +301,11 @@ export default function Step2({
                 })
               ) : (
                 <div className="w-full mt-4 col-span-3">
-                  <p className="text-lg text-center">Сул цаг байхгүй байна.</p>
+                  <p className="text-sm text-center text-gray-500">
+                    {!hasAnySlots
+                      ? "Таны сонгосон артист дээр 7 хоногийн хугацаанд сул цаг байхгүй байна."
+                      : "Сул цаг байхгүй байна."}
+                  </p>
                 </div>
               )}
             </div>
