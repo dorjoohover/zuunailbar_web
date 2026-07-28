@@ -1,0 +1,33 @@
+"use client";
+
+import { useEffect } from "react";
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
+  useEffect(() => {
+    // Log the error to an error reporting service
+    /* eslint-disable no-console */
+    console.error(error);
+  }, [error]);
+
+  return (
+    <div className="w-full h-screen flex items-center justify-center">
+      <div>
+        <h2 className="text-center">Алдаа гарлаа</h2>
+        <button
+          onClick={
+            // Attempt to recover by trying to re-render the segment
+            () => reset()
+          }
+        >
+          Дахин оролдоно уу
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,291 @@
+"use client";
+import { Button } from "@heroui/button";
+import { ArrowRight, User2, XIcon } from "lucide-react";
+import { IOrder, IOrderDetail, Service, User } from "@/models";
+import { MapType } from "@/lib/const";
+import { firstLetterUpper, money } from "@/lib/functions";
+import { ArtistCard } from "@/components/card";
+import { OrderSlot } from "@/models/slot.model";
+
+interface Step3Props {
+  showError: boolean;
+  errors?: {
+    user?: string;
+  };
+  values: {
+    details: IOrderDetail[];
+    users: Record<string, string>;
+    parallel: boolean;
+    order_date?: Date | string;
+    start_time?: string;
+  };
+  cant?: boolean;
+  slots: OrderSlot;
+
+  // eniig hiine
+  users: MapType<User>;
+  services: MapType<Service>;
+  onChange: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
+  // clearError: (field: string) => void;
+}
+
+export default function Step3({
+  // date,
+  onChange,
+  users,
+  slots,
+  showError,
+  errors,
+  services,
+  values,
+  cant,
+  // clearError,
+}: Step3Props) {
+  const selectedArtistCount = Object.values(values.users ?? {}).filter(
+    Boolean,
+  ).length;
+  const serviceArtistEntries = Object.entries(slots);
+
+  return (
+    <div className="w-full space-y-6">
+      {cant && (
+        <div className="mb-2 rounded-md bg-rose-50 border border-rose-100 p-3">
+          <p className="text-md mb-1 font-medium text-rose-800">Санамж</p>
+          <p className="text-sm text-rose-700">
+            Тухайн цагт зэрэг үйлчилгээ боломжгүй тул таны захиалга
+            дарааллаар үйлчлэгдэхээр тохируулагдлаа.
+          </p>
+        </div>
+      )}
+      <div className="space-y-2">
+        <p className="font-medium ">Артист сонгох </p>
+        {showError && errors?.user && (
+          <p className="text-sm text-rose-500">{errors.user}</p>
+        )}
+      </div>
+      {selectedArtistCount === 0 ? (
+        <div className="flex h-[64px] w-full items-center justify-center rounded-2xl border border-rose-200 bg-rose-50/70 px-4">
+          <p className="text-sm text-gray-500 px-2 py-2 text-center">
+            Артист сонгогдоогүй байна.
+          </p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-gray-500">
+            {values.parallel
+              ? "Зэрэг үйлчилгээ бүрт өөр artist сонгоно."
+              : `Сонгосон артист: ${selectedArtistCount}/${values.details.length}`}
+          </p>
+          <Button
+            onClick={() => onChange("users", {})}
+            startContent={<XIcon size={14} />}
+            color="primary"
+            size="sm"
+            variant="light"
+            className="text-rose-500"
+          >
+            Цэвэрлэх
+          </Button>
+        </div>
+      )}
+      <div className="space-y-4">
+        {serviceArtistEntries.map(([serviceId, artists], i) => {
+          const service = services[serviceId];
+          const key = serviceId ?? "";
+          const selectedUserId = values.users[key];
+          const selectedUser = selectedUserId ? users[selectedUserId] : null;
+
+          return (
+            <div
+              className="rounded-3xl border border-rose-100 bg-rose-50/40 p-4 shadow-sm"
+              key={i}
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-slate-700 ring-1 ring-rose-100">
+                  <span>{i + 1}</span>
+                </div>
+                <div className="w-full">
+                  <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold text-slate-900">
+                        {service?.name}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {service?.duration && `${service.duration} мин • `}
+                        {money(
+                          (service?.min_price ?? 0).toString(),
+                          "",
+                          1,
+                          service?.max_price ? 2 : undefined,
+                        )}
+                        {service?.max_price &&
+                          ` - ${money(service.max_price.toString(), "", 1, 2)}`}
+                      </p>
+                    </div>
+                    {selectedUser && (
+                      <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm text-slate-700 ring-1 ring-rose-100">
+                        <span className="text-slate-400">
+                          <ArrowRight size={14} />
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <User2 size={14} color="gray" />
+                          {firstLetterUpper(selectedUser.nickname ?? "")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {artists.map((artistId, index) => {
+                      const user = users[artistId];
+                      if (!user) return null;
+                      const selected = values.users[serviceId] == artistId;
+                      const usedInAnotherService =
+                        values.parallel &&
+                        Object.entries(values.users).some(
+                          ([selectedService, selectedArtist]) =>
+                            selectedService !== key &&
+                            selectedArtist === artistId,
+                        );
+                      return (
+                        <ArtistCard
+                          mini={true}
+                          data={user}
+                          onClick={(id: string) => {
+                            if (!selected && !usedInAnotherService) {
+                              onChange("users", {
+                                ...values.users,
+                                [key]: id,
+                              });
+                            }
+                          }}
+                          selected={selected}
+                          disabled={usedInAnotherService && !selected}
+                          key={index}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {/* {values.parallel
+        ? values.details.map((v, i) => {
+            const key = v.service_id ?? "";
+            const selectedUser =
+              users.items.filter((user) => user.id == values.users[key])?.[0] ??
+              null;
+            return (
+              <div className="flex w-full gap-3" key={i}>
+                <div className="w-[40px] h-[40px] flex items-center justify-center rounded-full bg-gray-200">
+                  <span>{i + 1}</span>
+                </div>
+                <div className="w-full">
+                  <div className="flex w-full mb-2 justify-between items-center">
+                    <div>
+                      <p className="text-sm">{v.service_name}</p>
+                      <p className="text-xs text-gray-300">
+                        {v.duration && `${v.duration} мин • `}
+                        {money(
+                          (v?.min_price ?? 0).toString(),
+                          "",
+                          1,
+                          v.max_price ? 2 : undefined
+                        )}
+                        {v.max_price &&
+                          ` - ${money(v.max_price.toString(), "", 1, 2)}`}
+                      </p>
+                    </div>
+                    {selectedUser && (
+                      <div className="flex gap-3 items-center">
+                        <span>
+                          <ArrowRight size={14} />
+                        </span>
+                        <span className="bg-gray-100 px-3 py-1 flex gap-2 items-center rounded-xl">
+                          <User2 size={14} color="gray" />
+                          {firstLetterUpper(selectedUser.nickname ?? "")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-6 gap-3">
+                    {slots.map((slot) => {
+                      const selected = (values.users[key] = slot.artists);
+                    })}
+                    {userServices
+                      .filter((u) => u.service_id == v.service_id)
+                      .map((user, index) => {
+                        const selected =
+                          values.users[key] == user?.user?.id &&
+                          key == v.service_id;
+                        const prevKey = Object.keys(values.users).find(
+                          (k) => k != key
+                        );
+                        const prevArtistId = prevKey
+                          ? values.users[prevKey]
+                          : null;
+                        let parallel = true;
+                        if (prevArtistId) {
+                          const prevArtist = userServices.find(
+                            (u) => u.user?.id == prevArtistId
+                          );
+                          // if (prevArtist)
+                          //   parallel = hasOverlap(prevArtist.slots, user.slots);
+                        }
+
+                        // өөр service-д давхцахгүй эсэхийг шалгана
+                        const disabled =
+                          Object.entries(values.users).some(
+                            ([k, v]) => k != key && v == user.user?.id
+                          ) || !parallel;
+                        return (
+                          <ArtistCard
+                            mini={true}
+                            data={user.user!}
+                            onClick={(id: string) => {
+                              if (!selected && !disabled) {
+                                onChange("users", {
+                                  ...values.users,
+                                  [key]: id,
+                                });
+                              }
+                            }}
+                            selected={selected}
+                            disabled={disabled}
+                            key={index}
+                          />
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        : [""].map((v, i) => {
+            return (
+              <div className="grid grid-cols-6 gap-4" key={i}>
+                {userServices.map((user, index) => {
+                  const key = "0";
+                  const selected = values.users[key] == user.user?.id;
+                  if (user.user)
+                    return (
+                      <ArtistCard
+                        data={user.user}
+                        onClick={(id: string) => {
+                          if (!selected) {
+                            onChange("users", { ...values.users, [key]: id });
+                          }
+                        }}
+                        selected={selected}
+                        key={index}
+                      />
+                    );
+                })}
+              </div>
+            );
+          })} */}
+    </div>
+  );
+}

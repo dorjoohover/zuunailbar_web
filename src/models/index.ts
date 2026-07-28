@@ -1,0 +1,30 @@
+export * from "./user.model";
+export * from "./branch.model";
+export * from "./brand.model";
+export * from "./category.model";
+export * from "./cost.model";
+export * from "./discount.model";
+export * from "./order.model";
+export * from "./product.model";
+export * from "./product.transaction.model";
+export * from "./salary.log.model";
+export * from "./schedule.model";
+export * from "./user.product.model";
+export * from "./user.service.model";
+export * from "./product.log.model";
+export * from "./voucher.model";
+export * from "./service.model";
+export * from "./branch.service.model";
+export * from "./service.category.model";
+
+export interface RegisterDto {
+  mobile: string;
+  otp: string;
+  firstname?: string
+  lastname?: string
+  password: string;
+}
+export interface LoginDto {
+  mobile: string;
+  password: string;
+}
