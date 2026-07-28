@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: dorjoohover/zuunailbar_backend
+  IMAGE_NAME: dorjoohover/zuunailbar_web
 
 jobs:
   build:
