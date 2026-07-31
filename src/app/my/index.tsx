@@ -237,7 +237,7 @@ export const MyOrderPage = ({
 
                             <p className="flex gap-2 items-center ">
                               <Clock4 className="text-primary" size={20} />
-                              {detail.start_time?.slice(0, 5)}
+                              {(detail.start_time ?? selectedOrder?.start_time)?.slice(0, 5) ?? "-"}
                             </p>
                           </div>
                           <div className="mb-2">
