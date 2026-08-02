@@ -13,7 +13,6 @@ next.config.js
 
 # next.js
 /.next/
-.package-lock.json
 /out/
 
 # production
@@ -40,5 +39,4 @@ next-env.d.ts
 
 pnpm-lock.yaml
 yarn.lock
-package-lock.json
 bun.lockb
