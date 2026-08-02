@@ -798,7 +798,7 @@ export const MyOrderPage = ({
                 <h3 className="font-semibold text-foreground text-base">Захиалга олдсонгүй</h3>
                 <p className="text-muted-foreground text-sm mt-1">Шинэ захиалга хийнэ үү</p>
                 <Link
-                  href="/"
+                  href="/order"
                   className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-semibold transition-all"
                 >
                   <Sparkles size={16} />
@@ -822,7 +822,7 @@ export const MyOrderPage = ({
             {data?.items && data.items.length > 0 && (
               <div className="mt-6">
                 <Link
-                  href="/"
+                  href="/order"
                   className="w-full py-4 rounded-[20px] flex items-center justify-center gap-2 font-bold text-base text-white transition-all hover:opacity-90 active:scale-[0.99]"
                   style={{
                     background: "linear-gradient(135deg, #F43F5E, #fb7185)",
