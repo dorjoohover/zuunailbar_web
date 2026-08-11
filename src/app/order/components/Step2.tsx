@@ -207,7 +207,7 @@ export default function Step2({
                 defaultFocusedValue={
                   values.date ? fromDate(values.date, "Asia/Ulaanbaatar") : null
                 }
-                errorMessage={"Буруу өдөр сонгосон."}
+                errorMessage={"Одоогоор сонгох боломжтой өдөр алга."}
                 isDateUnavailable={(v) => !isDateAvailable(v)}
                 calendarWidth={"100%"}
                 className="

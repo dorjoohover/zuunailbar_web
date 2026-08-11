@@ -534,17 +534,29 @@ export default function OrderPage({
     }
   };
 
-  // Book by Artist mode-д Artist жагсаалтыг цаггүйгээр татна
+  // Book by Artist mode-д Artist жагсаалтыг татна. `user_service/client` нь
+  // тухайн үйлчилгээг хийдэг бүх артистыг (салбар/огноо, тэр дундаа амралт
+  // үл харгалзан) буцаадаг тул үүнийг цонхны (getSlots, `availability_slots`
+  // view дээр суурилсан тул амралттай хоног/артистыг аль хэдийн хасдаг)
+  // боломжит цагуудтай харьцуулж, ойрын үед ямар ч сул цаггүй (амарсан,
+  // өөр салбарт шилжсэн гэх мэт) артистуудыг жагсаалтаас хасна.
   const fetchArtistsForServices = async () => {
-    const userServices = await create(
-      Api.user_service,
-      {
-        branch_id: selected.branch_id,
-        services:
-          (selected.details as IOrderDetail[])?.map((d) => d.service_id) ?? [],
-      },
-      "client",
-    );
+    const [userServices, slotsData] = await Promise.all([
+      create(
+        Api.user_service,
+        {
+          branch_id: selected.branch_id,
+          services:
+            (selected.details as IOrderDetail[])?.map((d) => d.service_id) ??
+            [],
+        },
+        "client",
+      ),
+      getSlots(selected.parallel, {
+        suppressEmptyToast: true,
+        updateSelectedDate: false,
+      }),
+    ]);
     if (userServices.error) {
       addToast({
         title: userServices.error ?? "Алдаа гарлаа",
@@ -561,8 +573,38 @@ export default function OrderPage({
       });
       return null;
     }
-    setUserService(data);
-    return data;
+
+    // slotsData == null бол (ж: сүлжээний алдаа) шүүлт хийхгүй, хуучин
+    // зан төлөвөө хадгална — артист жагсаалт огт хоосорч болзошгүй тул.
+    if (!slotsData) {
+      setUserService(data);
+      return data;
+    }
+
+    const availableArtistIds = new Set(
+      Object.values(slotsData)
+        .flat()
+        .map((s) => s.artist_id),
+    );
+    const filtered: OrderSlot = Object.fromEntries(
+      Object.entries(data)
+        .map(([service, artists]) => [
+          service,
+          artists.filter((a) => availableArtistIds.has(a)),
+        ])
+        .filter(([, artists]) => (artists as string[]).length > 0),
+    );
+
+    if (isEmpty(filtered)) {
+      addToast({
+        title: "Энэ үйлчилгээг хийх боломжтой артист одоогоор алга байна.",
+        timeout: 3000,
+      });
+      return null;
+    }
+
+    setUserService(filtered);
+    return filtered;
   };
 
   const fetcher = async (currentStep: number) => {
