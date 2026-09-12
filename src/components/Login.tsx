@@ -126,7 +126,7 @@ export function AuthModal({ token }: { token?: string } = {}) {
       });
     setOtpSent(true);
     setTimer(59);
-    const { data, error } = await sendOtpForget(username);
+    const { error } = await sendOtpForget(username);
     if (error) {
       setOtpSent(false);
       setTimer(0);
@@ -138,12 +138,8 @@ export function AuthModal({ token }: { token?: string } = {}) {
       });
     }
 
-    const viaMail = data === "mail";
-
     addToast({
-      title: viaMail
-        ? "4 оронтой кодыг имэйлээр илгээлээ"
-        : "4 оронтой кодыг мессежээр илгээлээ",
+      title: "4 оронтой кодыг бүртгэлтэй утсанд мессежээр илгээлээ",
       size: "lg",
       color: "success",
       timeout: 3000,
@@ -205,18 +201,14 @@ export function AuthModal({ token }: { token?: string } = {}) {
     if (!password || !passwordConfirm) {
       return setError("Нууц үг оруулна уу");
     }
-    if (!lastname || !firstname) {
-      return setError("Овог нэр оруулна уу");
-    }
     if (password !== passwordConfirm)
       return setError("Нууц үг таарахгүй байна");
     if (!username) return;
+    // Нууц үг сэргээхэд зөвхөн нууц үг солино — овог/нэр асуухгүй.
     const { data, error } = await updatePassword({
       mobile: username,
       otp,
       password,
-      lastname,
-      firstname,
     });
     if (error)
       return addToast({
@@ -374,22 +366,6 @@ export function AuthModal({ token }: { token?: string } = {}) {
                       {/* PASSWORD RESET */}
                       {otpSent && (
                         <>
-                          <Input
-                            ref={lastnameRef}
-                            type="text"
-                            label="Овог"
-                            value={lastname}
-                            onChange={(e) => setLastname(e.target.value)}
-                            isRequired
-                          />
-                          <Input
-                            ref={firstnameRef}
-                            type="text"
-                            label="Нэр"
-                            value={firstname}
-                            onChange={(e) => setFirstname(e.target.value)}
-                            isRequired
-                          />
                           <PasswordInput
                             innerRef={passwordRef}
                             nextRef={passwordConfirmRef}

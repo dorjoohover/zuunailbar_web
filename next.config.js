@@ -5,8 +5,10 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   env: {
-    API: "https://api.zunailbar.mn/api/v1/",
-    // API: "http://localhost:5000/api/v1/",
+    // admin/artist-тай ижил зарчим: build үеийн `API` env (docker-compose-ийн
+    // build arg, эсвэл dev дээр `API=http://localhost:5050/api/v1/ npm run dev`)
+    // -г уншина. Утга өгөөгүй бол production API руу fallback хийнэ.
+    API: process.env.API || "https://api.zunailbar.mn/api/v1/",
   },
   images: {
     remotePatterns: [
