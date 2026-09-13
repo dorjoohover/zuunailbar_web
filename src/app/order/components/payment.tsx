@@ -111,13 +111,17 @@ export const PaymentView = ({
       const data = res.data as any;
       if (data?.paid) {
         setStatus(data.status);
+        // Амжилттай төлөлтийг ҮРГЭЛЖ мэдэгдэнэ — автомат шалгалт
+        // (`checkPayment(false)`) төлбөрийг илрүүлэхэд өмнө нь чимээгүй
+        // redirect хийдэг байсан тул QPay-ээр төлсний дараа "төлөгдлөө"
+        // мэдэгдэл огт харагддаггүй байв. Мөн toast-ыг navigation-аас
+        // ӨМНӨ нэмнэ.
+        addToast({
+          title: "Төлбөр амжилттай төлөгдлөө.",
+          color: "success",
+          timeout: 4000,
+        });
         router.push(redirectTo);
-        if (showResult) {
-          addToast({
-            title: "Амжилттай төлөгдлөө.",
-            timeout: 3000,
-          });
-        }
         return true;
       }
       if (showResult) {
