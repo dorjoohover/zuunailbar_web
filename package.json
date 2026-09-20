@@ -27,7 +27,7 @@
     "@heroui/skeleton": "^2.2.15",
     "@heroui/switch": "^2.2.22",
     "@heroui/system": "2.4.20",
-    "@heroui/theme": "2.4.20",
+    "@heroui/theme": "^2.4.26",
     "@heroui/toast": "^2.0.14",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dropdown-menu": "^2.1.16",

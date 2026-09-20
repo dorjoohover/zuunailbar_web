@@ -180,9 +180,8 @@ export const create = async <T>(
     });
 
     const data = await res.json();
-    console.log(data)
     if (!res.ok) {
-      return { error: (data as Error).message, success: false };
+      return { error: data?.message ?? (data as Error).message, success: false, statusCode: res.status };
     }
 
     return {
@@ -190,7 +189,6 @@ export const create = async <T>(
       data: data,
     };
   } catch (error) {
-    console.log(error);
     return { error: (error as Error).message, success: false };
   }
 };

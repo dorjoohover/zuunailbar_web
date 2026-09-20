@@ -26,7 +26,22 @@ export function Providers({ children, themeProps }: ProvidersProps) {
 
   return (
     <HeroUIProvider navigate={router.push} >
-      <ToastProvider placement="top-center" />
+      {/*
+        HeroUI-ийн toast нь гарчгийг анхдагчаар `truncate` (нэг мөр) хийдэг тул
+        урт текст "…"-ээр таслагдаж харагддаг байсан. Бүх toast-д нийтээр нь
+        мөр таслах зөвшөөрөл өгч, өргөнийг нь дэлгэцэд тааруулна.
+      */}
+      <ToastProvider
+        placement="top-center"
+        toastProps={{
+          timeout: 4000,
+          classNames: {
+            base: "max-w-[92vw] sm:max-w-md",
+            title: "whitespace-normal break-words",
+            description: "whitespace-normal break-words",
+          },
+        }}
+      />
       <NextThemesProvider {...themeProps}>{children}</NextThemesProvider>
     </HeroUIProvider>
   );

@@ -2,28 +2,26 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserLevel } from "@/lib/constants";
 import { firstLetterUpper, mobileFormatter } from "@/lib/functions";
-import { User } from "@/models";
+import { User, UserPassword } from "@/models";
 import { Api, API } from "@/utils/api";
-import { Edit, IdCard, Mail, Phone, UserPen } from "lucide-react";
+import {
+  Crown,
+  IdCard,
+  KeyRound,
+  Mail,
+  Phone,
+  Sparkles,
+  UserCog,
+  UserPen,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { EditProfileModal } from "./edit";
-import { updateOne } from "../(api)";
+import { create, updateOne } from "../(api)";
 import { imageUploader } from "../(api)/base";
 import { addToast } from "@heroui/toast";
-const levelConfig = {
-  [UserLevel.GOLD]: {
-    gradient: "bg-gradient-to-r from-[#FFD700] to-[#FFA500]",
-    text: "Gold",
-  },
-  [UserLevel.SILVER]: {
-    gradient: "bg-gradient-to-r from-[#C0C0C0] to-[#E0E0E0]",
-    text: "Silver",
-  },
-  [UserLevel.BRONZE]: {
-    gradient: "bg-gradient-to-r from-[#CD7F32] to-[#D89B6E]",
-    text: "Bronze",
-  },
-};
+import { ResetPasswordModal } from "./reset";
+import { levelConfig } from "@/lib/const";
+
 export const ProfilePage = ({
   token,
   orders,
@@ -34,6 +32,7 @@ export const ProfilePage = ({
   const [user, setUser] = useState<User | undefined>();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isReset, setIsReset] = useState(false);
   const handleSaveProfile = async (data: User, file?: File) => {
     const { profile_img, ...body } = data;
     const formData = new FormData();
@@ -47,6 +46,19 @@ export const ProfilePage = ({
     const success = res.success;
     addToast({
       title: `${success ? "Амжилттай солигдлоо." : "Дахин оролдоно уу."}`,
+      timeout: 3000,
+    });
+    if (success) me();
+  };
+  const handleResetPassword = async (data: UserPassword) => {
+    const { ...body } = data;
+    let payload = { ...body };
+
+    const res = await create(Api.resetPassword, payload);
+    const success = res.success;
+    addToast({
+      title: `${success ? "Амжилттай солигдлоо." : (res.error ?? "Дахин оролдоно уу.")}`,
+      timeout: 3000,
     });
     if (success) me();
   };
@@ -154,13 +166,37 @@ export const ProfilePage = ({
           </div>
         </div>
 
-        <button
-          onClick={() => setIsEditModalOpen(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-rose-600 to-pink-600 text-white rounded-xl hover:from-rose-700 hover:to-pink-700 transition-all duration-200 shadow-sm mt-4"
-        >
-          <Edit className="w-4 h-4" />
-          <span className="text-sm">Засах</span>
-        </button>
+        <div className="flex gap-4">
+          <button
+            onClick={() => {
+              setIsReset(false);
+              setIsEditModalOpen(true);
+            }}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4
+      bg-gradient-to-r from-rose-500 to-rose-600
+      text-white rounded-xl
+      hover:from-rose-600 hover:to-rose-700
+      transition-all duration-200 shadow-sm"
+          >
+            <UserCog className="w-4 h-4" />
+            <span className="text-sm font-medium">Мэдээлэл засах</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setIsReset(true);
+              setIsEditModalOpen(true);
+            }}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4
+      bg-gradient-to-r from-rose-600 to-rose-800
+      text-white rounded-xl
+      hover:from-rose-700 hover:to-rose-900
+      transition-all duration-200 shadow-sm"
+          >
+            <KeyRound className="w-4 h-4" />
+            <span className="text-sm font-medium">Нууц үг солих</span>
+          </button>
+        </div>
       </div>
 
       {/* <div className="bg-white rounded-2xl p-6 shadow-sm my-8">
@@ -177,15 +213,23 @@ export const ProfilePage = ({
         </div>
       </div> */}
 
-      <EditProfileModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        userData={{
-          ...user,
-          mobile: mobileFormatter(user.mobile ?? ""),
-        }}
-        onSave={handleSaveProfile}
-      />
+      {isReset ? (
+        <ResetPasswordModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleResetPassword}
+        />
+      ) : (
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          userData={{
+            ...user,
+            mobile: mobileFormatter(user.mobile ?? ""),
+          }}
+          onSave={handleSaveProfile}
+        />
+      )}
     </div>
   );
 };

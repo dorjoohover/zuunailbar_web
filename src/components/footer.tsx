@@ -23,14 +23,13 @@ export default function Footer() {
       <div className="container grid grid-cols-6 gap-4 py-12">
         {/* <Image src={"/images/logo.png"} /> */}
         <div className="space-y-6 col-span-6 sm:col-span-">
-          <h1 className="text-2xl">+(976) ️8608 0708</h1>
+          <h1 className="text-2xl">+(976) 8608 0708</h1>
           <p>
             Бид Солонгос улсын yogurtnail, mayour зэрэг брэндүүдийн будаг,
             суурь, топыг үйлчилгээндээ ашигладаг бөгөөд үргэлж шинэ содон
             бүтээгдэхуун, илүү загварлаг байдлыг үйлчилгээндээ нэвтрүүлж байдаг
             билээ🥰 Мөн бүх үйлчилгээндээ стандартын дагуу ариутгасан багаж
-            хэрэгсэлээс гадна 1 удаагийн туслах хэрэгслүүдийг ашигладаг
-            байгаа.🎀
+            хэрэгсэлээс гадна 1 удаагийн туслах хэрэгслүүдийг ашигладаг.
           </p>
           <div className="flex gap-x-2">
             {siteData.footerLinks.map((item, index) => (

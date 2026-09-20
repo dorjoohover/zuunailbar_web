@@ -20,6 +20,8 @@ export * from "./service.category.model";
 export interface RegisterDto {
   mobile: string;
   otp: string;
+  firstname?: string
+  lastname?: string
   password: string;
 }
 export interface LoginDto {

@@ -13,6 +13,10 @@ export function toYMD(d: Date) {
   const day = String(d.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+// export function dateParser (d: Date, isHour = true) {
+//   const year = d.getFullYear()
+// }
 export const parseDate = (date = new Date(), isHour = true) => {
   const year = date.getFullYear();
   let month = (date.getMonth() + 1).toString();

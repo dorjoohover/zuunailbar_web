@@ -5,13 +5,31 @@ export enum METHOD {
   patch = "PATCH",
   delete = "DELETE",
 }
-const BASE = process.env.API;
-// ? process.env.API
-// : "https://api.zunailbar.mn/api/v1/";
-// : "https://api.zunailbar.mn/api/v1/";
+// Хуучин код-т "http://localhost:5050/api/v1/" гэж hardcode хийсэн байсан.
+// Docker дотор энэ нь зөвхөн БРАУЗЕРЭЭС (client component) хийгдэх fetch-д л
+// зөв ажиллана ("use client" файлууд, ж: NavbarDemo.tsx) — учир нь браузер нь
+// Mac дээрээ ажиллаж, host руу publish хийсэн 5050 портыг харна. Харин
+// server action-ууд (ж: app/(api)/auth.ts, "use server") нь web container
+// ДОТОР ажилладаг тул "localhost:5050" өөрийнхөө container-ыг л зааж,
+// backend container руу хүрдэггүй — яг үүнээс "fetch failed" гардаг байсан.
+//
+// Тиймээс хоёр өөр URL ашиглана:
+//   - PUBLIC_BASE:  build үед next.config.js-ийн `env.API`-аар inline хийгдэж
+//     browser bundle-д ордог (client-side fetch-д зориулав).
+//   - INTERNAL_BASE: зөвхөн server дээр (Node process) runtime-д уншигдана
+//     (docker-compose.yml-ийн `environment.API_INTERNAL`, ж:
+//     http://backend:5000/api/v1/) — client bundle-д огт орохгүй.
+const normalize = (url?: string | null) =>
+  !url ? null : url.endsWith("/") ? url : `${url}/`;
 
+const PUBLIC_BASE =
+  normalize(process.env.API) ?? "https://api.zunailbar.mn/api/v1/";
+const INTERNAL_BASE = normalize(process.env.API_INTERNAL) ?? PUBLIC_BASE;
+
+const BASE = typeof window === "undefined" ? INTERNAL_BASE : PUBLIC_BASE;
 export enum Api {
   login = "login",
+  resetPassword = "reset_password",
   home = "home",
   register = "register",
   user = "user",
@@ -45,6 +63,7 @@ export const API = {
   [Api.otp]: BASE + "otp",
   [Api.send_otp]: BASE + "send/otp",
   [Api.send_otp_forget]: BASE + "forget/otp",
+  [Api.resetPassword]: BASE + "reset_password",
   [Api.forget]: BASE + "forget",
   [Api.home]: BASE + "home",
   [Api.user]: BASE + "user",

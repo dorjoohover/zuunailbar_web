@@ -21,6 +21,8 @@ export enum UserLevel {
   BRONZE = 0,
   SILVER = 10,
   GOLD = 20,
+  SENIOR = 110,
+  JUNIOR = 100,
 }
 export const siteData = {
   navItems: [
@@ -207,6 +209,29 @@ export const orderSteps = [
     name: "Баталгаажуулах",
   },
 ];
+
+export enum BookingMode {
+  TIME = "time",
+  ARTIST = "artist",
+}
+
+// Алхамуудын нэр захиалгын төрлөөс хамаарна
+export const getOrderSteps = (mode: BookingMode) => {
+  if (mode === BookingMode.ARTIST) {
+    return [
+      { name: "Үйлчилгээ сонгох" },
+      { name: "Артист сонгох" },
+      { name: "Огноо ба цаг сонгох" },
+      { name: "Баталгаажуулах" },
+    ];
+  }
+  return [
+    { name: "Үйлчилгээ сонгох" },
+    { name: "Огноо ба цаг сонгох" },
+    { name: "Артист сонгох" },
+    { name: "Баталгаажуулах" },
+  ];
+};
 
 export enum OrderStatus {
   // uridchilgaa toloogui

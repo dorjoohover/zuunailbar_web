@@ -22,7 +22,7 @@ import {
   UserStatus,
 } from "./enum";
 import { DateValue } from "@heroui/calendar";
-import { OrderStatus } from "./constants";
+import { OrderStatus, UserLevel } from "./constants";
 
 export const roleIconMap = {
   [ROLE.SYSTEM]: { icon: Crown, color: "yellow" },
@@ -41,6 +41,33 @@ export const RoleValue = {
   [ROLE.CLIENT]: "CLIENT",
   [ROLE.ANY]: "ANY",
   [ROLE.E_M]: "ANY",
+};
+export const levelConfig = {
+  [UserLevel.GOLD]: {
+    gradient: "bg-gradient-to-r from-[#FFD700] to-[#FFA500]",
+    text: "Gold",
+  },
+  [UserLevel.SILVER]: {
+    gradient: "bg-gradient-to-r from-[#C0C0C0] to-[#E0E0E0]",
+    text: "Silver",
+  },
+  [UserLevel.BRONZE]: {
+    gradient: "bg-gradient-to-r from-[#CD7F32] to-[#D89B6E]",
+    text: "Bronze",
+  },
+  [UserLevel.JUNIOR]: {
+    text: "Junior",
+    textColor: "#fff",
+    gradient: "bg-gradient-to-r from-orange-400 to-orange-600",
+    Icon: Sparkles,
+  },
+
+  [UserLevel.SENIOR]: {
+    text: "Senior",
+    textColor: "#fff",
+    gradient: "bg-gradient-to-r from-purple-500 to-indigo-600",
+    Icon: Crown,
+  },
 };
 
 // export const EmployeeStatusValue = {
@@ -88,7 +115,7 @@ export enum ACTION {
   RUNNING = 30,
 }
 
-export const DEFAULT_LIMIT = 2;
+export const DEFAULT_LIMIT = 20;
 export const DEFAULT_PAGE = 0;
 export const DEFAULT_SORT = true;
 
@@ -112,7 +139,7 @@ export const DEFAULT_PG: Required<PG> = {
 // });
 
 // patch put delete type
-export type PPDT = { success: boolean; error?: string; data?: any };
+export type PPDT = { success: boolean; error?: string; data?: any, statusCode?: number };
 
 export const MODAL_ACTION = {
   add_emp: "add_emp",
@@ -198,6 +225,11 @@ export const OrderStatusValues = {
   [OrderStatus.Friend]: "Танил",
 };
 
+export const ActiveOrderStatuses = [
+  OrderStatus.Active,
+  OrderStatus.Friend,
+];
+
 export const button =
   " whitespace-nowrap text-sm transition-all h-auto py-2  rounded-full bg-rose-500/90 hover:bg-pink-600 text-white hover:scale-105 font-medium shadow-lg shadow-rose-200/50 px-5 duration-300";
 
@@ -206,3 +238,6 @@ export const text =
 
 export const icon =
   "flex items-center size-18 rounded-full transition-transform duration-300 bg-gradient-to-br from-rose-400 via-pink-400 to-rose-500 justify-center";
+
+
+  
