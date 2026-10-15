@@ -24,6 +24,7 @@ const normalize = (url?: string | null) =>
 
 const PUBLIC_BASE =
   normalize(process.env.API) ?? "https://api.zunailbar.mn/api/v1/";
+
 const INTERNAL_BASE = normalize(process.env.API_INTERNAL) ?? PUBLIC_BASE;
 
 const BASE = typeof window === "undefined" ? INTERNAL_BASE : PUBLIC_BASE;
