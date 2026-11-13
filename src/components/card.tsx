@@ -126,6 +126,10 @@ export const ArtistCard = ({
   selected: boolean;
   disabled?: boolean;
 }) => {
+  // backend-ийн нэр (шинэ түвшин), байхгүй бол Junior/Senior тогтмол нэр
+  const levelName =
+    data.level_name ??
+    (data.level ? levelConfig[data.level as UserLevel]?.text : undefined);
   if (mini)
     return (
       <button
@@ -156,6 +160,7 @@ export const ArtistCard = ({
             <div className="min-w-0">
               <h2 className="truncate text-sm font-semibold text-slate-900">
                 {firstLetterUpper(data.nickname ?? "")}
+                {levelName && ` (${levelName})`}
               </h2>
               {data.branch_name && (
                 <p className="mt-0.5 truncate text-xs text-slate-500">
@@ -175,16 +180,10 @@ export const ArtistCard = ({
                 {data.experience} жил
               </span>
             )}
-            {data.level ? (
-              <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                {levelConfig[data.level as UserLevel]?.text ?? "Артист"}
-              </span>
-            ) : null}
           </div>
         </div>
       </button>
     );
-  const level = data.level ? levelConfig[data.level as UserLevel] : null;
   return (
     <button
       type="button"
@@ -215,6 +214,7 @@ export const ArtistCard = ({
             <div className="min-w-0">
               <h2 className="truncate text-lg font-semibold text-slate-900">
                 {firstLetterUpper(data.nickname ?? "")}
+                {levelName && ` (${levelName})`}
               </h2>
               {data.description && (
                 <p className="mt-1 line-clamp-2 text-sm text-slate-500">
@@ -229,11 +229,6 @@ export const ArtistCard = ({
             )}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            {level && (
-              <span className="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700">
-                {level.text}
-              </span>
-            )}
             {data.experience != null && (
               <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
                 {data.experience} жил
