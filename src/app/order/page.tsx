@@ -13,6 +13,15 @@ export default async function Page() {
   });
   const branch = await find<Branch>(Api.branch);
   const user = await find<User>(Api.user, { limit: -1 }, "client");
+  const levels = await find(Api.order, {}, "artist-levels");
+  const levelNames = (levels.data.items ?? {}) as unknown as Record<
+    string,
+    { name?: string }
+  >;
+  user.data.items = user.data.items.map((u) => ({
+    ...u,
+    level_name: u.level ? levelNames[u.level]?.name : undefined,
+  }));
 
   const store = await cookies();
   const token = store.get("token")?.value;

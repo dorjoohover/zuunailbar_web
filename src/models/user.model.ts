@@ -21,6 +21,7 @@ export interface IUser {
 }
 export interface User {
   level?: number;
+  level_name?: string;
   id: string;
   firstname?: string;
   lastname?: string;
